@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "bot-apartaments-booking"
+version = "0.1.0"
+description = ""
+authors = ["Koresh06 <korets-24@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.13.0"
+sqlalchemy = "^2.0.35"
+aiogram-dialog = "^2.2.0"
+alembic = "^1.13.2"
+environs = "^11.0.0"
+uvicorn = "^0.30.6"
+python-multipart = "^0.0.9"
+fastapi = "^0.114.2"
+asyncpg = "^0.29.0"
+python-jose = "^3.3.0"
+passlib = "^1.7.4"
+aioredis = "^2.0.1"
+redis = "^5.0.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
