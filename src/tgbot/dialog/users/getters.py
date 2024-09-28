@@ -7,20 +7,17 @@ from src.core.models import Landlords
 from src.core.repo.requests import RequestsRepo
 
 
-
-
 async def start_getters(
     dialog_manager: DialogManager,
     event_from_user: User,
     **kwargs,
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    landlord: Landlords = await repo.users.check_landlord(dialog_manager.event.from_user.id)
+    check_landlord: Landlords = await repo.bot_apartments.check_landlord(
+        dialog_manager.event.from_user.id
+    )
 
-    return {
-        "landlord": landlord,
-        "not_landlord": not landlord,
-    }
+    return {"landlord": check_landlord, "not_landlord": not check_landlord}
 
 
 async def getter_information_registration(dialog_manager: DialogManager, **kwargs):
@@ -29,5 +26,5 @@ async def getter_information_registration(dialog_manager: DialogManager, **kwarg
 
     return {
         "name": name,
-        "phone": phone
+        "phone": phone,
     }

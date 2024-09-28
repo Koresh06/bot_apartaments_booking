@@ -8,7 +8,15 @@ from src.core.config import settings
 from src.tgbot.middlewares.db_session import DbSessionMiddleware
 from src.core.db_helper import db_helper
 
-from src.tgbot.dialog import start_dialog, register_landlord_dialog, main_manu_dialog
+from src.tgbot.dialog import (
+    start_dialog, 
+    register_landlord_dialog, 
+    main_manu_dialog,
+    menu_loandlord_dialog,
+    register_apartament_dialog,
+    my_apartmernt_landlord_dialog,
+    edit_apartment_dialog,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -16,6 +24,10 @@ logger = logging.getLogger(__name__)
 dp.update.middleware(DbSessionMiddleware(sessionmaker=db_helper.sessionmaker))
 
 dp.include_routers(
+    edit_apartment_dialog,
+    my_apartmernt_landlord_dialog,
+    register_apartament_dialog,
+    menu_loandlord_dialog,
     register_landlord_dialog,
     main_manu_dialog,
     start_dialog,

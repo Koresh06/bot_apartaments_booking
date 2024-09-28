@@ -2,8 +2,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 
 class StartSG(StatesGroup):
-    new_search = State()
-    current_start = State()
+    search = State()
 
 
 
@@ -15,3 +14,4 @@ class LandlordStateSG(StatesGroup):
 
 class UserCatalogSG(StatesGroup):
     catalog = State()
+    landlord = State()

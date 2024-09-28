@@ -1,8 +1,8 @@
 """create table
 
-Revision ID: c4bc10e185bb
+Revision ID: 0d18fcdc7920
 Revises: 
-Create Date: 2024-09-24 00:00:14.348320
+Create Date: 2024-09-25 23:35:05.870602
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'c4bc10e185bb'
+revision: str = '0d18fcdc7920'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,7 +25,6 @@ def upgrade() -> None:
     sa.Column('tg_id', sa.Integer(), nullable=False),
     sa.Column('username', sa.String(length=100), nullable=True),
     sa.Column('full_name', sa.String(length=100), nullable=False),
-    sa.Column('phone', sa.String(length=100), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
     sa.Column('create_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
@@ -36,7 +35,8 @@ def upgrade() -> None:
     op.create_table('landlords',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('company_name', sa.String(length=100), nullable=True),
+    sa.Column('company_name', sa.String(length=100), nullable=False),
+    sa.Column('phone', sa.String(length=100), nullable=False),
     sa.Column('create_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('landlords_user_id_fkey')),
@@ -48,9 +48,9 @@ def upgrade() -> None:
     sa.Column('landlord_id', sa.Integer(), nullable=False),
     sa.Column('city', sa.String(length=100), nullable=False),
     sa.Column('street', sa.String(length=255), nullable=False),
-    sa.Column('house_number', sa.String(length=50), nullable=False),
-    sa.Column('apartment_number', sa.String(length=50), nullable=True),
-    sa.Column('price_per_day', sa.Integer(), nullable=False),
+    sa.Column('house_number', sa.Integer(), nullable=False),
+    sa.Column('apartment_number', sa.Integer(), nullable=True),
+    sa.Column('price_per_day', sa.Float(), nullable=False),
     sa.Column('rooms', sa.Integer(), nullable=False),
     sa.Column('is_available', sa.Boolean(), nullable=False),
     sa.Column('description', sa.String(length=500), nullable=True),
@@ -63,7 +63,7 @@ def upgrade() -> None:
     op.create_table('apartment_photos',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('apartment_id', sa.Integer(), nullable=False),
-    sa.Column('file_path', sa.String(length=255), nullable=False),
+    sa.Column('photos_ids', sa.ARRAY(sa.String()), nullable=False),
     sa.ForeignKeyConstraint(['apartment_id'], ['apartments.id'], name=op.f('apartment_photos_apartment_id_fkey')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk__apartment_photos'))
     )

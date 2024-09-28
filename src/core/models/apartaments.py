@@ -1,5 +1,5 @@
 from typing import List, TYPE_CHECKING
-from sqlalchemy import DateTime, Integer, String, Boolean, ForeignKey
+from sqlalchemy import DateTime, Integer, String, Boolean, ForeignKey, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 
@@ -16,9 +16,9 @@ class Apartment(Base):
     landlord_id: Mapped[int] = mapped_column(Integer, ForeignKey("landlords.id"), nullable=False)
     city: Mapped[str] = mapped_column(String(100), nullable=False)
     street: Mapped[str] = mapped_column(String(255), nullable=False)
-    house_number: Mapped[str] = mapped_column(String(50), nullable=False)
-    apartment_number: Mapped[str] = mapped_column(String(50), nullable=True)
-    price_per_day: Mapped[int] = mapped_column(Integer, nullable=False)
+    house_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    apartment_number: Mapped[int] = mapped_column(Integer, nullable=True)
+    price_per_day: Mapped[float] = mapped_column(Float, nullable=False)
     rooms: Mapped[int] = mapped_column(Integer, nullable=False)
     is_available: Mapped[bool] = mapped_column(Boolean, default=True)
     description: Mapped[str] = mapped_column(String(500), nullable=True)
