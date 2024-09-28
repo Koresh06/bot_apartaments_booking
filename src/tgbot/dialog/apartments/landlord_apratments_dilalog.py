@@ -14,32 +14,23 @@ from aiogram_dialog.widgets.kbd import (
     Next,
     Row,
     Back,
-    Url,
     Group,
     SwitchTo,
     Start,
     NumberedPager, 
     StubScroll,
     Checkbox,
-    FirstPage,
-    NextPage, 
-    CurrentPage,
-    PrevPage,
-    LastPage,
-    ScrollingGroup,
-    Multiselect
     
 )
 
 from .states import EditApartmentSG, RegisterApartmentSG, LandlordApartmentsSG, MenuLandlordSG
-from .getters import getter_catalog_landlord_apartments, getter_confirm_edit_photos, getter_edit_apartment, getter_edit_apartment_photos, getter_get_media, getter_apartment_details
+from .getters import getter_catalog_landlord_apartments, getter_confirm_edit_photos, getter_edit_apartment, getter_edit_apartment_photos, getter_get_media, getter_apartment_details, getter_is_available
 from .handlers import (
-    confirm_information,
     confirm_photos,
     edit_data,
+    handle_update_is_available,
     on_delete,
     on_delete_apartment,
-    on_input_edit_photo,
     on_input_photo,
     on_next,
     on_prev,
@@ -244,15 +235,21 @@ my_apartmernt_landlord_dialog = Dialog(
             "<b>Цена за день: {apartment[price_per_day]}</b>\n"
             "<b>Комнат: {apartment[rooms]}</b>\n"
             "<b>Описание: {apartment[description]}</b>\n"
+            "<b> Статус: {apartment[is_available]}</b>\n"
         ),
         DynamicMedia(selector="media"),
         Next(Const("Детали"), id="details"),
         Row(
             Button(Const("◀️ Назад"), id="next", on_click=on_prev),
+            Button(
+                Format("{current_page}/{count_page}"),
+                id="paginator",
+            ),
             Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
-            when="count_apartments",
+            when="is_apartments",
         ),
         Button(Const("Редактировать"), id="edit", on_click=edit_data),
+        Button(Const("Удалить"), id="delete", on_click=on_delete_apartment),
         Start(Const("Меню арендодателя"), id="menu", state=MenuLandlordSG.start, show_mode=StartMode.RESET_STACK),
         state=LandlordApartmentsSG.catalog,
         getter=getter_catalog_landlord_apartments,
@@ -267,6 +264,7 @@ my_apartmernt_landlord_dialog = Dialog(
             "<b>Цена за день: {apartment[price_per_day]}</b>\n"
             "<b>Комнат: {apartment[rooms]}</b>\n"
             "<b>Описание: {apartment[description]}</b>\n"
+            "<b> Статус: {apartment[is_available]}</b>\n"
         ),
         DynamicMedia(selector="media"),
         StubScroll(id="pages", pages="media_count"),
@@ -296,8 +294,10 @@ edit_apartment_dialog = Dialog(
             id="edit_group",
             width=4,
         ),
+        Button(Format("Статус: {is_available}"), id="is_available", on_click=handle_update_is_available),
         Start(Const("◀️ Назад"), id="cancel_form_edit", state=LandlordApartmentsSG.catalog, show_mode=StartMode.RESET_STACK),
         state=EditApartmentSG.edit,
+        getter=getter_is_available,
     ),
     Window(
         Multi(

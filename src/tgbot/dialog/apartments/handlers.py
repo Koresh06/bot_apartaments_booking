@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery, Message
 from aiogram.enums.parse_mode import ParseMode
-from aiogram_dialog import Dialog, DialogManager, StartMode
+from aiogram_dialog import Dialog, DialogManager, StartMode, ShowMode
 from aiogram_dialog.widgets.common import ManagedScroll
 from aiogram_dialog.widgets.input import MessageInput, ManagedTextInput, TextInput
 from aiogram_dialog.widgets.kbd import Button
@@ -83,13 +83,12 @@ async def on_delete_apartment(
     widget: Button,
     dialog_manager: DialogManager,
 ):
-    pass
-    # repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    # if await repo.bot_apartments.delete_apartment_landlord(tg_id=callback.from_user.id):
-    #     await callback.answer(text="Поздравляем! ✅ Апартамент удален!")
-    #     await dialog_manager.done()
-    # else:
-    #     await callback.answer(text="Что-то пошло не так, попробуйте еще раз")
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    apartment = dialog_manager.dialog_data.get("apartment")
+    if await repo.bot_apartments.delete_apartment_landlord(tg_id=callback.from_user.id, apartment_id=apartment["apartment_id"]):
+        await callback.answer(text="Поздравляем! ✅ Апартамент удален!")
+    else:
+        await callback.answer(text="Что-то пошло не так, попробуйте еще раз")
 
 
 async def on_next(
@@ -125,10 +124,6 @@ async def edit_data(
     )
 
 
-async def confirm_information(callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, **_kwargs):
-    await dialog_manager.switch_to(state=EditApartmentSG.confirm)
-
-
 async def update_apartment_information(
     message: Message,
     widget: ManagedTextInput,
@@ -138,14 +133,12 @@ async def update_apartment_information(
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     apartment = dialog_manager.start_data
     apartment_id = apartment["apartment_id"]
-    
-    # Проверяем, что передан правильный tg_id
-    landlord_tg_id = message.from_user.id
+
     
     # Вызов функции для обновления информации
     updated = await repo.bot_apartments.update_apartment_info(
-        apartment_id=apartment_id, 
-        landlord_tg_id=landlord_tg_id, 
+        tg_id=message.from_user.id,
+        apartment_id=apartment_id,
         widget_id=widget.widget.widget_id,
         text=text
     )
@@ -167,14 +160,12 @@ async def handle_update_apartment_photos(
     apartment = dialog_manager.start_data
     apartment_id = apartment["apartment_id"]
     
-    # Получаем tg_id владельца
-    landlord_tg_id = callback.from_user.id
     photos = dialog_manager.dialog_data.get("photos", [])
 
     # Вызов функции для обновления фотографий
     updated = await repo.bot_apartments.update_apartment_photos(
-        apartment_id=apartment_id, 
-        landlord_tg_id=landlord_tg_id, 
+        tg_id=callback.from_user.id,
+        apartment_id=apartment_id,
         photos_ids=photos
     )
 
@@ -187,14 +178,32 @@ async def handle_update_apartment_photos(
 
 
 
-async def on_input_edit_photo(
-    message: Message,
-    widget: MessageInput,
+
+async def handle_update_is_available(
+    callback: CallbackQuery,
+    widget: Button,
     dialog_manager: DialogManager,
+    **_kwargs,
 ):
-    dialog_manager.dialog_data.setdefault("photos", []).append(
-        (message.photo[-1].file_id, message.photo[-1].file_unique_id),
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    apartment = dialog_manager.start_data
+    apartment_id = apartment["apartment_id"]
+
+    is_available = await repo.bot_apartments.update_is_available(
+        tg_id=callback.from_user.id,
+        apartment_id=apartment_id,
     )
+
+    if is_available is None:
+        await callback.message.answer("Не удалось обновить статус. Проверьте права доступа.", parse_mode=ParseMode.HTML)
+    else:
+        status_text = "✅ Свободно" if is_available else "❌ Занято"
+        dialog_manager.dialog_data["is_available"] = status_text
+        await callback.answer(f"Статус успешно обновлен на: <b>{status_text}</b>", parse_mode=ParseMode.HTML)
+        await dialog_manager.switch_to(state=EditApartmentSG.edit, show_mode=ShowMode.EDIT)
+
+
+
 
 async def close_dialog(_, __, dialog_manager: DialogManager, **kwargs):
     await dialog_manager.done()

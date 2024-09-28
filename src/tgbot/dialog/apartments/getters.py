@@ -49,16 +49,18 @@ async def getter_catalog_landlord_apartments(dialog_manager: DialogManager, even
     photos = apartment["photos"]
     dialog_manager.dialog_data["photos"] = photos
     photo = photos[0]
-    print(photo)
     media = MediaAttachment(
     file_id=MediaId(*photo),
     type=ContentType.PHOTO,
     )
 
     return {
-        "count_apartments": True if len(apartments) > 1 else False,
+        "is_apartments": True if len(apartments) > 1 else False,
         "media": media,
         "apartment": apartment,
+        "count_page": len(apartments),
+        "current_page": current_page,
+
     }
 
 
@@ -146,4 +148,8 @@ async def getter_confirm_edit_photos(dialog_manager: DialogManager, **kwargs) ->
         "media": media,
     }
 
+
+async def getter_is_available(dialog_manager: DialogManager, **kwargs) -> dict:
+    is_available = dialog_manager.dialog_data.get("is_available")
+    return {"is_available": is_available}
 
