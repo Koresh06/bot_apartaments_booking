@@ -227,7 +227,6 @@ register_apartament_dialog = Dialog(
 my_apartmernt_landlord_dialog = Dialog(
     Window(
         Format(
-            "<b>ID: {apartment[apartment_id]}</b>\n"
             "<b>Город: {apartment[city]}</b>\n"
             "<b>Улица: {apartment[street]}</b>\n"
             "<b>Дом: {apartment[house_number]}</b>\n"
@@ -256,7 +255,6 @@ my_apartmernt_landlord_dialog = Dialog(
     ),
     Window(
         Format(
-            "<b>ID: {apartment[apartment_id]}</b>\n"
             "<b>Город: {apartment[city]}</b>\n"
             "<b>Улица: {apartment[street]}</b>\n"
             "<b>Дом: {apartment[house_number]}</b>\n"
@@ -281,7 +279,7 @@ my_apartmernt_landlord_dialog = Dialog(
 
 edit_apartment_dialog = Dialog(
     Window(
-        Const("Панель редактирования"),
+        Format("Панель редактирования апартамента: #{apartment_id}"),
         Group(
             SwitchTo(Const("Город"), id="city", state=EditApartmentSG.city),
             SwitchTo(Const("Улица"), id="street", state=EditApartmentSG.street),
@@ -417,7 +415,7 @@ edit_apartment_dialog = Dialog(
         getter=getter_edit_apartment_photos,
     ),
     Window(
-        Const("Отправьте фото вашего апартамента (можно сразу группой фото)"),
+        Const("Отправьте фото вашего апартамента (можно сразу группой фото)", when="text"),
         DynamicMedia(selector="media"),
         StubScroll(id="pages", pages="media_count"),
         Group(

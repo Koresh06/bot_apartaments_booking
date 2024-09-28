@@ -40,12 +40,9 @@ async def getter_catalog_landlord_apartments(dialog_manager: DialogManager, even
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     apartments = await repo.bot_apartments.get_catalog_apartments_landlord(tg_id=event_from_user.id)
     dialog_manager.dialog_data["count_page"] = len(apartments)
-
     current_page = dialog_manager.dialog_data.get("page", 1)
     apartment = apartments[current_page - 1]
-
     dialog_manager.dialog_data["apartment"] = apartment
-
     photos = apartment["photos"]
     dialog_manager.dialog_data["photos"] = photos
     photo = photos[0]
@@ -53,7 +50,6 @@ async def getter_catalog_landlord_apartments(dialog_manager: DialogManager, even
     file_id=MediaId(*photo),
     type=ContentType.PHOTO,
     )
-
     return {
         "is_apartments": True if len(apartments) > 1 else False,
         "media": media,
@@ -68,20 +64,15 @@ async def getter_apartment_details(dialog_manager: DialogManager, **kwargs) -> d
     current_page = dialog_manager.dialog_data.get("page", 1)
     scroll: ManagedScroll = dialog_manager.find("pages")
     media_number = await scroll.get_page()
-    
     # Получаем предыдущую страницу для сравнения
     previous_page = dialog_manager.dialog_data.get("previous_page", 1)
-
     # Сброс media_number, если текущая страница изменилась
     if current_page != previous_page:
         media_number = 0  # Или 1, если хотите начинать с первого элемента
-    
     # Обновляем предыдущую страницу
     dialog_manager.dialog_data["previous_page"] = current_page
-
     photos = dialog_manager.dialog_data.get("photos", [])
     apartment = dialog_manager.dialog_data.get("apartment", [])
-    
     # Проверка на наличие фото
     if photos:
         photo = photos[media_number]  # Используем media_number
@@ -91,7 +82,6 @@ async def getter_apartment_details(dialog_manager: DialogManager, **kwargs) -> d
         )
     else:
         media = None  # Обработка случая, если фото отсутствуют
-
     return {
         "media_count": len(photos),
         "media_number": media_number + 1,  # Отображаем 1, если нужно
@@ -108,10 +98,8 @@ async def getter_edit_apartment(dialog_manager: DialogManager, **kwargs) -> dict
 async def getter_edit_apartment_photos(dialog_manager: DialogManager, **kwargs) -> dict:
     apartmet = dialog_manager.start_data
     photos = apartmet["photos"]
-
     scroll: ManagedScroll = dialog_manager.find("pages")
     media_number = await scroll.get_page()
-
     photo = photos[media_number]
     media = MediaAttachment(
         file_id=MediaId(*photo),
@@ -127,9 +115,7 @@ async def getter_edit_apartment_photos(dialog_manager: DialogManager, **kwargs) 
 async def getter_confirm_edit_photos(dialog_manager: DialogManager, **kwargs) -> dict:
     scroll: ManagedScroll = dialog_manager.find("pages")
     media_number = await scroll.get_page()
-    print(media_number)
     photos = dialog_manager.dialog_data.get("photos", [])
-    print(photos)
     if photos:
         photo = photos[media_number]
         media = MediaAttachment(
@@ -141,15 +127,24 @@ async def getter_confirm_edit_photos(dialog_manager: DialogManager, **kwargs) ->
             url="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Image_not_available.png/800px-Image_not_available.png?20210219185637",  # noqa: E501
             type=ContentType.PHOTO,
         )
+    confirm = False if photos == [] else True
     return {
-        "confirm": False if photos == [] else True,
+        "confirm": confirm,
         "media_count": len(photos),
         "media_number": media_number + 1,
         "media": media,
+        "text": not confirm
     }
 
 
 async def getter_is_available(dialog_manager: DialogManager, **kwargs) -> dict:
+    apartment = dialog_manager.start_data
+    one_is_available = apartment["is_available"]
     is_available = dialog_manager.dialog_data.get("is_available")
-    return {"is_available": is_available}
+    if is_available is None:
+        is_available = one_is_available
+    return {
+        "is_available": is_available,
+        "apartment_id": apartment["apartment_id"],
+    }
 

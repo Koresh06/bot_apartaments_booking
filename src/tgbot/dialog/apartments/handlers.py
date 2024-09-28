@@ -195,11 +195,11 @@ async def handle_update_is_available(
     )
 
     if is_available is None:
-        await callback.message.answer("Не удалось обновить статус. Проверьте права доступа.", parse_mode=ParseMode.HTML)
+        await callback.message.answer("Не удалось обновить статус. Проверьте права доступа.")
     else:
         status_text = "✅ Свободно" if is_available else "❌ Занято"
         dialog_manager.dialog_data["is_available"] = status_text
-        await callback.answer(f"Статус успешно обновлен на: <b>{status_text}</b>", parse_mode=ParseMode.HTML)
+        await callback.answer(f"Статус успешно обновлен на: {status_text}")
         await dialog_manager.switch_to(state=EditApartmentSG.edit, show_mode=ShowMode.EDIT)
 
 
