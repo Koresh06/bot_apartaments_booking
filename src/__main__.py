@@ -16,6 +16,11 @@ from src.tgbot.dialog import (
     register_apartament_dialog,
     my_apartmernt_landlord_dialog,
     edit_apartment_dialog,
+    filter_catalog_apartments_dialog,
+    city_filter_apartment_dialog,
+    catalog_users_apartments_dialog,
+    price_range_filter_dialog,
+    rooms_filter_dialog,
 )
 
 
@@ -24,6 +29,11 @@ logger = logging.getLogger(__name__)
 dp.update.middleware(DbSessionMiddleware(sessionmaker=db_helper.sessionmaker))
 
 dp.include_routers(
+    rooms_filter_dialog,
+    price_range_filter_dialog,
+    catalog_users_apartments_dialog,
+    filter_catalog_apartments_dialog,
+    city_filter_apartment_dialog,
     edit_apartment_dialog,
     my_apartmernt_landlord_dialog,
     register_apartament_dialog,

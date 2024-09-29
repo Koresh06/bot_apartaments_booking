@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.input import MessageInput, ManagedTextInput, TextInp
 from aiogram_dialog.widgets.kbd import Button
 
 from src.core.repo.requests import RequestsRepo
-from src.tgbot.dialog.apartments.states import MenuLandlordSG, EditApartmentSG
+from src.tgbot.dialog.apartments_landlord.states import MenuLandlordSG, EditApartmentSG
 
 
 async def error_handler(

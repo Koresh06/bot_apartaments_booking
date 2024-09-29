@@ -14,4 +14,4 @@ class LandlordStateSG(StatesGroup):
 
 class UserCatalogSG(StatesGroup):
     catalog = State()
-    landlord = State()
+    search_catalog = State()

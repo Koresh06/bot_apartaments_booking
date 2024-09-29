@@ -1,5 +1,3 @@
-import calendar
-from operator import itemgetter
 from aiogram import F
 from aiogram.filters import CommandStart
 from aiogram.types import CallbackQuery, ContentType, Message
@@ -17,14 +15,26 @@ from aiogram_dialog.widgets.kbd import (
     Group,
     SwitchTo,
     Start,
-    NumberedPager, 
+    NumberedPager,
     StubScroll,
     Checkbox,
-    
 )
 
-from .states import EditApartmentSG, RegisterApartmentSG, LandlordApartmentsSG, MenuLandlordSG
-from .getters import getter_catalog_landlord_apartments, getter_confirm_edit_photos, getter_edit_apartment, getter_edit_apartment_photos, getter_get_media, getter_apartment_details, getter_is_available
+from .states import (
+    EditApartmentSG,
+    MenuLandlordSG,
+    RegisterApartmentSG,
+    LandlordApartmentsSG,
+)
+from .getters import (
+    getter_catalog_landlord_apartments,
+    getter_confirm_edit_photos,
+    getter_edit_apartment,
+    getter_edit_apartment_photos,
+    getter_get_media,
+    getter_apartment_details,
+    getter_is_available,
+)
 from .handlers import (
     confirm_photos,
     edit_data,
@@ -42,13 +52,20 @@ from .handlers import (
 )
 
 
-
 menu_loandlord_dialog = Dialog(
     Window(
         Const("Меню арендодателя"),
-        Start(Const("Регистрация апартамента"), id="register_apartament", state=RegisterApartmentSG.city),
-        Start(Const("Мои апартаменты"), id="current_apartments", state=LandlordApartmentsSG.catalog),
-        state=MenuLandlordSG.start
+        Start(
+            Const("Регистрация апартамента"),
+            id="register_apartament",
+            state=RegisterApartmentSG.city,
+        ),
+        Start(
+            Const("Мои апартаменты"),
+            id="current_apartments",
+            state=LandlordApartmentsSG.catalog,
+        ),
+        state=MenuLandlordSG.start,
     ),
 )
 
@@ -67,8 +84,13 @@ register_apartament_dialog = Dialog(
             on_error=error_handler,
         ),
         Row(
-            Start(Const("◀️ Назад"), id="cancel_form_register", state=MenuLandlordSG.start, show_mode=StartMode.RESET_STACK),
-            Next(when="name")
+            Start(
+                Const("◀️ Назад"),
+                id="cancel_form_register",
+                state=MenuLandlordSG.start,
+                show_mode=StartMode.RESET_STACK,
+            ),
+            Next(when="name"),
         ),
         state=RegisterApartmentSG.city,
     ),
@@ -217,10 +239,15 @@ register_apartament_dialog = Dialog(
             width=8,
         ),
         Button(Const("Подтвердить"), id="confirm", on_click=confirm_photos),
-        Start(Const("❌ Отмена"), id="cancel_form_register", state=MenuLandlordSG.start, show_mode=StartMode.RESET_STACK),
+        Start(
+            Const("❌ Отмена"),
+            id="cancel_form_register",
+            state=MenuLandlordSG.start,
+            show_mode=StartMode.RESET_STACK,
+        ),
         state=RegisterApartmentSG.confirm,
         getter=getter_get_media,
-    )
+    ),
 )
 
 
@@ -249,7 +276,12 @@ my_apartmernt_landlord_dialog = Dialog(
         ),
         Button(Const("Редактировать"), id="edit", on_click=edit_data),
         Button(Const("Удалить"), id="delete", on_click=on_delete_apartment),
-        Start(Const("Меню арендодателя"), id="menu", state=MenuLandlordSG.start, show_mode=StartMode.RESET_STACK),
+        Start(
+            Const("Меню арендодателя"),
+            id="menu",
+            state=MenuLandlordSG.start,
+            show_mode=StartMode.RESET_STACK,
+        ),
         state=LandlordApartmentsSG.catalog,
         getter=getter_catalog_landlord_apartments,
     ),
@@ -274,7 +306,7 @@ my_apartmernt_landlord_dialog = Dialog(
         state=LandlordApartmentsSG.details,
         getter=getter_apartment_details,
     ),
-)   
+)
 
 
 edit_apartment_dialog = Dialog(
@@ -283,17 +315,38 @@ edit_apartment_dialog = Dialog(
         Group(
             SwitchTo(Const("Город"), id="city", state=EditApartmentSG.city),
             SwitchTo(Const("Улица"), id="street", state=EditApartmentSG.street),
-            SwitchTo(Const("Дом"), id="house_number", state=EditApartmentSG.house_number),
-            SwitchTo(Const("Квартира"), id="apartment_number", state=EditApartmentSG.apartment_number),
-            SwitchTo(Const("Цена за день"), id="price_per_day", state=EditApartmentSG.price_per_day),
+            SwitchTo(
+                Const("Дом"), id="house_number", state=EditApartmentSG.house_number
+            ),
+            SwitchTo(
+                Const("Квартира"),
+                id="apartment_number",
+                state=EditApartmentSG.apartment_number,
+            ),
+            SwitchTo(
+                Const("Цена за день"),
+                id="price_per_day",
+                state=EditApartmentSG.price_per_day,
+            ),
             SwitchTo(Const("Комнат"), id="rooms", state=EditApartmentSG.rooms),
-            SwitchTo(Const("Описание"), id="description", state=EditApartmentSG.description),
+            SwitchTo(
+                Const("Описание"), id="description", state=EditApartmentSG.description
+            ),
             SwitchTo(Const("Фото"), id="photo", state=EditApartmentSG.photo),
             id="edit_group",
             width=4,
         ),
-        Button(Format("Статус: {is_available}"), id="is_available", on_click=handle_update_is_available),
-        Start(Const("◀️ Назад"), id="cancel_form_edit", state=LandlordApartmentsSG.catalog, show_mode=StartMode.RESET_STACK),
+        Button(
+            Format("Статус: {is_available}"),
+            id="is_available",
+            on_click=handle_update_is_available,
+        ),
+        Start(
+            Const("◀️ Назад"),
+            id="cancel_form_edit",
+            state=LandlordApartmentsSG.catalog,
+            show_mode=StartMode.RESET_STACK,
+        ),
         state=EditApartmentSG.edit,
         getter=getter_is_available,
     ),
@@ -376,7 +429,7 @@ edit_apartment_dialog = Dialog(
             Format("Ваше текущее количество комнат: <b>{apartment[rooms]}</b>"),
             Const("Укажите новое количество комнат:"),
             sep="\n\n",
-        ), 
+        ),
         TextInput(
             id="rooms",
             type_factory=int,
@@ -415,7 +468,9 @@ edit_apartment_dialog = Dialog(
         getter=getter_edit_apartment_photos,
     ),
     Window(
-        Const("Отправьте фото вашего апартамента (можно сразу группой фото)", when="text"),
+        Const(
+            "Отправьте фото вашего апартамента (можно сразу группой фото)", when="text"
+        ),
         DynamicMedia(selector="media"),
         StubScroll(id="pages", pages="media_count"),
         Group(
@@ -430,7 +485,12 @@ edit_apartment_dialog = Dialog(
             # Alternative F['media_count']
         ),
         MessageInput(content_types=[ContentType.PHOTO], func=on_input_photo),
-        Button(Const("Подтвердить"), id="confirm_photos", on_click=handle_update_apartment_photos, when="confirm", ),
+        Button(
+            Const("Подтвердить"),
+            id="confirm_photos",
+            on_click=handle_update_apartment_photos,
+            when="confirm",
+        ),
         Back(Const("◀️ Назад"), id="back"),
         state=EditApartmentSG.confirm_photos,
         getter=getter_confirm_edit_photos,

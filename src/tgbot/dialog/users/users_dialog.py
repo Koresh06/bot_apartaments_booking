@@ -19,7 +19,8 @@ from src.core.repo.requests import RequestsRepo
 from src.core.config import settings
 
 from .states import StartSG, LandlordStateSG, UserCatalogSG
-from ..apartments.states import MainSG
+from ..apartments_users.states import FilteredCatalogApartmentsSG, FiltersApartmentsSG
+from ..apartments_landlord.states import MainSG
 from .getters import start_getters, getter_information_registration
 from .handlers import (
     error_name_handler,
@@ -29,7 +30,7 @@ from .handlers import (
     confirm_landlord_handler,
 )
 from .utils import name_check, phone_check
-from ..apartments.states import MenuLandlordSG
+from ..apartments_landlord.states import MenuLandlordSG
 
 
 start_dialog = Dialog(
@@ -47,12 +48,7 @@ main_manu_dialog = Dialog(
     Window(
         Const("<b>Главное меню</b>"),
         Group(
-            Start(
-                Const("🏠 Каталог апартаментов"),
-                id="catalog",
-                state=MainSG.catalog,
-                mode=StartMode.NORMAL,
-            ),
+            SwitchTo(Const("🏠 Каталог апартаментов"), id="catalog", state=UserCatalogSG.search_catalog),
             Start(
                 Const("👤 Мой профиль"),
                 id="profile",
@@ -68,8 +64,30 @@ main_manu_dialog = Dialog(
             width=2,
         ),
         state=UserCatalogSG.catalog,
-    )
+    ),
+    Window(
+        Const("Каталог апартаментов"),
+        Group(
+            Start(
+                Const("Фильтр каталога"),
+                id="filter_catalog",
+                state=FiltersApartmentsSG.start,
+                mode=StartMode.NORMAL,
+            ),
+            Start(
+                Const("Каталог апартаментов"),
+                id="filtered_catalog",
+                state=FilteredCatalogApartmentsSG.start,
+                data={"city": None, "price_range": None, "rooms": None},
+                mode=StartMode.NORMAL,
+            ),
+        ),
+        Back(Const("◀️ Назад"), id="back"),
+        state=UserCatalogSG.search_catalog,
+    ),
 )
+
+
 
 register_landlord_dialog = Dialog(
     Window(

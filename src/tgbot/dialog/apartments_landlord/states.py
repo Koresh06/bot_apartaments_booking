@@ -2,7 +2,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 
 class MainSG(StatesGroup):
-    catalog = State()
+    start = State()
     profile = State()
     faq = State()
 
@@ -37,7 +37,8 @@ class EditApartmentSG(StatesGroup):
     confirm_photos = State()
 
 
-
 class LandlordApartmentsSG(StatesGroup):
     catalog = State()
     details = State()
+
+

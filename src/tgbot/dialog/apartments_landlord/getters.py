@@ -47,9 +47,9 @@ async def getter_catalog_landlord_apartments(dialog_manager: DialogManager, even
     dialog_manager.dialog_data["photos"] = photos
     photo = photos[0]
     media = MediaAttachment(
-    file_id=MediaId(*photo),
-    type=ContentType.PHOTO,
-    )
+        file_id=MediaId(*photo),
+        type=ContentType.PHOTO,
+        )
     return {
         "is_apartments": True if len(apartments) > 1 else False,
         "media": media,
