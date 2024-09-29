@@ -22,4 +22,5 @@ class FilterRoomsSG(StatesGroup):
 
 class FilteredCatalogApartmentsSG(StatesGroup):
     start = State()
+    details = State()
 

@@ -23,6 +23,7 @@ from aiogram_dialog.widgets.kbd import (
     Select,
 )
 
+from src.tgbot.dialog.apartments_landlord.getters import getter_apartment_details
 from src.tgbot.dialog.users.states import UserCatalogSG
 
 from .handlers import handle_city_filter, handle_confirm_min_max_price, handle_room_filter, on_booking
@@ -146,5 +147,25 @@ catalog_users_apartments_dialog = Dialog(
         Start(Const("Главное меню"), id="main_menu", state=UserCatalogSG.catalog, mode=StartMode.RESET_STACK),
         state=FilteredCatalogApartmentsSG.start,
         getter=getter_apartments_data,
+    ),
+    Window(
+        Format(
+            "<b>Город: {apartment[city]}</b>\n"
+            "<b>Улица: {apartment[street]}</b>\n"
+            "<b>Дом: {apartment[house_number]}</b>\n"
+            "<b>Квартира: {apartment[apartment_number]}</b>\n"
+            "<b>Цена за день: {apartment[price_per_day]}</b>\n"
+            "<b>Комнат: {apartment[rooms]}</b>\n"
+            "<b>Описание: {apartment[description]}</b>\n"
+        ),
+        DynamicMedia(selector="media"),
+        StubScroll(id="pages", pages="media_count"),
+        Group(
+            NumberedPager(scroll="pages", when=F["pages"] > 1),
+            width=8,
+        ),
+        Back(Const("◀️ Назад"), id="back", show_mode=StartMode.RESET_STACK),
+        state=FilteredCatalogApartmentsSG.details,
+        getter=getter_apartment_details,
     )
 )
