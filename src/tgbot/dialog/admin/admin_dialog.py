@@ -16,16 +16,17 @@ from .handlers import handle_register_name_city
 
 main_admin_dialog = Dialog(
     Window(
-        Const("Администратор"),
-        Start(Const("Добавить город"), id="add_city", state=RegisterNameCitysSG.start, show_mode=StartMode.RESET_STACK),
-        Url(Const("Панель администратора"), url=Const(settings.api.web_server_admin)),
-        state=MainAdminSG.start
+        Const("🛠️ Администратор"),
+        Start(Const("🌆 Добавить город"), id="add_city", state=RegisterNameCitysSG.start, show_mode=StartMode.RESET_STACK),
+        Url(Const("🔗 Панель администратора"), url=Const(settings.api.web_server_admin)),
+        state=MainAdminSG.start,
     )
 )
 
+
 register_name_city_dialog = Dialog(
     Window(
-        Const("Укажите название города:"),
+        Const("🏙️ Укажите название города:"),
         TextInput(
             id="name",
             type_factory=str,
@@ -33,16 +34,17 @@ register_name_city_dialog = Dialog(
             on_error=error_handler,
         ),
         Start(Const("◀️ Назад"), id="back", state=RegisterNameCitysSG.start, mode=StartMode.RESET_STACK),
-        state=RegisterNameCitysSG.start
+        state=RegisterNameCitysSG.start,
     ),
     Window(
-        Format("Название города: <b>{name}</b>"),
+        Format("🌆 Название города: <b>{name}</b>"),
         Button(Const("✅ Подтвердить"), id="confirm", on_click=handle_register_name_city),
         Back(Const("◀️ Назад")),
         state=RegisterNameCitysSG.confirm,
     ),
-    getter=getter_name_city
+    getter=getter_name_city,
 )
+
 
 
 @dp.message(Command("admin"))

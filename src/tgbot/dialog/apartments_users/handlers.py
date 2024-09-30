@@ -10,10 +10,11 @@ from src.tgbot.dialog.booking_apartment.states import BookingApartmentSG
 
 async def handle_city_filter(callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: str):
     list_citys = dialog_manager.dialog_data.get("citys")
-    city = list_citys[int(item_id) - 1][0]  
-    dialog_manager.dialog_data["city"] = city
+    city_id = list_citys[int(item_id) - 1][1]  
+    city_tuple = next((city for city in list_citys if city[1] == city_id), None)
+    dialog_manager.dialog_data["city_id"] = city_id
 
-    await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, data={"city": city}, mode=StartMode.RESET_STACK)
+    await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, data={"city_id": city_id}, mode=StartMode.RESET_STACK)
 
 
 async def handle_room_filter(callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: str):

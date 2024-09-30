@@ -29,11 +29,11 @@ from src.tgbot.dialog.apartments_landlord.handlers import error_handler, on_next
 
 filter_catalog_apartments_dialog = Dialog(
     Window(
-        Const("Фильтр каталога апартаментов"),
+        Const("🔍 Фильтр каталога апартаментов"),
         Group(
-            Start(Const("Город"), id="city", state=FilterCitysSG.start),  
-            Start(Const("Диапазон цен"), id="price_per_day", state=FilterPricePerDaySG.min_price),  
-            Start(Const("Комнаты"), id="rooms", state=FilterRoomsSG.start),
+            Start(Const("🌆 Город"), id="city", state=FilterCitysSG.start),  
+            Start(Const("💰 Диапазон цен"), id="price_per_day", state=FilterPricePerDaySG.min_price),  
+            Start(Const("🛏️ Комнаты"), id="rooms", state=FilterRoomsSG.start),
             width=2,
         ),
         state=FiltersApartmentsSG.start,
@@ -43,7 +43,7 @@ filter_catalog_apartments_dialog = Dialog(
 
 city_filter_apartment_dialog = Dialog(
     Window(
-        Const("Фильтр по городам"),
+        Const("🌆 Фильтр по городам"),
         Group(
             Select(
                 Format("{item[0]}"),
@@ -56,13 +56,14 @@ city_filter_apartment_dialog = Dialog(
         ),
         Start(Const("◀️ Назад"), id="back", state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK),
         state=FilterCitysSG.start,
-        getter=getter_get_city
+        getter=getter_get_city,
     ),
 )
 
+
 price_range_filter_dialog = Dialog(
     Window(
-        Const("Укажите минимальную цену:"),
+        Const("💰 Укажите минимальную цену:"),
         TextInput(
             id="min_price",
             type_factory=float,
@@ -73,7 +74,7 @@ price_range_filter_dialog = Dialog(
         state=FilterPricePerDaySG.min_price,
     ),
     Window(
-        Const("Укажите максимальную цену:"),
+        Const("💸 Укажите максимальную цену:"),
         TextInput(
             id="max_price",
             type_factory=float,
@@ -84,7 +85,7 @@ price_range_filter_dialog = Dialog(
         state=FilterPricePerDaySG.max_price,
     ),
     Window(
-        Format("Указанный диапазон цен: <b>{min_price}-{max_price}</b>"),
+        Format("📊 Указанный диапазон цен: <b>{min_price}-{max_price}</b>"),
         Button(Const("✅ Подтвердить"), id="confirm", on_click=handle_confirm_min_max_price),
         Back(Const("◀️ Назад")),
         state=FilterPricePerDaySG.confirm,
@@ -95,7 +96,7 @@ price_range_filter_dialog = Dialog(
 
 rooms_filter_dialog = Dialog(
     Window(
-        Const("Выберите количество комнат:"),
+        Const("🏠 Выберите количество комнат:"),
         Group(
             Select(
                 Format("{item[0]}"),
@@ -113,21 +114,21 @@ rooms_filter_dialog = Dialog(
 )
 
 
+
 catalog_users_apartments_dialog = Dialog(
     Window(
         Format(
-            "<b>ID: {apartment[apartment_id]}</b>\n"
-            "<b>Город: {apartment[city]}</b>\n"
-            "<b>Улица: {apartment[street]}</b>\n"
-            "<b>Дом: {apartment[house_number]}</b>\n"
-            "<b>Квартира: {apartment[apartment_number]}</b>\n"
-            "<b>Цена за день: {apartment[price_per_day]}</b>\n"
-            "<b>Комнат: {apartment[rooms]}</b>\n"
-            "<b>Описание: {apartment[description]}</b>\n"
+            "<b>🌆 Город: {apartment[city]}</b>\n"
+            "<b>🛣️ Улица: {apartment[street]}</b>\n"
+            "<b>🏠 Дом: {apartment[house_number]}</b>\n"
+            "<b>🏢 Квартира: {apartment[apartment_number]}</b>\n"
+            "<b>💰 Цена за день: {apartment[price_per_day]}₽</b>\n"
+            "<b>🛏️ Количество комнат: {apartment[rooms]}</b>\n"
+            "<b>📝 Описание: {apartment[description]}</b>\n"
         ),
         DynamicMedia(selector="media"),
-        Next(Const("Детали"), id="details"),
-        Button(Const("Бронировать"), id="booking", on_click=on_booking),
+        Next(Const("🔍 Детали"), id="details"),
+        Button(Const("📅 Бронировать"), id="booking", on_click=on_booking),
         Row(
             Button(Const("◀️ Назад"), id="next", on_click=on_prev),
             Button(
@@ -137,19 +138,19 @@ catalog_users_apartments_dialog = Dialog(
             Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
             when="is_apartments",
         ),
-        Start(Const("Фильтры"), id="main_menu", state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK, when="check_filters"),
+        Start(Const("🔍 Фильтры"), id="main_filters", state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK, when="check_filters"),
         state=FilteredCatalogApartmentsSG.start,
         getter=getter_apartments_data,
     ),
     Window(
         Format(
-            "<b>Город: {apartment[city]}</b>\n"
-            "<b>Улица: {apartment[street]}</b>\n"
-            "<b>Дом: {apartment[house_number]}</b>\n"
-            "<b>Квартира: {apartment[apartment_number]}</b>\n"
-            "<b>Цена за день: {apartment[price_per_day]}</b>\n"
-            "<b>Комнат: {apartment[rooms]}</b>\n"
-            "<b>Описание: {apartment[description]}</b>\n"
+            "<b>🌆 Город: {apartment[city]}</b>\n"
+            "<b>🛣️ Улица: {apartment[street]}</b>\n"
+            "<b>🏠 Дом: {apartment[house_number]}</b>\n"
+            "<b>🏢 Квартира: {apartment[apartment_number]}</b>\n"
+            "<b>💰 Цена за день: {apartment[price_per_day]}₽</b>\n"
+            "<b>🛏️ Количество комнат: {apartment[rooms]}</b>\n"
+            "<b>📝 Описание: {apartment[description]}</b>\n"
         ),
         DynamicMedia(selector="media"),
         StubScroll(id="pages", pages="media_count"),
@@ -162,6 +163,7 @@ catalog_users_apartments_dialog = Dialog(
         getter=getter_apartment_details,
     )
 )
+
 
 
 

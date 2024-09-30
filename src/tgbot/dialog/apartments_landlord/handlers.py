@@ -167,18 +167,51 @@ async def on_prev(
         dialog_manager.dialog_data["page"] = count_page
 
 
+# async def handle_edit_city(
+#     callback: CallbackQuery, 
+#     widget: Button, 
+#     dialog_manager: DialogManager, 
+#     item_id: str
+# ):
+#     print(item_id)
+#     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+#     apartment = dialog_manager.start_data
+#     apartment_id = apartment["apartment_id"]
+#     list_citys = dialog_manager.dialog_data.get("citys")
+#     print(list_citys)
+#     city_id = list_citys[int(item_id) - 1][1]  
+#     print(city_id)
+#     city_name = list_citys[int(item_id) - 1][0]
+#     print(city_name)
+#     updated = await repo.bot_apartments.update_apartment_info(
+#         tg_id=callback.from_user.id,
+#         apartment_id=apartment_id,
+#         widget_id=widget.widget_id,
+#         text=city_id
+#     )
+
+#     if not updated:
+#         await callback.message.answer("Не удалось обновить информацию. Убедитесь, что вы являетесь владельцем квартиры и все данные верны.", parse_mode=ParseMode.HTML)
+#     else:
+#         await callback.message.answer(f"Успешно изменено на: <b>{city_name}</b>", parse_mode=ParseMode.HTML)
+
+#     await dialog_manager.switch_to(state=EditApartmentSG.edit)
+
 async def handle_edit_city(
     callback: CallbackQuery, 
     widget: Button, 
     dialog_manager: DialogManager, 
-    item_id: str
+    item_id: int
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     apartment = dialog_manager.start_data
     apartment_id = apartment["apartment_id"]
     list_citys = dialog_manager.dialog_data.get("citys")
-    city_id = list_citys[int(item_id) - 1][1]  
-    city_name = list_citys[int(item_id) - 1][0]
+    
+    city_id = int(item_id)
+    city_tuple = next((city for city in list_citys if city[1] == city_id), None)
+    
+    city_name = city_tuple[0]
     updated = await repo.bot_apartments.update_apartment_info(
         tg_id=callback.from_user.id,
         apartment_id=apartment_id,
@@ -192,6 +225,8 @@ async def handle_edit_city(
         await callback.message.answer(f"Успешно изменено на: <b>{city_name}</b>", parse_mode=ParseMode.HTML)
 
     await dialog_manager.switch_to(state=EditApartmentSG.edit)
+
+
 
 
 async def edit_data(

@@ -11,6 +11,7 @@ async def getter_get_city(dialog_manager: DialogManager, **kwargs) -> dict:
 
     citys = await repo.filter_apartments.get_citys()  
     dialog_manager.dialog_data["citys"] = citys  
+    print(citys, "rkfdf")
     return {"citys": citys}
 
 
@@ -42,7 +43,13 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         "price_range": dialog_manager.start_data.get("price_range", None),
         "rooms": dialog_manager.start_data.get("room", None),
     }
-    apartments = await repo.filter_apartments.filter_apartments(**{k: v for k, v in filters.items() if v is not None})
+    apartments = await repo.filter_apartments.filter_apartments(
+        city_id=int(filters["city_id"]) if filters["city_id"] is not None else None,
+        street=filters.get("street"),
+        price_range=filters.get("price_range"),
+        rooms=filters.get("rooms")
+    )
+
     dialog_manager.dialog_data["count_page"] = len(apartments)
     current_page = dialog_manager.dialog_data.get("page", 1)
     apartment = apartments[current_page - 1]
@@ -54,7 +61,13 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         file_id=MediaId(*photo), 
         type=ContentType.PHOTO
     )
-    check_filters = False if filters["city_id"] is None and filters["price_range"] is None and filters["rooms"] is None else True
+    
+    check_filters = any([
+        filters["city_id"] is not None,
+        filters["price_range"] is not None,
+        filters["rooms"] is not None
+    ])
+
     return {
         "check_filters": check_filters,
         "is_apartments": True if len(apartments) > 1 else False,

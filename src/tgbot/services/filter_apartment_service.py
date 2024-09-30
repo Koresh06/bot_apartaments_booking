@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import select, Result
+from sqlalchemy import desc, select, Result
 from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 from src.core.repo.base import BaseRepo
@@ -9,8 +9,8 @@ from src.core.repo.base import BaseRepo
 class FilterApartmentRepo(BaseRepo):
 
     async def get_citys(self) -> List[tuple]:
-        query = select(City.id, City.name).distinct()  
-        result: Result = await self.session.execute(query)
+        query = select(City.id, City.name).order_by(City.id)  # Сортировка по убыванию id
+        result: Result = await self.session.execute(query)  # Выполнение запроса
 
         citys = result.all()  
         return [(city_name, city_id) for city_id, city_name in citys]
@@ -26,7 +26,7 @@ class FilterApartmentRepo(BaseRepo):
 
     async def filter_apartments(
             self,
-            city_id: Optional[str] = None,
+            city_id: Optional[int] = None,
             street: Optional[str] = None,
             price_range: Optional[tuple] = None,  # (min_price, max_price)
             rooms: Optional[int] = None

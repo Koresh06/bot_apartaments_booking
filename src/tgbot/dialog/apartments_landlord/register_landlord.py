@@ -41,7 +41,7 @@ register_landlord_dialog = Dialog(
         Const("Укажите ваш контактный телефон:"),
         TextInput(
             id="phone",
-            type_factory=int,
+            type_factory=lambda x: x if x.isdigit() else None,
             on_success=Next(),
             on_error=error_phone_handler,
         ),
