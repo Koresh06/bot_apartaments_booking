@@ -1,33 +1,27 @@
-import calendar
 from operator import itemgetter
 from aiogram import F
-from aiogram.filters import CommandStart
-from aiogram.types import CallbackQuery, ContentType, Message
+from aiogram.filters import CommandStart, Command
+from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, DialogManager, StartMode, Window
-from aiogram_dialog.widgets.text import Format, Const, Multi
-from aiogram_dialog.api.entities import MediaAttachment, MediaId
-from aiogram_dialog.widgets.common import ManagedScroll
+from aiogram_dialog.widgets.text import Format, Const
 from aiogram_dialog.widgets.media import DynamicMedia
-from aiogram_dialog.widgets.input import TextInput, MessageInput
+from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import (
     Button,
     Next,
     Row,
     Back,
     Group,
-    SwitchTo,
     Start,
     NumberedPager, 
     StubScroll,
-    Checkbox,
     Select,
 )
 
+from src.core.repo.requests import RequestsRepo
+from src.tgbot.bot import dp
 from src.tgbot.dialog.apartments_landlord.getters import getter_apartment_details
-from src.tgbot.dialog.users.states import UserCatalogSG
-
 from .handlers import handle_city_filter, handle_confirm_min_max_price, handle_room_filter, on_booking
-
 from .states import FilterCitysSG, FilterPricePerDaySG, FilterRoomsSG, FiltersApartmentsSG, FilteredCatalogApartmentsSG
 from .getters import getter_apartments_data, getter_get_city, getter_get_rooms, getter_min_max_price
 from src.tgbot.dialog.apartments_landlord.handlers import error_handler, on_next, on_prev
@@ -42,7 +36,6 @@ filter_catalog_apartments_dialog = Dialog(
             Start(Const("Комнаты"), id="rooms", state=FilterRoomsSG.start),
             width=2,
         ),
-        Start(Const("◀️ Назад"), id="back", state=UserCatalogSG.search_catalog, mode=StartMode.RESET_STACK),
         state=FiltersApartmentsSG.start,
     ),
 )
@@ -76,7 +69,7 @@ price_range_filter_dialog = Dialog(
             on_success=Next(),
             on_error=error_handler,
         ),
-        Back(Const("◀️ Назад")),
+        Start(Const("◀️ Назад"), id="back", state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK),
         state=FilterPricePerDaySG.min_price,
     ),
     Window(
@@ -144,7 +137,7 @@ catalog_users_apartments_dialog = Dialog(
             Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
             when="is_apartments",
         ),
-        Start(Const("Главное меню"), id="main_menu", state=UserCatalogSG.catalog, mode=StartMode.RESET_STACK),
+        Start(Const("Фильтры"), id="main_menu", state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK, when="check_filters"),
         state=FilteredCatalogApartmentsSG.start,
         getter=getter_apartments_data,
     ),
@@ -169,3 +162,21 @@ catalog_users_apartments_dialog = Dialog(
         getter=getter_apartment_details,
     )
 )
+
+
+
+@dp.message(CommandStart())
+async def command_start_process(message: Message, dialog_manager: DialogManager):
+    print("Start!")
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    await repo.bot_users.add_user(
+        tg_id=message.from_user.id,
+        username=message.from_user.username,
+        full_name=message.from_user.full_name,
+    )
+    await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, data={"city": None, "price_range": None, "rooms": None}, mode=StartMode.RESET_STACK)
+
+
+@dp.message(Command("filter"))
+async def command_filter_process(callback: CallbackQuery, dialog_manager: DialogManager):
+    await dialog_manager.start(state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK)

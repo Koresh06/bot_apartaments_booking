@@ -1,6 +1,6 @@
 from aiogram.types import CallbackQuery, Message
 from aiogram.enums.parse_mode import ParseMode
-from aiogram_dialog import Dialog, DialogManager, StartMode, ShowMode
+from aiogram_dialog import DialogManager, StartMode, ShowMode
 from aiogram_dialog.widgets.common import ManagedScroll
 from aiogram_dialog.widgets.input import MessageInput, ManagedTextInput, TextInput
 from aiogram_dialog.widgets.kbd import Button
@@ -18,6 +18,45 @@ async def error_handler(
     await message.answer(
         text="Вы ввели некоректные данные, убедитесь, что вы правильно ввели необходимые данные"
     )
+
+
+async def error_phone_handler(
+    message: Message,
+    widget: ManagedTextInput,
+    dialog_manager: DialogManager,
+    error: ValueError,
+):
+    await message.answer(text="Вы ввели некорректный телефон. Попробуйте еще раз")
+
+
+async def correct_name_handler(
+    message: Message,
+    widget: ManagedTextInput,
+    dialog_manager: DialogManager,
+    text: str,
+) -> None:
+    await message.answer("Ваше имя: " + text)
+    await dialog_manager.next()
+
+
+async def confirm_landlord_handler(
+    callback: CallbackQuery,
+    widget: ManagedTextInput,
+    dialog_manager: DialogManager,
+) -> None:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    
+    name: TextInput = dialog_manager.find("name").get_value()
+    phone: TextInput = dialog_manager.find("phone").get_value()
+
+    await repo.bot_users.add_handler(
+        tg_id=callback.from_user.id,
+        company_name=name,
+        phone=phone,
+    )
+
+    await callback.answer(text="Поздравляем! ✅ Регисрация прошла успешно!")
+    await dialog_manager.start(state=MenuLandlordSG.start, mode=StartMode.RESET_STACK)
 
 
 async def skip_apartment_number_handler(
@@ -201,8 +240,6 @@ async def handle_update_is_available(
         dialog_manager.dialog_data["is_available"] = status_text
         await callback.answer(f"Статус успешно обновлен на: {status_text}")
         await dialog_manager.switch_to(state=EditApartmentSG.edit, show_mode=ShowMode.EDIT)
-
-
 
 
 async def close_dialog(_, __, dialog_manager: DialogManager, **kwargs):

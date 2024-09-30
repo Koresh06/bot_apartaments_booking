@@ -1,7 +1,7 @@
 from typing import Optional
 
 from sqlalchemy import select, Result
-from src.core.models import Users, Landlords, ApartmentPhoto, Apartment
+from src.core.models import Users, Landlords
 
 from src.core.repo.base import BaseRepo
 

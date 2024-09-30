@@ -7,6 +7,13 @@ class MainSG(StatesGroup):
     faq = State()
 
 
+class LandlordStateSG(StatesGroup):
+    register = State()
+    name = State()
+    phone = State()
+    confirm = State()
+
+
 class MenuLandlordSG(StatesGroup):
     start = State()
     register_apartament = State()

@@ -1,7 +1,7 @@
 from aiogram.types import ContentType
 from aiogram_dialog import DialogManager
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
-from aiogram_dialog.widgets.input import TextInput, MessageInput
+from aiogram_dialog.widgets.input import TextInput
 
 from src.core.repo.requests import RequestsRepo
 
@@ -54,7 +54,9 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         file_id=MediaId(*photo), 
         type=ContentType.PHOTO
     )
+    check_filters = False if filters["city"] is None and filters["price_range"] is None and filters["rooms"] is None else True
     return {
+        "check_filters": check_filters,
         "is_apartments": True if len(apartments) > 1 else False,
         "media": media,
         "apartment": apartment,

@@ -1,10 +1,7 @@
 from aiogram import F
-from aiogram.filters import CommandStart
-from aiogram.types import CallbackQuery, ContentType, Message
-from aiogram_dialog import Dialog, DialogManager, StartMode, Window
+from aiogram.types import ContentType
+from aiogram_dialog import Dialog, StartMode, Window
 from aiogram_dialog.widgets.text import Format, Const, Multi
-from aiogram_dialog.api.entities import MediaAttachment, MediaId
-from aiogram_dialog.widgets.common import ManagedScroll
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram_dialog.widgets.kbd import (
@@ -17,7 +14,6 @@ from aiogram_dialog.widgets.kbd import (
     Start,
     NumberedPager,
     StubScroll,
-    Checkbox,
 )
 
 from .states import (
@@ -277,8 +273,8 @@ my_apartmernt_landlord_dialog = Dialog(
         Button(Const("Редактировать"), id="edit", on_click=edit_data),
         Button(Const("Удалить"), id="delete", on_click=on_delete_apartment),
         Start(
-            Const("Меню арендодателя"),
-            id="menu",
+            Const("◀️ Назад"),
+            id="back",
             state=MenuLandlordSG.start,
             show_mode=StartMode.RESET_STACK,
         ),

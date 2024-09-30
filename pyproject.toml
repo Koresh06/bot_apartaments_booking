@@ -20,6 +20,8 @@ python-jose = "^3.3.0"
 passlib = "^1.7.4"
 aioredis = "^2.0.1"
 redis = "^5.0.8"
+babel = "^2.16.0"
+ruff = "^0.6.8"
 
 
 [build-system]

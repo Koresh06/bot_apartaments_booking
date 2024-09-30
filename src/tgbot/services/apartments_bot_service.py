@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import delete, select, Result
+from sqlalchemy import delete, select
 from src.core.models import Users, Landlords, ApartmentPhoto, Apartment
 
 from src.core.repo.base import BaseRepo
@@ -46,13 +46,20 @@ class BotApartmentRepo(BaseRepo):
         return True
 
     async def get_catalog_apartments_landlord(self, tg_id: int) -> Optional[List[dict]]:
-        # Получение всех апартаментов с фотографиями для арендодателя по tg_id
+        # Получение арендодателя по tg_id
+        landlord_stmt = await self.session.scalar(
+            select(Landlords).join(Users).where(Users.tg_id == tg_id)
+        )
+
+        if not landlord_stmt:
+            return None  # Если арендодатель не найден, возвращаем None
+
+        # Получение всех апартаментов с фотографиями для арендодателя
         stmt = (
             select(Apartment, ApartmentPhoto)
-            .join(Landlords, Apartment.landlord_id == Landlords.id)
-            .join(Users, Landlords.user_id == Users.id)
+            .where(Apartment.landlord_id == landlord_stmt.id)
             .outerjoin(ApartmentPhoto, ApartmentPhoto.apartment_id == Apartment.id)
-            .where(Users.tg_id == tg_id)
+            .order_by(Apartment.id.desc())
         )
 
         # Выполняем запрос и получаем все результаты
@@ -65,6 +72,8 @@ class BotApartmentRepo(BaseRepo):
             formatted_result.append(
                 {
                     "apartment_id": apartment.id,
+                    "landlord_id": apartment.landlord_id,
+                    "landlord_tg_id": tg_id,  # Сохраняем tg_id арендодателя
                     "city": apartment.city,
                     "street": apartment.street,
                     "house_number": apartment.house_number,
@@ -75,11 +84,12 @@ class BotApartmentRepo(BaseRepo):
                     "is_available": (
                         "✅ Свободно" if apartment.is_available else "❌ Занято"
                     ),
-                    "photos": photo.photos_ids,
+                    "photos": photo.photos_ids if photo else [],  # Обработка отсутствующих фотографий
                 }
             )
 
         return formatted_result
+
 
     async def check_apartment_landlord(
         self,
