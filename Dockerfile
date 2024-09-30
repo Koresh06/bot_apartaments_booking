@@ -5,7 +5,6 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     curl \
-    make \  # Устанавливаем make
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -27,8 +26,4 @@ RUN /root/.local/bin/poetry install --no-root --only main
 # Копируем код приложения
 COPY . .
 
-# Запуск Alembic для миграций
-RUN /root/.local/bin/poetry run alembic upgrade head
-
-# Указываем команду для запуска Makefile
-CMD ["make", "start_all"]
+CMD ["poetry", "run", "python", "your_bot_script.py"]
