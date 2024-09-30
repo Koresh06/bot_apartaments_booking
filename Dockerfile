@@ -27,5 +27,5 @@ COPY . .
 # Запуск Alembic для миграций
 RUN poetry run alembic upgrade head
 
-# Указываем команду для запуска Makefile
-CMD ["make", "start_all"]
+# Указываем команду для запуска бота
+CMD ["make", "start_bot"]

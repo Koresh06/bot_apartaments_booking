@@ -17,9 +17,18 @@ services:
       retries: 5
     volumes:
       - "01-simple-alchemy-postgres:/var/lib/postgresql/data"
-
-    # Установка локалей
     command: ["sh", "-c", "apk add --no-cache musl-locales musl-locales-lang && docker-entrypoint.sh postgres"]
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Укажите путь к вашему Dockerfile
+    volumes:
+      - .:/app  # Монтируем текущую директорию в контейнер
+    depends_on:
+      - postgres  # Бот будет ждать, пока запустится PostgreSQL
+    environment:
+      DATABASE_URL: postgres://postgres:12345@postgres/rental_bot  # Если необходимо передать URL для БД
 
 volumes:
   01-simple-alchemy-postgres:
