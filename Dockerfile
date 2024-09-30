@@ -1,6 +1,9 @@
 # Используем образ Python 3.11
 FROM python:3.11-slim
 
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
 # Устанавливаем необходимые системные библиотеки
 RUN apt-get update && apt-get install -y \
     libpq-dev \
@@ -8,22 +11,12 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем Poetry
-ENV POETRY_VERSION=1.8.0
-RUN curl -sSL https://install.python-poetry.org | python3 - --version $POETRY_VERSION \
-    && echo "export PATH=\"/root/.local/bin:$PATH\"" >> /root/.bashrc \
-    && /root/.local/bin/poetry --version  # Проверка установки
+# Устанавливаем Poetry и зависимости
+RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-dev
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
 
-# Копируем файлы проекта
-COPY pyproject.toml poetry.lock ./
+# Копируем все файлы проекта в контейнер
+COPY . /app
 
-# Устанавливаем зависимости
-RUN /root/.local/bin/poetry install --no-root --only main
-
-# Копируем код приложения
-COPY . .
-
+# Запускаем команду для запуска бота
 CMD ["poetry", "run", "python", "your_bot_script.py"]
