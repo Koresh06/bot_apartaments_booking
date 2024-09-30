@@ -6,28 +6,21 @@ services:
     image: postgres:15-alpine
     restart: "no"  # избавляемся от автоматической перезагрузки
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     environment:
-      # Superuser username/password
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: rental_bot
-    volumes:
-      - "01-simple-alchemy-postgres:/var/lib/postgresql/engl"
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    restart: "no"
-    ports:
-      - "127.0.0.1:8080:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: a@a.com
-      PGADMIN_DEFAULT_PASSWORD: pgadmin
+      healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      
     volumes:
-      - "01-simple-alchemy-pgadmin:/var/lib/pgadmin"
-    depends_on:
-      - postgres
+      - "01-simple-alchemy-postgres:/var/lib/postgresql/rental_bot"
 
 volumes:
   01-simple-alchemy-pgadmin:
-  01-simple-alchemy-postgres:
+
