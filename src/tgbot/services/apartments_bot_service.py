@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from sqlalchemy import delete, select
-from src.core.models import Users, Landlords, ApartmentPhoto, Apartment
+from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 from src.core.repo.base import BaseRepo
 
@@ -23,7 +23,7 @@ class BotApartmentRepo(BaseRepo):
 
         params = Apartment(
             landlord_id=stmt.id,
-            city=data["city"],
+            city_id=data["city_id"],
             street=data["street"],
             house_number=data["house_number"],
             apartment_number=data["apartment_number"],
@@ -56,9 +56,10 @@ class BotApartmentRepo(BaseRepo):
 
         # Получение всех апартаментов с фотографиями для арендодателя
         stmt = (
-            select(Apartment, ApartmentPhoto)
+            select(Apartment, ApartmentPhoto, City.name)
             .where(Apartment.landlord_id == landlord_stmt.id)
             .outerjoin(ApartmentPhoto, ApartmentPhoto.apartment_id == Apartment.id)
+            .join(City, City.id == Apartment.city_id)
             .order_by(Apartment.id.desc())
         )
 
@@ -68,13 +69,13 @@ class BotApartmentRepo(BaseRepo):
 
         # Форматирование результатов в удобный формат
         formatted_result = []
-        for apartment, photo in apartments:
+        for apartment, photo, city_name in apartments:
             formatted_result.append(
                 {
                     "apartment_id": apartment.id,
                     "landlord_id": apartment.landlord_id,
                     "landlord_tg_id": tg_id,  # Сохраняем tg_id арендодателя
-                    "city": apartment.city,
+                    "city": city_name,
                     "street": apartment.street,
                     "house_number": apartment.house_number,
                     "apartment_number": apartment.apartment_number,
@@ -122,7 +123,7 @@ class BotApartmentRepo(BaseRepo):
         tg_id: int,
         apartment_id: int,
         widget_id: int,
-        text: str,
+        text: str | int,
     ) -> bool:
 
         apartment_info = await self.check_apartment_landlord(
@@ -133,7 +134,7 @@ class BotApartmentRepo(BaseRepo):
 
         # Обновляем информацию
         if widget_id == "city":
-            apartment_info.city = text
+            apartment_info.city_id = text
         elif widget_id == "street":
             apartment_info.street = text
         elif widget_id == "house_number":

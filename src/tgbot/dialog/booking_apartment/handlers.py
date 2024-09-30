@@ -33,6 +33,11 @@ async def on_end_date_selected(callback: CallbackQuery, widget, dialog_manager: 
         await dialog_manager.next()
 
 
+async def back_to_catalog_apartments(callback: CallbackQuery, widget: Button, dialog_manager: DialogManager):
+    apartment = dialog_manager.start_data.get("apartment")
+    await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, mode=StartMode.RESET_STACK, data=apartment)
+
+
 async def handle_confirm_booking(
     callback: CallbackQuery,
     widget: Button,

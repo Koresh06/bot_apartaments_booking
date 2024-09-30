@@ -1,3 +1,4 @@
+from operator import itemgetter
 from aiogram import F
 from aiogram.types import ContentType
 from aiogram_dialog import Dialog, StartMode, Window
@@ -14,6 +15,7 @@ from aiogram_dialog.widgets.kbd import (
     Start,
     NumberedPager,
     StubScroll,
+    Select,
 )
 
 from .states import (
@@ -30,10 +32,13 @@ from .getters import (
     getter_get_media,
     getter_apartment_details,
     getter_is_available,
+    getter_get_city,
 )
 from .handlers import (
     confirm_photos,
     edit_data,
+    handle_city,
+    handle_edit_city,
     handle_update_is_available,
     on_delete,
     on_delete_apartment,
@@ -68,16 +73,16 @@ menu_loandlord_dialog = Dialog(
 
 register_apartament_dialog = Dialog(
     Window(
-        Multi(
-            Const("Укажите название города:"),
-            Format("Название города: {name}", when="name"),
-            sep="\n\n",
-        ),
-        TextInput(
-            id="city",
-            type_factory=str,
-            on_success=Next(),
-            on_error=error_handler,
+        Const("Выберите город:"),
+        Group(
+            Select(
+                Format("{item[0]}"),
+                id="city",
+                items="citys",
+                item_id_getter=itemgetter(1),
+                on_click=handle_city,
+            ),
+            width=4,
         ),
         Row(
             Start(
@@ -89,6 +94,7 @@ register_apartament_dialog = Dialog(
             Next(when="name"),
         ),
         state=RegisterApartmentSG.city,
+        getter=getter_get_city,
     ),
     Window(
         Multi(
@@ -352,13 +358,19 @@ edit_apartment_dialog = Dialog(
             Const("Укажите новый город: "),
             sep="\n\n",
         ),
-        TextInput(
-            id="city",
-            type_factory=update_apartment_information,
-            on_error=error_handler,
+        Group(
+            Select(
+                Format("{item[0]}"),
+                id="city",
+                items="citys",
+                item_id_getter=itemgetter(1),
+                on_click=handle_edit_city,
+            ),
+            width=4,
         ),
         SwitchTo(Const("Назад"), id="back", state=EditApartmentSG.edit),
         state=EditApartmentSG.city,
+        getter=getter_get_city,
     ),
     Window(
         Multi(

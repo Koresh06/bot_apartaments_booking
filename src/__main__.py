@@ -21,6 +21,9 @@ from src.tgbot.dialog import (
     price_range_filter_dialog,
     rooms_filter_dialog,
     booking_apartment,
+    confirm_booking_landlord_dialog,
+    register_name_city_dialog,
+    main_admin_dialog
 )
 
 
@@ -35,6 +38,9 @@ dp.update.middleware(DbSessionMiddleware(
 ))
 
 dp.include_routers(
+    register_name_city_dialog,
+    # confirm_booking_landlord_dialog,
+    main_admin_dialog,
     booking_apartment,
     rooms_filter_dialog,
     price_range_filter_dialog,

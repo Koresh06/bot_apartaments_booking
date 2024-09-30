@@ -39,6 +39,19 @@ async def correct_name_handler(
     await dialog_manager.next()
 
 
+async def handle_city(
+    callback: CallbackQuery, 
+    widget: Button, 
+    dialog_manager: DialogManager, 
+    item_id: str
+):
+    list_citys = dialog_manager.dialog_data.get("citys")
+    city_id = list_citys[int(item_id) - 1][1]  
+    dialog_manager.dialog_data["city"] = city_id
+    await dialog_manager.next()
+    
+
+
 async def confirm_landlord_handler(
     callback: CallbackQuery,
     widget: ManagedTextInput,
@@ -98,7 +111,7 @@ async def confirm_photos(
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     data = {
-        "city": dialog_manager.find("city").get_value(),
+        "city_id": dialog_manager.dialog_data["city"],
         "street": dialog_manager.find("street").get_value(),
         "house_number": dialog_manager.find("house_number").get_value(),
         "apartment_number": dialog_manager.find("apartment_number").get_value(),
@@ -154,6 +167,33 @@ async def on_prev(
         dialog_manager.dialog_data["page"] = count_page
 
 
+async def handle_edit_city(
+    callback: CallbackQuery, 
+    widget: Button, 
+    dialog_manager: DialogManager, 
+    item_id: str
+):
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    apartment = dialog_manager.start_data
+    apartment_id = apartment["apartment_id"]
+    list_citys = dialog_manager.dialog_data.get("citys")
+    city_id = list_citys[int(item_id) - 1][1]  
+    city_name = list_citys[int(item_id) - 1][0]
+    updated = await repo.bot_apartments.update_apartment_info(
+        tg_id=callback.from_user.id,
+        apartment_id=apartment_id,
+        widget_id=widget.widget_id,
+        text=city_id
+    )
+
+    if not updated:
+        await callback.message.answer("Не удалось обновить информацию. Убедитесь, что вы являетесь владельцем квартиры и все данные верны.", parse_mode=ParseMode.HTML)
+    else:
+        await callback.message.answer(f"Успешно изменено на: <b>{city_name}</b>", parse_mode=ParseMode.HTML)
+
+    await dialog_manager.switch_to(state=EditApartmentSG.edit)
+
+
 async def edit_data(
     callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, **_kwargs
 ):
@@ -173,7 +213,6 @@ async def update_apartment_information(
     apartment = dialog_manager.start_data
     apartment_id = apartment["apartment_id"]
 
-    
     # Вызов функции для обновления информации
     updated = await repo.bot_apartments.update_apartment_info(
         tg_id=message.from_user.id,

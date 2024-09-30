@@ -13,7 +13,7 @@ from src.tgbot.dialog.apartments_users.states import FilteredCatalogApartmentsSG
 
 from .custom_calendar import CustomCalendar
 from .states import BookingApartmentSG, ConfirmBooking
-from .handlers import handle_confirm_booking, no_confirm_booking, on_end_date_selected, on_start_date_selected, yes_confirm_booking
+from .handlers import back_to_catalog_apartments, handle_confirm_booking, no_confirm_booking, on_end_date_selected, on_start_date_selected, yes_confirm_booking
 from .getters import getter_confirm_landlord_booking, getter_date
 
 
@@ -25,7 +25,7 @@ booking_apartment = Dialog(
             id="start_calendar",
             on_click=on_start_date_selected,
         ),
-        Start(Const("◀️ Назад"), id="back", state=FilteredCatalogApartmentsSG.start, mode=StartMode.RESET_STACK),
+        Button(Const("◀️ Назад"), id="back", on_click=back_to_catalog_apartments),
         state=BookingApartmentSG.start_date,
     ),
     Window(

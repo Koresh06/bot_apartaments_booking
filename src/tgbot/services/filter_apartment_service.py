@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from sqlalchemy import select, Result
-from src.core.models import Users, Landlords, ApartmentPhoto, Apartment
+from sqlalchemy import Tuple, select, Result
+from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 from src.core.repo.base import BaseRepo
 
@@ -9,12 +9,12 @@ from src.core.repo.base import BaseRepo
 class FilterApartmentRepo(BaseRepo):
 
     async def get_citys(self) -> List[tuple]:
-        query = select(Apartment.city).distinct().where(Apartment.is_available)
+        query = select(City.id, City.name).distinct()  
         result: Result = await self.session.execute(query)
 
-        cities = result.scalars().all()
-        return [(city, index) for index, city in enumerate(cities, start=1)]
-    
+        citys = result.all()  
+        return [(city_name, city_id) for city_id, city_name in citys]
+
 
     async def get_rooms(self) -> List[tuple]:
         query = select(Apartment.rooms).distinct().where(Apartment.is_available)
@@ -26,22 +26,23 @@ class FilterApartmentRepo(BaseRepo):
 
     async def filter_apartments(
             self,
-            city: Optional[str] = None,
+            city_id: Optional[str] = None,
             street: Optional[str] = None,
             price_range: Optional[tuple] = None,  # (min_price, max_price)
             rooms: Optional[int] = None
         ) -> List[dict]:
         query = (
-            select(Apartment, ApartmentPhoto, Users.tg_id)
+            select(Apartment, ApartmentPhoto, Users.tg_id, City.name)
             .outerjoin(ApartmentPhoto, ApartmentPhoto.apartment_id == Apartment.id)
             .join(Landlords, Landlords.id == Apartment.landlord_id)  # Присоединяем таблицу Landlords
             .join(Users, Users.id == Landlords.user_id)  # Присоединяем таблицу Users
+            .join(City, City.id == Apartment.city_id)
             .where(Apartment.is_available)  # Проверяем статус
             .order_by(Apartment.id.desc())
         )
 
-        if city:
-            query = query.where(Apartment.city == city)
+        if city_id:
+            query = query.where(Apartment.city_id == city_id)
         if street:
             query = query.where(Apartment.street == street)
         if price_range:
@@ -53,11 +54,11 @@ class FilterApartmentRepo(BaseRepo):
         apartments = result.all()
 
         formatted_result = []
-        for apartment, photo, landlord_tg_id in apartments:
+        for apartment, photo, landlord_tg_id, city_name in apartments:
             formatted_result.append({
                 "apartment_id": apartment.id,
                 "landlord_tg_id": landlord_tg_id,  # Сохраняем tg_id арендодателя
-                "city": apartment.city,
+                "city": city_name,
                 "street": apartment.street,
                 "house_number": apartment.house_number,
                 "apartment_number": apartment.apartment_number,

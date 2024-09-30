@@ -6,7 +6,7 @@ from datetime import datetime
 from src.core.base import Base
 
 if TYPE_CHECKING:
-    from src.core.models import Landlords, Booking, ApartmentPhoto
+    from src.core.models import Landlords, Booking, ApartmentPhoto, City
 
 
 class Apartment(Base):
@@ -14,7 +14,7 @@ class Apartment(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     landlord_id: Mapped[int] = mapped_column(Integer, ForeignKey("landlords.id"), nullable=False)
-    city: Mapped[str] = mapped_column(String(100), nullable=False)
+    city_id: Mapped[int] = mapped_column(Integer, ForeignKey("citys.id"))
     street: Mapped[str] = mapped_column(String(255), nullable=False)
     house_number: Mapped[int] = mapped_column(Integer, nullable=False)
     apartment_number: Mapped[int] = mapped_column(Integer, nullable=True)
@@ -28,3 +28,5 @@ class Apartment(Base):
     landlord_rel: Mapped["Landlords"] = relationship("Landlords", back_populates="apartment_rel")
     booking_rel: Mapped[List["Booking"]] = relationship("Booking", back_populates="apartment_rel", cascade="all, delete")
     photos_rel: Mapped[List["ApartmentPhoto"]] = relationship("ApartmentPhoto", back_populates="apartment_rel", cascade="all, delete")
+    city_rel: Mapped["City"] = relationship("City", back_populates="apartment_rel")  # Исправлено имя класса
+

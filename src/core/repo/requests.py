@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.tgbot.services.admin_service import AdminRepo
 from src.tgbot.services.users_bot_service import BotUserRepo
 from src.tgbot.services.apartments_bot_service import BotApartmentRepo
 from src.tgbot.services.filter_apartment_service import FilterApartmentRepo
@@ -34,6 +35,12 @@ class RequestsRepo:
     def apartment_bookings(self) -> ApartmentBookingRepo:
         
         return ApartmentBookingRepo(self.session)
+    
+
+    @property
+    def admin(self) -> AdminRepo:
+        
+        return AdminRepo(self.session)
     
 
 

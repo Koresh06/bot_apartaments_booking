@@ -9,6 +9,14 @@ from src.core.repo.requests import RequestsRepo
 
 
 
+async def getter_get_city(dialog_manager: DialogManager, **kwargs) -> dict:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+
+    citys = await repo.filter_apartments.get_citys()  
+    dialog_manager.dialog_data["citys"] = citys  
+    return {"citys": citys}
+
+
 async def start_getters(
     dialog_manager: DialogManager,
     event_from_user: User,
@@ -53,7 +61,7 @@ async def getter_get_media(dialog_manager: DialogManager, **kwargs) -> dict:
         "media_count": len(photos),
         "media_number": media_number + 1,
         "media": media,
-        "city": dialog_manager.find("city").get_value(),
+        "city": dialog_manager.dialog_data.get("city"),
         "street": dialog_manager.find("street").get_value(),
         "house_number": dialog_manager.find("house_number").get_value(),
         "apartment_number": dialog_manager.find("apartment_number").get_value(),

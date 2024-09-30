@@ -38,7 +38,7 @@ async def getter_get_rooms(dialog_manager: DialogManager, **kwargs) -> dict:
 async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dict:
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     filters = {
-        "city": dialog_manager.start_data.get("city", None),
+        "city_id": dialog_manager.start_data.get("city_id", None),
         "price_range": dialog_manager.start_data.get("price_range", None),
         "rooms": dialog_manager.start_data.get("room", None),
     }
@@ -54,7 +54,7 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         file_id=MediaId(*photo), 
         type=ContentType.PHOTO
     )
-    check_filters = False if filters["city"] is None and filters["price_range"] is None and filters["rooms"] is None else True
+    check_filters = False if filters["city_id"] is None and filters["price_range"] is None and filters["rooms"] is None else True
     return {
         "check_filters": check_filters,
         "is_apartments": True if len(apartments) > 1 else False,
