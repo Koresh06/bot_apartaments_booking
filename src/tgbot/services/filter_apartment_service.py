@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import Tuple, select, Result
+from sqlalchemy import select, Result
 from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 from src.core.repo.base import BaseRepo

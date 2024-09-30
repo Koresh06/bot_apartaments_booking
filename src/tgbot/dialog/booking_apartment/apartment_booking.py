@@ -1,14 +1,12 @@
-from aiogram_dialog import Dialog, StartMode, Window
+from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Format, Const
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import (
     Button,
     Next,
-    Back,
-    Start
+    Back
 )
 
-from src.tgbot.dialog.apartments_users.states import FilteredCatalogApartmentsSG
 
 
 from .custom_calendar import CustomCalendar

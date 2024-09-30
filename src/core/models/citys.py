@@ -1,12 +1,11 @@
 from typing import List, TYPE_CHECKING
-from sqlalchemy import Integer, String, ForeignKey, DateTime
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime
 
 from src.core.base import Base
 
 if TYPE_CHECKING:
-    from src.core.models import Users, Apartment
+    from src.core.models import Apartment
 
 
 class City(Base):

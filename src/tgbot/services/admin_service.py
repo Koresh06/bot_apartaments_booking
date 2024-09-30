@@ -1,7 +1,4 @@
-from datetime import date
 
-from sqlalchemy import select
-from src.core.models import Users, Apartment, Booking
 
 from src.core.repo.base import BaseRepo
 from src.core.models import City
