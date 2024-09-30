@@ -26,8 +26,5 @@ RUN /root/.local/bin/poetry install --no-root --only main
 # Копируем код приложения
 COPY . .
 
-# Запуск Alembic для миграций
-RUN /root/.local/bin/poetry run alembic upgrade head
-
 # Указываем команду для запуска Makefile
 CMD ["make", "start_all"]

@@ -30,6 +30,20 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:12345@postgres/rental_bot  # Если необходимо передать URL для БД
 
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["poetry", "run", "alembic", "upgrade", "head"]
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:12345@postgres:5432/rental_bot
+    volumes:
+      - .:/app
+
 volumes:
   01-simple-alchemy-postgres:
 
