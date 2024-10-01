@@ -14,5 +14,5 @@ RUN pip install poetry && poetry config virtualenvs.create false && poetry insta
 COPY . /src
 
 # Запускаем команду для запуска бота
-CMD ["python", "-m", "__main__"]
+CMD ["python", "-m", "src.__main__"]
 
