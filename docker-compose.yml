@@ -24,7 +24,7 @@ services:
       context: .
       dockerfile: Dockerfile  # Укажите путь к вашему Dockerfile
     volumes:
-      - .:/app  # Монтируем текущую директорию в контейнер
+      - .:/src  # Монтируем текущую директорию в контейнер
     depends_on:
       - postgres  # Бот будет ждать, пока запустится PostgreSQL
     environment:
@@ -42,7 +42,7 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:12345@postgres:5432/rental_bot
     volumes:
-      - .:/app
+      - .:/src
 
 volumes:
   01-simple-alchemy-postgres:
