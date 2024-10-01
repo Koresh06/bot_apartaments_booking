@@ -11,12 +11,14 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Копируем файлы проекта в контейнер
+COPY pyproject.toml poetry.lock ./
+
 # Устанавливаем Poetry и зависимости
 RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-dev
 
-
-# Копируем все файлы проекта в контейнер
-COPY . /app
+# Копируем остальной код проекта в контейнер
+COPY . .
 
 # Запускаем команду для запуска бота
-CMD ["poetry", "run", "python", "your_bot_script.py"]
+CMD ["poetry", "run", "python", "src.__main__.py"]
