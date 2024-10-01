@@ -4,13 +4,6 @@ FROM python:3.11-slim
 # Устанавливаем рабочую директорию
 WORKDIR /src
 
-# # Устанавливаем необходимые системные библиотеки
-# RUN apt-get update && apt-get install -y \
-#     libpq-dev \
-#     curl \
-#     && apt-get clean \
-#     && rm -rf /var/lib/apt/lists/*
-
 # Копируем файлы проекта в контейнер
 COPY pyproject.toml poetry.lock /src/
 
@@ -21,4 +14,5 @@ RUN pip install poetry && poetry config virtualenvs.create false && poetry insta
 COPY . /src
 
 # Запускаем команду для запуска бота
-CMD ["python", "-m", "src.__main__"]
+CMD ["python", "-m", "__main__"]
+
