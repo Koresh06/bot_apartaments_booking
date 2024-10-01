@@ -23,12 +23,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile  # Укажите путь к вашему Dockerfile
-    volumes:
-      - .:/src  # Монтируем текущую директорию в контейнер
+    restart: "always"
     depends_on:
       - postgres  # Бот будет ждать, пока запустится PostgreSQL
     environment:
       DATABASE_URL: postgres://postgres:12345@postgres/rental_bot  # Если необходимо передать URL для БД
+    env_file:
+      - .env
 
   migrate:
     build:
