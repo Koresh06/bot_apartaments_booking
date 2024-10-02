@@ -17,7 +17,6 @@ class ApartmentBookingRepo(BaseRepo):
     ) -> bool:
         # Получение пользователя по user_id
         user_stmt = await self.session.scalar(select(Users).where(Users.tg_id == tg_id))
-        print(user_stmt)
 
         if not user_stmt:
             return False  # Если пользователь не найден, возвращаем False
@@ -26,7 +25,6 @@ class ApartmentBookingRepo(BaseRepo):
         apartment_stmt = await self.session.scalar(
             select(Apartment).where(Apartment.id == apartment_id)
         )
-        print(apartment_stmt)
 
         if not apartment_stmt:
             return False  # Если квартира не найдена, возвращаем False
@@ -46,11 +44,13 @@ class ApartmentBookingRepo(BaseRepo):
         return booking
 
 
-    async def booking_confirmation(self, booking_id: int):
+    async def booking_confirmation(self, booking_id: int, apartment_id: int) -> bool:
         # Получаем текущее состояние бронирования по его ID
         booking = await self.session.scalar(
             select(Booking).where(Booking.id == booking_id)
         )
+
+        apartment = await self.session.scalar(select(Apartment).where(Apartment.id == apartment_id))
 
         if booking is None:
             return False  # Бронирование не найдено
@@ -58,8 +58,12 @@ class ApartmentBookingRepo(BaseRepo):
         # Изменяем статус бронирования на подтвержденный
         booking.is_confirmed = True  # Устанавливаем поле is_confirmed в True
 
+        # Обновляем информацию о квартире
+        apartment.is_available = False  # Устанавливаем поле is_available в False
+
         # Сохраняем изменения в базе данных
         self.session.add(booking)
+        self.session.add(apartment)
         await self.session.commit()
 
         # Обновляем объект после сохранения
@@ -76,15 +80,16 @@ class ApartmentBookingRepo(BaseRepo):
 
         if booking is None:
             return False  # Бронирование не найдено
+        
+        try:
+            # Удаляем бронирование
+            await self.session.delete(booking)
 
-        # Проверяем, является ли арендодатель владельцем этого бронирования
-        if booking.apartment_rel.landlord_id != landlord_id:
-            return False  # Арендодатель не имеет прав на удаление этого бронирования
-
-        # Удаляем бронирование
-        await self.session.delete(booking)
-
-        # Сохраняем изменения в базе данных
-        await self.session.commit()
+            # Сохраняем изменения в базе данных
+            await self.session.commit()
+        except Exception as e:
+            await self.session.rollback()  # Откатываем транзакцию в случае ошибки
+            raise e  # Перебрасываем исключение для обработки на более высоком уровне
 
         return True  # Успешно удалено
+

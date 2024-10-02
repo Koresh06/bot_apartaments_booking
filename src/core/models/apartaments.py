@@ -28,5 +28,5 @@ class Apartment(Base):
     landlord_rel: Mapped["Landlords"] = relationship("Landlords", back_populates="apartment_rel")
     booking_rel: Mapped[List["Booking"]] = relationship("Booking", back_populates="apartment_rel", cascade="all, delete")
     photos_rel: Mapped[List["ApartmentPhoto"]] = relationship("ApartmentPhoto", back_populates="apartment_rel", cascade="all, delete")
-    city_rel: Mapped["City"] = relationship("City", back_populates="apartment_rel")  # Исправлено имя класса
+    city_rel: Mapped["City"] = relationship("City", back_populates="apartment_rel") 
 

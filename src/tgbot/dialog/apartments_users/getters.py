@@ -8,10 +8,8 @@ from src.core.repo.requests import RequestsRepo
 
 async def getter_get_city(dialog_manager: DialogManager, **kwargs) -> dict:
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-
     citys = await repo.filter_apartments.get_citys()  
     dialog_manager.dialog_data["citys"] = citys  
-    print(citys, "rkfdf")
     return {"citys": citys}
 
 

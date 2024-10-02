@@ -1,15 +1,17 @@
 from datetime import date
 from aiogram import Bot
 from aiogram.types import CallbackQuery, User, Chat
+from aiogram.enums.parse_mode import ParseMode
 from aiogram_dialog import DialogManager, ShowMode, StartMode
 from aiogram_dialog.manager.bg_manager import BgManager
 from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.input import TextInput
 
 from src.core.models.bookings import Booking
 from src.core.repo.requests import RequestsRepo
 from src.tgbot.dialog.apartments_users.states import FilteredCatalogApartmentsSG
 from .states import ConfirmBooking
-from src.tgbot.bot import dp
+from src.tgbot.bot import dp, bot
 
 
 async def on_start_date_selected(callback: CallbackQuery, widget, dialog_manager: DialogManager, start_date: date):
@@ -45,8 +47,6 @@ async def handle_confirm_booking(
     dialog_manager: DialogManager,
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    # bg_manager: MyBgManagerFactory = dialog_manager.middleware_data.get("bg_manager")
-    bot: Bot = dialog_manager.middleware_data.get("bot")
     start_date = dialog_manager.dialog_data.get("start_date")
     end_date = dialog_manager.dialog_data.get("end_date")
 
@@ -64,43 +64,41 @@ async def handle_confirm_booking(
     )
     if booking:
         await callback.answer(text="Поздравляем! ✅ Апартамент забронирован!\n\nДата начала аренды: " + str(start_date) + "\nДата окончания аренды: " + str(end_date))
+
         user = User(id=landlord_id, is_bot=False, first_name="landlord")
         chat = Chat(id=landlord_chat_id, type="private")
         bg_manager = BgManager(chat=chat, user=user, bot=bot, router=dp, intent_id=None, stack_id="")
-
-        await bg_manager.start(state=ConfirmBooking.start, data={"booking_id": booking.id, "apartment": apartment, "user_id": callback.from_user.id}, show_mode=ShowMode.SEND)
+        await bg_manager.start(state=ConfirmBooking.start, data={"booking_id": booking.id, "apartment": apartment, "user_id": callback.from_user.id}, show_mode=ShowMode.SEND) # Запуск диалога подтверждения арендодателем
         
         await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, data={"city": None, "price_range": None, "rooms": None}, mode=StartMode.RESET_STACK)
-        # Запуск диалога для подтверждения бронирования у арендодателя
-        # await dialog_manager_landlord.start(
-        #     state=ConfirmBooking.start,
-        #     data={"booking_id": booking.id, "apartment": apartment, "user_id": callback.from_user.id},
-        #     mode=StartMode.NORMAL
-        # )
     else:
         await callback.answer(text="Что-то пошло не так, попробуйте еще раз")
 
 
 
-async def yes_confirm_booking(callback: CallbackQuery, dialog_manager: DialogManager, bot: Bot):
+async def yes_confirm_booking(callback: CallbackQuery, widget: Button, dialog_manager: DialogManager):
     booking_id = dialog_manager.start_data.get("booking_id")
     user_id = dialog_manager.start_data.get("user_id")
+    apartment_id = dialog_manager.start_data.get("apartment")["apartment_id"]
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    confirm = await repo.apartment_bookings.booking_confirmation(booking_id=booking_id)
+    confirm = await repo.apartment_bookings.booking_confirmation(booking_id=booking_id, apartment_id=apartment_id)
     if confirm:
         await bot.send_message(chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!")
-        await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, mode=StartMode.RESET_STACK)
+        await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
     else:
         await callback.answer(text="Не удалось подтвердить бронирование. Попробуйте еще раз.")
 
 
-async def no_confirm_booking(callback: CallbackQuery, dialog_manager: DialogManager, bot: Bot):
+async def no_confirm_booking(callback: CallbackQuery, widget: Button, dialog_manager: DialogManager):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     booking_id = dialog_manager.start_data.get("booking_id")
+    user_id = dialog_manager.start_data.get("user_id")
+    message: TextInput = dialog_manager.find("cancel_reason").get_value()
     del_bookint = await repo.apartment_bookings.delete_booking(booking_id=booking_id, landlord_id=callback.from_user.id)
     if del_bookint:
+        await bot.send_message(chat_id=user_id, text=f"Ваше бронирование отменено.\n\nПричина отмены: <b>{message}</b>", parse_mode=ParseMode.HTML)
         await callback.answer(text="Бронирование отменено.")
-        await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, mode=StartMode.RESET_STACK)
+        await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
     else:
         await callback.answer(text="Не удалось отменить бронирование. Попробуйте еще раз.")
 
