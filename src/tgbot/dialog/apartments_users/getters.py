@@ -1,9 +1,10 @@
-from aiogram.types import ContentType
-from aiogram_dialog import DialogManager
+from aiogram.types import ContentType, CallbackQuery
+from aiogram_dialog import DialogManager, ShowMode
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram_dialog.widgets.input import TextInput
 
 from src.core.repo.requests import RequestsRepo
+from src.tgbot.dialog.apartments_users.states import FiltersApartmentsSG
 
 
 async def getter_get_city(dialog_manager: DialogManager, **kwargs) -> dict:
@@ -48,6 +49,17 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         rooms=filters.get("rooms")
     )
 
+    check_filters = any([
+        filters["city_id"] is not None,
+        filters["price_range"] is not None,
+        filters["rooms"] is not None
+    ])
+    if not apartments:
+        await dialog_manager.event.message.answer(text="По вашему запросу ничего не найдено.")
+        await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
+        return {}
+        
+
     dialog_manager.dialog_data["count_page"] = len(apartments)
     current_page = dialog_manager.dialog_data.get("page", 1)
     apartment = apartments[current_page - 1]
@@ -59,12 +71,7 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         file_id=MediaId(*photo), 
         type=ContentType.PHOTO
     )
-    
-    check_filters = any([
-        filters["city_id"] is not None,
-        filters["price_range"] is not None,
-        filters["rooms"] is not None
-    ])
+
 
     return {
         "check_filters": check_filters,

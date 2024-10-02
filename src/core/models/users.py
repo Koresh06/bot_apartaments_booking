@@ -9,8 +9,6 @@ if TYPE_CHECKING:
     from src.core.models import Landlords, Booking
 
 
-
-
 class Users(Base):
     __tablename__ = "users"
 

@@ -3,7 +3,7 @@ from aiogram import F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, DialogManager, StartMode, Window
-from aiogram_dialog.widgets.text import Format, Const
+from aiogram_dialog.widgets.text import Format, Const, Case
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import (
@@ -136,7 +136,7 @@ catalog_users_apartments_dialog = Dialog(
                 id="paginator",
             ),
             Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
-            when="is_apartments",
+            when="is_apartments and is_empty",
         ),
         Start(Const("🔍 Фильтры"), id="main_filters", state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK, when="check_filters"),
         state=FilteredCatalogApartmentsSG.start,

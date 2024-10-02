@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light"></nav>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Админ Панель</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="mx-auto">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-success me-2" href="/apartaments/create_apartament/">Создать апартамент</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-primary me-2" href="/apartaments/get_apartaments/">Апартаменты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-warning me-2" href="/users/statistics/">Статистика</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-info me-2" href="/users/get_users/">Пользователи</a>
+                    </li>
+                </ul>
+            </div>
+            {% if user %}
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="btn btn-outline-danger" href="/auth/logout/">Выйти</a>
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+</nav>

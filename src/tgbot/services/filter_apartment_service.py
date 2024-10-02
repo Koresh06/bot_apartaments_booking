@@ -53,6 +53,9 @@ class FilterApartmentRepo(BaseRepo):
         result = await self.session.execute(query)
         apartments = result.all()
 
+        if not apartments:
+            return False
+
         formatted_result = []
         for apartment, photo, landlord_tg_id, chat_id,city_name in apartments:
             formatted_result.append({
