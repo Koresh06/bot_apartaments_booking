@@ -11,6 +11,7 @@ class BotUserRepo(BaseRepo):
     async def add_user(
         self,
         tg_id: int,
+        chat_id: int,
         username: Optional[str] = None,
         full_name: Optional[str] = None,
     ):
@@ -21,6 +22,7 @@ class BotUserRepo(BaseRepo):
             return
         stmt = Users(
             tg_id=tg_id,
+            chat_id=chat_id,
             username=username,
             full_name=full_name,
         )

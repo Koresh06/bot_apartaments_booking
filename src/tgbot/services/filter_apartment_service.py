@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from sqlalchemy import desc, select, Result
+from sqlalchemy import select, Result
 from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 from src.core.repo.base import BaseRepo
@@ -32,7 +32,7 @@ class FilterApartmentRepo(BaseRepo):
             rooms: Optional[int] = None
         ) -> List[dict]:
         query = (
-            select(Apartment, ApartmentPhoto, Users.tg_id, City.name)
+            select(Apartment, ApartmentPhoto, Users.tg_id, Users.chat_id, City.name)
             .outerjoin(ApartmentPhoto, ApartmentPhoto.apartment_id == Apartment.id)
             .join(Landlords, Landlords.id == Apartment.landlord_id)  # Присоединяем таблицу Landlords
             .join(Users, Users.id == Landlords.user_id)  # Присоединяем таблицу Users
@@ -54,10 +54,11 @@ class FilterApartmentRepo(BaseRepo):
         apartments = result.all()
 
         formatted_result = []
-        for apartment, photo, landlord_tg_id, city_name in apartments:
+        for apartment, photo, landlord_tg_id, chat_id,city_name in apartments:
             formatted_result.append({
                 "apartment_id": apartment.id,
-                "landlord_tg_id": landlord_tg_id,  # Сохраняем tg_id арендодателя
+                "landlord_tg_id": landlord_tg_id,
+                "landlord_chat_id": chat_id,
                 "city": city_name,
                 "street": apartment.street,
                 "house_number": apartment.house_number,

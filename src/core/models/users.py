@@ -16,6 +16,7 @@ class Users(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     tg_id: Mapped[int] = mapped_column(Integer, unique=True, nullable=False)
+    chat_id: Mapped[int] = mapped_column(Integer, nullable=True)
     username: Mapped[str] = mapped_column(String(100), nullable=True)
     full_name: Mapped[str] = mapped_column(String(100), nullable=False)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)

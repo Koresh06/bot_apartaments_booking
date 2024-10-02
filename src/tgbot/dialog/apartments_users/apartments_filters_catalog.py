@@ -173,6 +173,7 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     await repo.bot_users.add_user(
         tg_id=message.from_user.id,
+        chat_id=message.chat.id,
         username=message.from_user.username,
         full_name=message.from_user.full_name,
     )

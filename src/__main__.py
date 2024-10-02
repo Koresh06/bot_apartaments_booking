@@ -5,7 +5,6 @@ import uvicorn
 
 from src.tgbot.bot import dp, bot
 from src.core.config import settings
-from src.tgbot.dialog.bg_manager_factory import MyBgManagerFactory
 from src.tgbot.middlewares.db_session import DbSessionMiddleware
 from src.core.db_helper import db_helper
 
@@ -22,23 +21,21 @@ from src.tgbot.dialog import (
     rooms_filter_dialog,
     booking_apartment,
     register_name_city_dialog,
-    main_admin_dialog
+    main_admin_dialog,
+    confirm_booking_landlord_dialog,
 )
 
 
 logger = logging.getLogger(__name__)
 
-bg_manager = MyBgManagerFactory()
 
 dp.update.middleware(DbSessionMiddleware(
-    sessionmaker=db_helper.sessionmaker,
-    bg_manager=bg_manager,
-    bot=bot  
+    sessionmaker=db_helper.sessionmaker
 ))
 
 dp.include_routers(
     register_name_city_dialog,
-    # confirm_booking_landlord_dialog,
+    confirm_booking_landlord_dialog,
     main_admin_dialog,
     booking_apartment,
     rooms_filter_dialog,

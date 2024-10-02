@@ -1,14 +1,15 @@
 from datetime import date
 from aiogram import Bot
-from aiogram.types import CallbackQuery
-from aiogram_dialog import DialogManager, StartMode
+from aiogram.types import CallbackQuery, User, Chat
+from aiogram_dialog import DialogManager, ShowMode, StartMode
+from aiogram_dialog.manager.bg_manager import BgManager
 from aiogram_dialog.widgets.kbd import Button
 
 from src.core.models.bookings import Booking
 from src.core.repo.requests import RequestsRepo
 from src.tgbot.dialog.apartments_users.states import FilteredCatalogApartmentsSG
-from src.tgbot.dialog.bg_manager_factory import MyBgManagerFactory
 from .states import ConfirmBooking
+from src.tgbot.bot import dp
 
 
 async def on_start_date_selected(callback: CallbackQuery, widget, dialog_manager: DialogManager, start_date: date):
@@ -44,7 +45,7 @@ async def handle_confirm_booking(
     dialog_manager: DialogManager,
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    bg_manager: MyBgManagerFactory = dialog_manager.middleware_data.get("bg_manager")
+    # bg_manager: MyBgManagerFactory = dialog_manager.middleware_data.get("bg_manager")
     bot: Bot = dialog_manager.middleware_data.get("bot")
     start_date = dialog_manager.dialog_data.get("start_date")
     end_date = dialog_manager.dialog_data.get("end_date")
@@ -52,6 +53,7 @@ async def handle_confirm_booking(
     apartment = dialog_manager.start_data.get("apartment")
     landlord_id = apartment["landlord_tg_id"]
     apartment_id = apartment["apartment_id"]
+    landlord_chat_id = apartment["landlord_chat_id"]
     
     # Сохранение бронирования
     booking: Booking = await repo.apartment_bookings.save_booking(
@@ -62,22 +64,19 @@ async def handle_confirm_booking(
     )
     if booking:
         await callback.answer(text="Поздравляем! ✅ Апартамент забронирован!\n\nДата начала аренды: " + str(start_date) + "\nДата окончания аренды: " + str(end_date))
+        user = User(id=landlord_id, is_bot=False, first_name="landlord")
+        chat = Chat(id=landlord_chat_id, type="private")
+        bg_manager = BgManager(chat=chat, user=user, bot=bot, router=dp, intent_id=None, stack_id="")
+
+        await bg_manager.start(state=ConfirmBooking.start, data={"booking_id": booking.id, "apartment": apartment, "user_id": callback.from_user.id}, show_mode=ShowMode.SEND)
         
-        # Запуск диалога для арендодателя
-        dialog_manager_landlord = await bg_manager.bg(
-            bot=bot,
-            user_id=landlord_id,
-            chat_id=callback.message.chat.id,
-            load=True  # Если нужно загрузить состояние чата и пользователя
-        )
-        
-        await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, mode=StartMode.RESET_STACK)
+        await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, data={"city": None, "price_range": None, "rooms": None}, mode=StartMode.RESET_STACK)
         # Запуск диалога для подтверждения бронирования у арендодателя
-        await dialog_manager_landlord.start(
-            state=ConfirmBooking.start,
-            data={"booking_id": booking.id, "apartment": apartment, "user_id": callback.from_user.id},
-            mode=StartMode.NORMAL
-        )
+        # await dialog_manager_landlord.start(
+        #     state=ConfirmBooking.start,
+        #     data={"booking_id": booking.id, "apartment": apartment, "user_id": callback.from_user.id},
+        #     mode=StartMode.NORMAL
+        # )
     else:
         await callback.answer(text="Что-то пошло не так, попробуйте еще раз")
 
