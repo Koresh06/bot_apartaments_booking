@@ -1,4 +1,6 @@
-from datetime import date
+from datetime import date, datetime, time, timedelta
+from functools import partial
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram import Bot
 from aiogram.types import CallbackQuery, User, Chat
 from aiogram.enums.parse_mode import ParseMode
@@ -68,7 +70,7 @@ async def handle_confirm_booking(
         user = User(id=landlord_id, is_bot=False, first_name="landlord")
         chat = Chat(id=landlord_chat_id, type="private")
         bg_manager = BgManager(chat=chat, user=user, bot=bot, router=dp, intent_id=None, stack_id="")
-        await bg_manager.start(state=ConfirmBooking.start, data={"booking_id": booking.id, "apartment": apartment, "user_id": callback.from_user.id}, show_mode=ShowMode.SEND) # Запуск диалога подтверждения арендодателем
+        await bg_manager.start(state=ConfirmBooking.start, data={"booking": booking, "apartment": apartment, "user_id": callback.from_user.id}, show_mode=ShowMode.SEND) # Запуск диалога подтверждения арендодателем
         
         await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, data={"city": None, "price_range": None, "rooms": None}, mode=StartMode.RESET_STACK)
     else:
@@ -77,13 +79,24 @@ async def handle_confirm_booking(
 
 
 async def yes_confirm_booking(callback: CallbackQuery, widget: Button, dialog_manager: DialogManager):
-    booking_id = dialog_manager.start_data.get("booking_id")
+    booking: Booking = dialog_manager.start_data.get("booking")
     user_id = dialog_manager.start_data.get("user_id")
     apartment_id = dialog_manager.start_data.get("apartment")["apartment_id"]
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    confirm = await repo.apartment_bookings.booking_confirmation(booking_id=booking_id, apartment_id=apartment_id)
+    scheduler: AsyncIOScheduler = dialog_manager.middleware_data.get("scheduler")
+    
+    confirm = await repo.apartment_bookings.booking_confirmation(booking_id=booking.id, apartment_id=apartment_id)
+    
     if confirm:
         await bot.send_message(chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!")
+        
+        # Устанавливаем время окончания на 12:00
+        update_time = datetime.combine(booking.end_date, time(12, 0))
+        # update_time = datetime.now() + timedelta(seconds=10)  # Например, через 1 день в 12:00
+        # Запускаем задачу для обновления статуса бронирования
+        func = partial(repo.apartment_bookings.update_booking_status, booking.id)
+        scheduler.add_job(func=func, trigger='date', run_date=update_time)
+        
         await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
     else:
         await callback.answer(text="Не удалось подтвердить бронирование. Попробуйте еще раз.")

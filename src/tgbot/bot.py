@@ -3,6 +3,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.storage.base import DefaultKeyBuilder
+from aiogram.fsm.storage.memory import SimpleEventIsolation
 from redis.asyncio import Redis
 from src.core.config import settings
 

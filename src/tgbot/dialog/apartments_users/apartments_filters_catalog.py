@@ -136,7 +136,7 @@ catalog_users_apartments_dialog = Dialog(
                 id="paginator",
             ),
             Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
-            when="is_apartments and is_empty",
+            when="is_apartments",
         ),
         Start(Const("🔍 Фильтры"), id="main_filters", state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK, when="check_filters"),
         state=FilteredCatalogApartmentsSG.start,
@@ -169,7 +169,6 @@ catalog_users_apartments_dialog = Dialog(
 
 @dp.message(CommandStart())
 async def command_start_process(message: Message, dialog_manager: DialogManager):
-    print("Start!")
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     await repo.bot_users.add_user(
         tg_id=message.from_user.id,

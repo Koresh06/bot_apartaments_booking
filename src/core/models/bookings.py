@@ -17,6 +17,9 @@ class Booking(Base):
     start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     is_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_completed: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    create_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    update_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     user_rel: Mapped["Users"] = relationship("Users", back_populates="booking_rel")
     apartment_rel: Mapped["Apartment"] = relationship("Apartment", back_populates="booking_rel")

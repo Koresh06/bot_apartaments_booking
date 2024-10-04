@@ -20,3 +20,6 @@ class DbSessionMiddleware(BaseMiddleware):
             data["session"] = session
             result = await handler(event, data)
         return result
+
+
+

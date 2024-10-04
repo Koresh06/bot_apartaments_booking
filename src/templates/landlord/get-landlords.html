@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Список Арендодателей</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Имя Арендодателя</th>
+                <th>Имя Telegram</th>
+                <th>Телефон</th>
+                <th>Дата создания</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for landlord in landlords %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ landlord.company_name }}</td>
+                <td>{{ landlord.user_rel.username }}</td>
+                <td>{{ landlord.phone }}</td>
+                <td>{{ landlord.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>
+                    <a href="/landlord/statistics/{{ landlord.id }}" class="btn btn-outline-primary">Cтатистика</a>
+                    <a href="/landlord/edit/{{ landlord.id }}" class="btn btn-outline-warning">Редактировать</a>
+                    <a href="/landlord/delete/{{ landlord.id }}" class="btn btn-outline-danger">Удалить</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center">Нет арендодателей для отображения</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/landlords/create" class="btn btn-success">Добавить нового арендодателя</a>
+</div>
+
+{% endblock %}

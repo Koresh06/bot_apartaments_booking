@@ -5,6 +5,8 @@ from src.apmin_panel.conf_static import configure_static
 
 
 from src.apmin_panel.api.routers.auth import router as auth_router
+from src.apmin_panel.api.routers.bookings import router as bookings_router
+from src.apmin_panel.api.routers.landlords import router as landlords_router
 
 app = FastAPI()
 
@@ -20,3 +22,5 @@ async def root():
 
 
 app.include_router(auth_router)
+app.include_router(bookings_router)
+app.include_router(landlords_router)

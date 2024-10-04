@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+import logging
 
 from sqlalchemy import select
 from src.core.models import Users, Apartment, Booking
@@ -93,3 +94,14 @@ class ApartmentBookingRepo(BaseRepo):
 
         return True  # Успешно удалено
 
+    async def update_booking_status(self, booking_id):
+        try:
+            booking = await self.session.scalar(select(Booking).where(Booking.id == booking_id))
+
+            booking.is_completed = True
+
+            self.session.add(booking)
+            await self.session.commit()
+            logging.info("Статусы бронирований обновлены успешно.")
+        except Exception as e:
+            logging.error(f"Ошибка при обновлении статусов бронирований: {e}")

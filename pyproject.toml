@@ -23,6 +23,7 @@ redis = "^5.0.8"
 babel = "^2.16.0"
 ruff = "^0.6.8"
 tree = "^0.2.4"
+apscheduler = "^3.10.4"
 
 
 [build-system]

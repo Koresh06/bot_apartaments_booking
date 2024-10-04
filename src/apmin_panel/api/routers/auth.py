@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError
-from datetime import timedelta
 from ..auth_helpers import (
     create_hashed_cookie,
 )
@@ -56,7 +54,7 @@ async def login(
         else:
         # Генерация зашифрованной куки
             hashed_cookie = create_hashed_cookie(login_data.username, settings.api.seckret_key)
-            response = RedirectResponse(url="/users/",  status_code=status. HTTP_302_FOUND)
+            response = RedirectResponse(url="/booking/get-bookings",  status_code=status. HTTP_302_FOUND)
             # Устанавливаем зашифрованную куку
             response.set_cookie(
                 key="admin_token", value=hashed_cookie, httponly=True, max_age=1800
