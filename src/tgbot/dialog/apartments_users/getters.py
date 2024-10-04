@@ -49,17 +49,9 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         rooms=filters.get("rooms")
     )
 
-    check_filters = any([
-        filters["city_id"] is not None,
-        filters["price_range"] is not None,
-        filters["rooms"] is not None
-    ])
     if not apartments:
-        await dialog_manager.event.message.answer(text="По вашему запросу ничего не найдено.")
-        await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
-        return {}
+        return {"data": apartments}
         
-
     dialog_manager.dialog_data["count_page"] = len(apartments)
     current_page = dialog_manager.dialog_data.get("page", 1)
     apartment = apartments[current_page - 1]
@@ -72,8 +64,14 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         type=ContentType.PHOTO
     )
 
+    check_filters = any([
+        filters["city_id"] is not None,
+        filters["price_range"] is not None,
+        filters["rooms"] is not None
+    ])
 
     return {
+        "data": True,
         "check_filters": check_filters,
         "is_apartments": True if len(apartments) > 1 else False,
         "media": media,

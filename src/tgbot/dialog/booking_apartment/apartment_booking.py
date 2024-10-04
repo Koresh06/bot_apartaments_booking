@@ -1,10 +1,10 @@
 from aiogram_dialog import Dialog, Window
-from aiogram_dialog.widgets.text import Format, Const
+from aiogram_dialog.widgets.text import Format, Const, Case
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import (
     Button,
     Next,
-    Back
+    Back,
 )
 
 from .custom_calendar import CustomCalendar

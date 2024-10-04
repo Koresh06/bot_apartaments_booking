@@ -52,8 +52,8 @@ class FilterApartmentRepo(BaseRepo):
 
         result = await self.session.execute(query)
         apartments = result.all()
-
-        if not apartments:
+        
+        if not apartments or not any(apartment for apartment, *_ in apartments):
             return False
 
         formatted_result = []
