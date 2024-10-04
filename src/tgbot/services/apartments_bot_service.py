@@ -67,6 +67,9 @@ class BotApartmentRepo(BaseRepo):
         result = await self.session.execute(stmt)
         apartments = result.all()
 
+        if not apartments or not any(apartment for apartment, *_ in apartments):
+            return False
+
         # Форматирование результатов в удобный формат
         formatted_result = []
         for apartment, photo, city_name in apartments:
