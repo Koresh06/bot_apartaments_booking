@@ -48,3 +48,34 @@ async def get_landlords(
             "user": is_authenticated,
         },
     )
+
+
+@router.get("/statistics/{landlord_id}", response_class=HTMLResponse)
+async def statistics_landlord_by_id(
+    request: Request,
+    landlord_id: int,
+    session: Annotated[
+        AsyncSession,
+        Depends(db_helper.get_db),
+    ],
+    is_authenticated: bool = Depends(admin_auth),
+):
+    statistics = await LandlordApiRepo(session).get_statistics_by_landlord_id(landlord_id)
+    print(statistics)
+    if isinstance(statistics, str):
+        return templates.TemplateResponse(
+            "landlord/statistics.html",
+            {
+                "request": request,
+                "message": statistics,
+            },
+        )
+
+    return templates.TemplateResponse(
+        "landlord/statistics.html",
+        {
+            "request": request,
+            "statistics": statistics,
+            "user": is_authenticated,
+        },
+    )

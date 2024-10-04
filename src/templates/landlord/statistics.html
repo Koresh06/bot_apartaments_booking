@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="text-center">Статистика Арендодателя: {{ landlord.name }}</h1>
+    {% if statistics %}
+        <form method="get" action="/statistics/{{ landlord.id }}">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="start_date">Начальная дата</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="end_date">Конечная дата</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Показать</button>
+        </form>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Общая информация</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Телеграм ID:</strong> {{ statistics.landlord.tg_id }}</p>
+                <p><strong>Количество апартаментов:</strong> {{ statistics.landlord.total_apartments }}</p>
+                <p><strong>Количество бронирований находящихся в работе:</strong> {{ statistics.landlord.total_pending_bookings }}</p>
+                <p><strong>Количество завершенных бронирований:</strong> {{ statistics.landlord.total_completed_bookings }} ₽</p>
+                <p><strong>Общий доход:</strong> {{ statistics.landlord.total_income }} ₽</p>
+            </div>
+        </div>
+        
+        <!-- <div class="card mb-4">
+            <div class="card-header">
+                <h5>Последние Бронирования</h5>
+            </div>
+            <div class="card-body">
+                {% if landlord.bookings %}
+                    <ul class="list-group">
+                        {% for booking in landlord.bookings %}
+                            <li class="list-group-item">
+                                <strong>Бронирование ID:</strong> {{ booking.id }} <br>
+                                <strong>Апартаменты:</strong> {{ booking.apartment_name }} <br>
+                                <strong>Статус:</strong> {{ booking.status }} <br>
+                                <strong>Дата начала:</strong> {{ booking.start_date }} <br>
+                                <strong>Дата окончания:</strong> {{ booking.end_date }} <br>
+                                <strong>Цена:</strong> {{ booking.price }} ₽
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>Нет доступных бронирований.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Рейтинг Апартаментов</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for apartment in landlord.apartments %}
+                        <li class="list-group-item">
+                            <strong>Апартаменты:</strong> {{ apartment.name }} <br>
+                            <strong>Рейтинг:</strong> {{ apartment.rating }} <br>
+                            <strong>Цена за день:</strong> {{ apartment.price_per_day }} ₽
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div> -->
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,8 +1,8 @@
 """create table
 
-Revision ID: 426cb90ad180
+Revision ID: f1a7c11a368c
 Revises: 
-Create Date: 2024-10-02 21:55:56.837290
+Create Date: 2024-10-04 18:35:47.634837
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '426cb90ad180'
+revision: str = 'f1a7c11a368c'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,6 +33,7 @@ def upgrade() -> None:
     sa.Column('username', sa.String(length=100), nullable=True),
     sa.Column('full_name', sa.String(length=100), nullable=False),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
+    sa.Column('is_banned', sa.Boolean(), server_default='false', nullable=False),
     sa.Column('create_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk__users')),
@@ -61,6 +62,7 @@ def upgrade() -> None:
     sa.Column('rooms', sa.Integer(), nullable=False),
     sa.Column('is_available', sa.Boolean(), nullable=False),
     sa.Column('description', sa.String(length=500), nullable=True),
+    sa.Column('rating', sa.Integer(), server_default='0', nullable=False),
     sa.Column('create_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['city_id'], ['citys.id'], name=op.f('apartments_city_id_fkey')),
@@ -83,6 +85,9 @@ def upgrade() -> None:
     sa.Column('start_date', sa.DateTime(), nullable=False),
     sa.Column('end_date', sa.DateTime(), nullable=False),
     sa.Column('is_confirmed', sa.Boolean(), nullable=False),
+    sa.Column('is_completed', sa.Boolean(), server_default='false', nullable=False),
+    sa.Column('create_at', sa.DateTime(), nullable=False),
+    sa.Column('update_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['apartment_id'], ['apartments.id'], name=op.f('bookings_apartment_id_fkey')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('bookings_user_id_fkey')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk__bookings'))
