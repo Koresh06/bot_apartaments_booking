@@ -74,6 +74,10 @@ async def getter_get_media(dialog_manager: DialogManager, **kwargs) -> dict:
 async def getter_catalog_landlord_apartments(dialog_manager: DialogManager, event_from_user: User, **kwargs) -> dict:
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     apartments = await repo.bot_apartments.get_catalog_apartments_landlord(tg_id=event_from_user.id)
+
+    if not apartments:
+        return {"data": apartments}
+    
     dialog_manager.dialog_data["count_page"] = len(apartments)
     current_page = dialog_manager.dialog_data.get("page", 1)
     apartment = apartments[current_page - 1]
@@ -86,6 +90,7 @@ async def getter_catalog_landlord_apartments(dialog_manager: DialogManager, even
         type=ContentType.PHOTO,
         )
     return {
+        "data": True,
         "is_apartments": True if len(apartments) > 1 else False,
         "media": media,
         "apartment": apartment,

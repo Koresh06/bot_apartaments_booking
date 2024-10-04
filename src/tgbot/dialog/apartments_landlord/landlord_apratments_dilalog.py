@@ -144,7 +144,9 @@ register_apartament_dialog = Dialog(
             on_success=Next(),
             on_error=error_handler,
         ),
-        Button(Const("🔄 Пропустить"), id="skip", on_click=skip_apartment_number_handler),
+        Button(
+            Const("🔄 Пропустить"), id="skip", on_click=skip_apartment_number_handler
+        ),
         Back(Const("◀️ Назад")),
         Next(when="apartment_number"),
         state=RegisterApartmentSG.apartment_number,
@@ -254,6 +256,18 @@ register_apartament_dialog = Dialog(
 
 my_apartmernt_landlord_dialog = Dialog(
     Window(
+        Const(
+            "⚠️ На данный момент у вас нет добавленных апартаментов. "
+            "Пожалуйста, создайте новые объявления для ваших апартаментов. "
+            "Если у вас есть вопросы, не стесняйтесь обращаться за помощью! 🏠",
+            when=~F["data"],
+        ),
+        Start(
+            Const("➕ Регистрация апартамента"),
+            id="register_apartament",
+            state=RegisterApartmentSG.city,
+            when=~F["data"],
+        ),
         Format(
             "<b>🏙️ Город: {apartment[city]}</b>\n"
             "<b>📍 Улица: {apartment[street]}</b>\n"
@@ -262,26 +276,30 @@ my_apartmernt_landlord_dialog = Dialog(
             "<b>💰 Цена за день: {apartment[price_per_day]}</b>\n"
             "<b>🛏️ Комнат: {apartment[rooms]}</b>\n"
             "<b>✍️ Описание: {apartment[description]}</b>\n"
-            "<b>✅ Статус: {apartment[is_available]}</b>\n"
+            "<b>✅ Статус: {apartment[is_available]}</b>\n",
+            when="data",
         ),
-        DynamicMedia(selector="media"),
-        Next(Const("🔍 Детали"), id="details"),
-        Row(
-            Button(Const("◀️ Назад"), id="next", on_click=on_prev),
-            Button(
-                Format("{current_page}/{count_page}"),
-                id="paginator",
+        DynamicMedia(selector="media", when="data"),
+        Group(
+            Next(Const("🔍 Детали"), id="details"),
+            Row(
+                Button(Const("◀️ Назад"), id="next", on_click=on_prev),
+                Button(
+                    Format("{current_page}/{count_page}"),
+                    id="paginator",
+                ),
+                Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
+                when="is_apartments",
             ),
-            Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
-            when="is_apartments",
-        ),
-        Button(Const("✏️ Редактировать"), id="edit", on_click=edit_data),
-        Button(Const("🗑️ Удалить"), id="delete", on_click=on_delete_apartment),
-        Start(
-            Const("◀️ Назад"),
-            id="back",
-            state=MenuLandlordSG.start,
-            show_mode=StartMode.RESET_STACK,
+            Button(Const("✏️ Редактировать"), id="edit", on_click=edit_data),
+            Button(Const("🗑️ Удалить"), id="delete", on_click=on_delete_apartment),
+            Start(
+                Const("◀️ Назад"),
+                id="back",
+                state=MenuLandlordSG.start,
+                show_mode=StartMode.RESET_STACK,
+            ),
+            when="data",
         ),
         state=LandlordApartmentsSG.catalog,
         getter=getter_catalog_landlord_apartments,
@@ -316,11 +334,23 @@ edit_apartment_dialog = Dialog(
         Group(
             SwitchTo(Const("🏙️ Город"), id="city", state=EditApartmentSG.city),
             SwitchTo(Const("📍 Улица"), id="street", state=EditApartmentSG.street),
-            SwitchTo(Const("🏠 Дом"), id="house_number", state=EditApartmentSG.house_number),
-            SwitchTo(Const("🏢 Квартира"), id="apartment_number", state=EditApartmentSG.apartment_number),
-            SwitchTo(Const("💰 Цена за день"), id="price_per_day", state=EditApartmentSG.price_per_day),
+            SwitchTo(
+                Const("🏠 Дом"), id="house_number", state=EditApartmentSG.house_number
+            ),
+            SwitchTo(
+                Const("🏢 Квартира"),
+                id="apartment_number",
+                state=EditApartmentSG.apartment_number,
+            ),
+            SwitchTo(
+                Const("💰 Цена за день"),
+                id="price_per_day",
+                state=EditApartmentSG.price_per_day,
+            ),
             SwitchTo(Const("🛏️ Комнат"), id="rooms", state=EditApartmentSG.rooms),
-            SwitchTo(Const("✍️ Описание"), id="description", state=EditApartmentSG.description),
+            SwitchTo(
+                Const("✍️ Описание"), id="description", state=EditApartmentSG.description
+            ),
             SwitchTo(Const("📸 Фото"), id="photo", state=EditApartmentSG.photo),
             id="edit_group",
             width=4,
@@ -391,7 +421,9 @@ edit_apartment_dialog = Dialog(
     ),
     Window(
         Multi(
-            Format("🏢 Ваш текущий номер квартиры: <b>{apartment[apartment_number]}</b>"),
+            Format(
+                "🏢 Ваш текущий номер квартиры: <b>{apartment[apartment_number]}</b>"
+            ),
             Const("🔢 Укажите новый номер квартиры:"),
             sep="\n\n",
         ),
@@ -464,7 +496,8 @@ edit_apartment_dialog = Dialog(
     ),
     Window(
         Const(
-            "📤 Отправьте фото вашего апартамента (можно сразу группой фото)", when="text"
+            "📤 Отправьте фото вашего апартамента (можно сразу группой фото)",
+            when="text",
         ),
         DynamicMedia(selector="media"),
         StubScroll(id="pages", pages="media_count"),
@@ -492,4 +525,3 @@ edit_apartment_dialog = Dialog(
     getter=getter_edit_apartment,
     on_close=close_dialog,
 )
-
