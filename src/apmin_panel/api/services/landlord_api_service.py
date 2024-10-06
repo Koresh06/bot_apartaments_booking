@@ -28,8 +28,8 @@ class LandlordApiRepo(BaseRepo):
     async def get_statistics_by_landlord_id(
         self,
         landlord_id: int,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
     ):
         # Получаем информацию об арендодателе
         stmt = select(Landlords).join(Users).where(Landlords.id == landlord_id)

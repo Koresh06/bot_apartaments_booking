@@ -10,6 +10,7 @@ from src.core.db_helper import db_helper
 from src.apmin_panel.conf_static import templates
 
 from ..services.landlord_api_service import LandlordApiRepo
+from ..schemas.landlord_schemas import LandlordDateSchema
 
 
 router = APIRouter(
@@ -60,8 +61,9 @@ async def statistics_landlord_by_id(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
-    statistics = await LandlordApiRepo(session).get_statistics_by_landlord_id(landlord_id)
-    print(statistics)
+    statistics = await LandlordApiRepo(session).get_statistics_by_landlord_id(
+        landlord_id=landlord_id,
+    )
     if isinstance(statistics, str):
         return templates.TemplateResponse(
             "landlord/statistics.html",
@@ -79,3 +81,40 @@ async def statistics_landlord_by_id(
             "user": is_authenticated,
         },
     )
+
+
+@router.post("/submit-statistics/")
+async def statistics_landlord_date_by_id(
+    request: Request,
+    session: Annotated[
+        AsyncSession,
+        Depends(db_helper.get_db),
+    ],
+    is_authenticated: bool = Depends(admin_auth),
+    date_data: LandlordDateSchema = Depends(LandlordDateSchema.as_form),
+):
+    statistics = await LandlordApiRepo(session).get_statistics_by_landlord_id(
+        landlord_id=date_data.landlord_id,
+        start_date=date_data.start_date,
+        end_date=date_data.end_date,
+    )
+    if isinstance(statistics, str):
+        return templates.TemplateResponse(
+            "landlord/statistics.html",
+            {
+                "request": request,
+                "message": statistics,
+            },
+        )
+
+    return templates.TemplateResponse(
+        "landlord/statistics.html",
+        {
+            "request": request,
+            "statistics": statistics,
+            "user": is_authenticated,
+            "start_date": date_data.start_date,
+            "end_date": date_data.end_date,
+        },
+    )
+
