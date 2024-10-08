@@ -94,14 +94,25 @@ class ApartmentBookingRepo(BaseRepo):
 
         return True  # Успешно удалено
 
+
     async def update_booking_status(self, booking_id):
         try:
             booking = await self.session.scalar(select(Booking).where(Booking.id == booking_id))
+            
+            if booking:
+                booking.is_completed = True
+                apartment = await self.session.scalar(select(Apartment).where(Apartment.id == booking.apartment_id))
 
-            booking.is_completed = True
+                if apartment:
+                    apartment.rating += 1
+                    self.session.add(apartment)
 
-            self.session.add(booking)
-            await self.session.commit()
-            logging.info("Статусы бронирований обновлены успешно.")
+                self.session.add(booking)
+                await self.session.commit()
+                
+                logging.info("Статусы бронирований обновлены успешно.")
+            else:
+                logging.warning(f"Бронирование с ID {booking_id} не найдено.")
+
         except Exception as e:
             logging.error(f"Ошибка при обновлении статусов бронирований: {e}")

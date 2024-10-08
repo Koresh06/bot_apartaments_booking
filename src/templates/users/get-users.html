@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4 text-center">
+    <h2>Список пользователей</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>Имя пользователя</th>
+                <th>Роль</th>
+                <th>Статус</th>
+                <th>Дата создания</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr class="{% if user.is_blocked %}table-danger{% endif %}">
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        <a class="text-decoration-none">{{ user.username }}</a>
+                    </td>
+                    <td>
+                        {% if user.landlord_rel %}
+                            <span class="badge bg-primary">Арендодатель</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Пользователь</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_banned == True %}
+                            <span class="badge bg-danger">Заблокирован</span>
+                        {% else %}
+                            <span class="badge bg-success">Активен</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.create_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        <a href="/users/get-user-detail/{{ user.id }}" class="btn btn-info btn-sm">Подробнее</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

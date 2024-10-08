@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Request
 
@@ -10,7 +10,7 @@ from src.core.db_helper import db_helper
 from src.apmin_panel.conf_static import templates
 
 from ..services.landlord_api_service import LandlordApiRepo
-from ..schemas.landlord_schemas import LandlordDateSchema
+from ..schemas.landlord_schemas import CreateLandlordSchema, LandlordDateSchema
 
 
 router = APIRouter(
@@ -83,7 +83,7 @@ async def statistics_landlord_by_id(
     )
 
 
-@router.post("/submit-statistics/")
+@router.post("/submit-landlord-statistics/")
 async def statistics_landlord_date_by_id(
     request: Request,
     session: Annotated[
@@ -117,4 +117,148 @@ async def statistics_landlord_date_by_id(
             "end_date": date_data.end_date,
         },
     )
+
+
+@router.get("/{landlord_id}/completed-bookings", response_class=HTMLResponse)
+async def get_completed_bookings(
+    request: Request,
+    landlord_id: int,
+    session: Annotated[
+        AsyncSession,
+        Depends(db_helper.get_db),
+    ],
+    is_authenticated: bool = Depends(admin_auth),
+):
+    completed_bookings = await LandlordApiRepo(
+        session
+    ).get_completed_bookings_by_landlord_id(landlord_id)
+
+    if isinstance(completed_bookings, str):
+        return templates.TemplateResponse(
+            "statistics/completed-bookings.html",
+            {
+                "request": request,
+                "message": completed_bookings,
+            },
+        )
+
+    return templates.TemplateResponse(
+        "statistics/completed-bookings.html",
+        {
+            "request": request,
+            "bookings": completed_bookings,
+            "user": is_authenticated,
+        },
+    )
+
+
+@router.get("/{landlord_id}/pending-bookings", response_class=HTMLResponse)
+async def get_completed_bookings(
+    request: Request,
+    landlord_id: int,
+    session: Annotated[
+        AsyncSession,
+        Depends(db_helper.get_db),
+    ],
+    is_authenticated: bool = Depends(admin_auth),
+):
+    pending_bookings = await LandlordApiRepo(
+        session
+    ).get_pending_bookings_by_landlord_id(landlord_id)
+
+    if isinstance(pending_bookings, str):
+        return templates.TemplateResponse(
+            "statistics/pending-bookings.html",
+            {
+                "request": request,
+                "message": pending_bookings,
+            },
+        )
+
+    return templates.TemplateResponse(
+        "statistics/pending-bookings.html",
+        {
+            "request": request,
+            "bookings": pending_bookings,
+            "user": is_authenticated,
+        },
+    )
+
+
+@router.get("/{landlord_id}/total-income-bookings", response_class=HTMLResponse)
+async def get_total_income_bookings(
+    request: Request,
+    landlord_id: int,
+    session: Annotated[
+        AsyncSession,
+        Depends(db_helper.get_db),
+    ],
+    is_authenticated: bool = Depends(admin_auth),
+):
+    total_income_bookings = await LandlordApiRepo(
+        session
+    ).get_total_income_bookings_by_landlord_id(landlord_id)
+
+    if isinstance(total_income_bookings, str):
+        return templates.TemplateResponse(
+            "statistics/total-income-bookings.html",
+            {
+                "request": request,
+                "message": total_income_bookings,
+            },
+        )
+
+    return templates.TemplateResponse(
+        "statistics/total-income-bookings.html",
+        {
+            "request": request,
+            "bookings": total_income_bookings,
+            "user": is_authenticated,
+        },
+    )
+
+
+@router.get("/create-landlord", response_class=HTMLResponse)
+async def show_create_landlord_form(
+    request: Request,
+    session: Annotated[AsyncSession, Depends(db_helper.get_db)],
+    is_authenticated: bool = Depends(admin_auth),
+    message: str = None,  # Добавлен параметр для сообщения
+):
+    not_landlords = await LandlordApiRepo(session).get_users_not_landlord()
+
+    if isinstance(not_landlords, str):
+        return templates.TemplateResponse(
+            "landlord/create-landlord.html",
+            {
+                "request": request,
+                "message": not_landlords,
+            },
+        )
+
+    return templates.TemplateResponse(
+        "landlord/create-landlord.html",
+        {
+            "request": request,
+            "users": not_landlords,
+            "user": is_authenticated,
+            "message": message,  # Передаем сообщение в шаблон
+        },
+    )
+
+
+@router.post("/submit-create-landlord")
+async def submit_create_landlord(
+    session: Annotated[AsyncSession, Depends(db_helper.get_db)],
+    create_landlord: CreateLandlordSchema = Depends(CreateLandlordSchema.as_form),
+    is_authenticated: bool = Depends(admin_auth),
+):
+    landlord = await LandlordApiRepo(session).create_landlord(create_landlord)
+    
+    if not landlord:
+        # Если не удалось создать, перенаправляем с сообщением об ошибке
+        return RedirectResponse("/landlord/create-landlord?message=Не удалось создать арендодателя.", status_code=303)
+
+    # Если успешно создан, перенаправляем с сообщением об успехе
+    return RedirectResponse("/landlord/create-landlord?message=Арендодатель успешно добавлен!", status_code=303)
 

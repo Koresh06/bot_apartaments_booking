@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Завершенные бронирования</h1>
+
+    {% if bookings %}
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr class="text-center" style="vertical-align: top;">
+                    <th scope="col" >Номер<br>бронирования</th>
+                    <th scope="col" >Апартамент</th>
+                    <th scope="col" >Пользователь</th>
+                    <th scope="col" >Дата начала</th>
+                    <th scope="col" >Дата окончания</th>
+                    <th scope="col" >Дата создания<br>бронирования</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking, username, street, house_number, apartment_number, city_name in bookings %}
+                    <tr class="text-center">
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr>
+                                    <td>Город:</td>
+                                    <td>{{ city_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Улица:</td>
+                                    <td>{{ street }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Дом:</td>
+                                    <td>{{ house_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Квартира:</td>
+                                    <td>{{ apartment_number or '—' }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>{{ username }}</td>
+                        <td>{{ booking.start_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.end_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.create_at.strftime('%d.%m.%Y') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Нет завершенных бронирований.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Добавить арендодателя</h1>
+
+    {% if message %}
+        <div class="alert alert-info" role="alert">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <form action="/landlord/submit-create-landlord" method="post">
+        <div class="mb-3">
+            <label for="user_id" class="form-label">Выберите пользователя</label>
+            <select class="form-select" id="user_id" name="user_id" required>
+                <option value="" disabled selected>Выберите пользователя</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="company_name" class="form-label">Имя арендодателя</label>
+            <input type="text" class="form-control" id="company_name" name="company_name" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Телефон</label>
+            <input type="text" class="form-control" id="phone" name="phone" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Добавить арендодателя</button>
+    </form>
+</div>
+{% endblock %}

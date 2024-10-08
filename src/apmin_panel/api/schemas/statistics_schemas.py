@@ -4,15 +4,13 @@ from datetime import date
 from fastapi import Form
 
 
-class LandlordDateSchema(BaseModel):
-    landlord_id: int
+class StatisticsDateSchema(BaseModel):
     start_date: Optional[Union[date, None]] = None  # поддержка строк и None
     end_date: Optional[Union[date, None]] = None    # поддержка строк и None
 
     @classmethod
     def as_form(
         cls,
-        landlord_id: int = Form(...),
         start_date: Optional[str] = Form(None),  # строка по умолчанию
         end_date: Optional[str] = Form(None),    # строка по умолчанию
     ):
@@ -23,26 +21,6 @@ class LandlordDateSchema(BaseModel):
             return date.fromisoformat(date_str)
         
         return cls(
-            landlord_id=landlord_id,
             start_date=parse_date(start_date),
             end_date=parse_date(end_date),
-        )
-
-
-class CreateLandlordSchema(BaseModel):
-    user_id: int
-    company_name: str
-    phone: str
-
-    @classmethod    
-    def as_form(
-        cls,
-        user_id: int = Form(...),
-        company_name: str = Form(...),
-        phone: str = Form(...),
-    ):
-        return cls(
-            user_id=user_id,
-            company_name=company_name,
-            phone=phone
         )

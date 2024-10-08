@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apmin_panel.api.services.booking_api_service import BookingApiRepo
 from src.apmin_panel.api.services.landlord_api_service import LandlordApiRepo
+from src.apmin_panel.api.services.statistics_api_service import StatisticsApiRepo
+from src.apmin_panel.api.services.users_api_service import UsersApiRepo
 from src.tgbot.services.admin_service import AdminRepo
 from src.tgbot.services.users_bot_service import BotUserRepo
 from src.tgbot.services.apartments_bot_service import BotApartmentRepo
@@ -50,8 +52,21 @@ class RequestsRepo:
 
         return BookingApiRepo(self.session)
     
+
     @property
     def landlord_api(self) -> LandlordApiRepo:
 
         return LandlordApiRepo(self.session)
+    
+
+    @property
+    def statistics_api(self) -> StatisticsApiRepo:
+
+        return StatisticsApiRepo(self.session)
+    
+
+    @property
+    def users_api(self) -> UsersApiRepo:
+
+        return UsersApiRepo(self.session)
 

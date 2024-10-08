@@ -12,7 +12,6 @@
                 <th>Имя Telegram</th>
                 <th>Телефон</th>
                 <th>Дата создания</th>
-                <th>Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -25,8 +24,8 @@
                 <td>{{ landlord.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 <td>
                     <a href="/landlord/statistics/{{ landlord.id }}" class="btn btn-outline-primary">Cтатистика</a>
-                    <a href="/landlord/edit/{{ landlord.id }}" class="btn btn-outline-warning">Редактировать</a>
-                    <a href="/landlord/delete/{{ landlord.id }}" class="btn btn-outline-danger">Удалить</a>
+                    <!-- <a href="/landlord/edit/{{ landlord.id }}" class="btn btn-outline-warning">Редактировать</a>
+                    <a href="/landlord/delete/{{ landlord.id }}" class="btn btn-outline-danger">Удалить</a> -->
                 </td>
             </tr>
             {% else %}
@@ -36,7 +35,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="/landlords/create" class="btn btn-success">Добавить нового арендодателя</a>
+    <a href="/landlord/create-landlord" class="btn btn-success">Добавить нового арендодателя</a>
 </div>
 
 {% endblock %}

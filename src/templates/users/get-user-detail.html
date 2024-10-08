@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="text-center">
+        <h5><strong>Имя пользователя:</strong> {{ by_user.username }}</h5>
+        <p><strong>Роль:</strong>
+            {% if by_user.landlord_rel %}
+            Арендодатель
+            {% else %}
+            Пользователь
+            {% endif %}
+        </p>
+        <p><strong>Статус:</strong>
+            <span class="badge {% if by_user.is_banned %}bg-danger{% else %}bg-success{% endif %}">
+                {{ 'Заблокирован' if by_user.is_banned else 'Активен' }}
+            </span>
+        </p>
+        <div class="d-flex justify-content-center align-items-center mb-4">
+            <button type="button" class="btn {% if by_user.is_banned %}btn-success{% else %}btn-danger{% endif %} btn-sm"
+                data-bs-toggle="modal" data-bs-target="#exampleModal">
+                {% if by_user.is_banned %}Разблокировать{% else %}Заблокировать{% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="confirmModalLabel">Подтверждение действия</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    Вы уверены, что хотите {% if by_user.is_banned %}разблокировать{% else %}заблокировать{% endif %}
+                    пользователя {{ by_user.username }}?
+                    <form
+                        action="{% if by_user.is_banned %}/users/{{ by_user.id }}/unbanned{% else %}/users/{{ by_user.id }}/banned{% endif %}"
+                        method="POST" style="display:inline;">
+                        <input type="hidden" name="user_id" value="{{ by_user.id }}">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn {% if by_user.is_banned %}btn-success{% else %}btn-danger{% endif %}">
+                        {% if by_user.is_banned %}Разблокировать{% else %}Заблокировать{% endif %}
+                    </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица с апартаментами, если пользователь является арендодателем -->
+    {% if by_user.landlord_rel %}
+    <div class="mt-4">
+        <h5>Список апартаментов:</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>Адрес</th>
+                        <th>Цена за день</th>
+                        <th>Количество комнат</th>
+                        <th>Доступен</th>
+                        <th>Дата создания</th>
+                        <th>Описание</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for apartment in by_user.landlord_rel.apartment_rel %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ apartment.street }} {{ apartment.house_number }}{% if apartment.apartment_number %}, кв. {{ apartment.apartment_number }}{% endif %}</td>
+                        <td>{{ apartment.price_per_day }} ₽</td>
+                        <td>{{ apartment.rooms }}</td>
+                        <td>{{ 'Да' if apartment.is_available else 'Нет' }}</td>
+                        <td>{{ apartment.create_at.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <!-- Кнопка для открытия модального окна с описанием -->
+                            <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalDescription{{ apartment.id }}">
+                                Показать описание
+                            </button>
+                            
+                            <!-- Модальное окно с описанием -->
+                            <div class="modal fade" id="modalDescription{{ apartment.id }}" tabindex="-1" aria-labelledby="modalDescriptionLabel{{ apartment.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalDescriptionLabel{{ apartment.id }}">Описание апартаментов (№: {{ loop.index }})</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>{{ apartment.description }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Нет апартаментов</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

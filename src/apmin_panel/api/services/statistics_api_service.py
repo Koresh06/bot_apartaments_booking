@@ -1,57 +1,35 @@
 from datetime import date, datetime
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 from src.core.models import Landlords, Users, Apartment, Booking, City
 
 from src.core.repo.base import BaseRepo
-from ..schemas.landlord_schemas import CreateLandlordSchema
 
 
-class LandlordApiRepo(BaseRepo):
 
-    async def get_all_landlords(self):
-        stmt = (
-            select(Landlords)
-            .options(selectinload(Landlords.user_rel))
-            .order_by(Landlords.id.desc())  # Сортируем по ID арендодателя
-        )
+class StatisticsApiRepo(BaseRepo):
 
-        result = await self.session.execute(stmt)
-        landlords = result.scalars().all()
-
-        if not landlords:
-            return "Нет доступных арендодателей"
-
-        return landlords
-
-    
-
-    async def get_statistics_by_landlord_id(
+    async def get_general_statistics(
         self,
-        landlord_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ):
-        # Получаем информацию об арендодателе
-        stmt = select(Landlords).join(Users).where(Landlords.id == landlord_id)
-        result = await self.session.execute(stmt)
-        landlord = result.scalar()
+        # Получаем количество всех пользователей
+        stmt_users = select(Users)
+        result_users = await self.session.execute(stmt_users)
+        users = result_users.scalars().all()
+        total_users = len(users) if users else "Нет данных"
 
-        if not landlord:
-            return "Арендодатель не найден"
-
-        # Получаем апартаменты арендодателя
-        stmt_apartments = select(Apartment).where(Apartment.landlord_id == landlord_id)
+        # Получаем все апартаменты
+        stmt_apartments = select(Apartment)
         result_apartments = await self.session.execute(stmt_apartments)
         apartments = result_apartments.scalars().all()
-
         total_apartments = len(apartments) if apartments else "Нет данных"
 
         # Получаем завершённые бронирования
         stmt_completed_bookings = select(Booking).where(
-            Booking.apartment_id.in_([apartment.id for apartment in apartments]),
             Booking.is_completed == True,
         )
 
@@ -72,7 +50,6 @@ class LandlordApiRepo(BaseRepo):
 
         # Получаем ожидающие бронирования
         stmt_pending_bookings = select(Booking).where(
-            Booking.apartment_id.in_([apartment.id for apartment in apartments]),
             Booking.is_completed == False,
         )
 
@@ -106,16 +83,14 @@ class LandlordApiRepo(BaseRepo):
         total_income = total_income if total_income > 0 else "Нет данных"
 
         return {
-            "landlord": landlord,
-            "apartments": apartments,
+            "total_users": total_users,
             "total_apartments": total_apartments,
             "total_completed_bookings": total_completed_bookings,
-            "total_pending_bookings": total_pending_bookings,  # Добавлено
+            "total_pending_bookings": total_pending_bookings,
             "total_income": total_income,
         }
     
-
-    async def get_completed_bookings_by_landlord_id(self, landlord_id: int):
+    async def get_pending_bookings(self):
         stmt = (
             select(
                 Booking,
@@ -125,19 +100,18 @@ class LandlordApiRepo(BaseRepo):
                 Apartment.apartment_number,
                 City.name.label('city_name')
             )
-            .join(Users, Booking.user_id == Users.id)
-            .join(Apartment, Booking.apartment_id == Apartment.id)
-            .join(City, Apartment.city_id == City.id)
-            .where(Booking.is_completed == True)
-            .where(Apartment.landlord_id == landlord_id)  # Фильтр по ID арендатора
+            .join(Users, Booking.user_id == Users.id) 
+            .join(Apartment, Booking.apartment_id == Apartment.id)  
+            .join(City, Apartment.city_id == City.id) 
+            .where(Booking.is_completed == False)  
             .order_by(Booking.id.desc())
         )
         result = await self.session.execute(stmt)
-        bookings_with_details = result.all()
+        bookings_with_details = result.all()  
         return bookings_with_details
     
 
-    async def get_pending_bookings_by_landlord_id(self, landlord_id: int):
+    async def get_completed_bookings(self):
         stmt = (
             select(
                 Booking,
@@ -147,23 +121,19 @@ class LandlordApiRepo(BaseRepo):
                 Apartment.apartment_number,
                 City.name.label('city_name')
             )
-            .join(Users, Booking.user_id == Users.id)
-            .join(Apartment, Booking.apartment_id == Apartment.id)
-            .join(City, Apartment.city_id == City.id)
-            .join(Landlords, Apartment.landlord_id == Landlords.id)  # Соединяем с арендодателями
-            .where(
-                Booking.is_completed == False,
-                Landlords.id == landlord_id  # Фильтруем по id арендодателя
-            )
+            .join(Users, Booking.user_id == Users.id) 
+            .join(Apartment, Booking.apartment_id == Apartment.id)  
+            .join(City, Apartment.city_id == City.id) 
+            .where(Booking.is_completed == True)  
             .order_by(Booking.id.desc())
         )
         result = await self.session.execute(stmt)
-        bookings_with_details = result.all()
+        bookings_with_details = result.all()  
         return bookings_with_details
 
 
-    async def get_total_income_bookings_by_landlord_id(self, landlord_id: int):
-    # Выполняем запрос для получения завершенных бронирований с деталями
+    async def get_total_income_bookings(self):
+        # Выполняем запрос для получения завершенных бронирований с деталями
         stmt = (
             select(
                 Booking,
@@ -177,11 +147,7 @@ class LandlordApiRepo(BaseRepo):
             .join(Users, Booking.user_id == Users.id)  # Присоединение пользователей
             .join(Apartment, Booking.apartment_id == Apartment.id)  # Присоединение апартаментов
             .join(City, Apartment.city_id == City.id)  # Присоединение городов
-            .join(Landlords, Apartment.landlord_id == Landlords.id)  # Соединяем с арендодателями
-            .where(
-                Booking.is_completed == True,  # Только завершенные бронирования
-                Landlords.id == landlord_id  # Фильтруем по id арендодателя
-            )
+            .where(Booking.is_completed == True)  # Только завершенные бронирования
             .order_by(Booking.id.desc())
         )
         
@@ -207,47 +173,13 @@ class LandlordApiRepo(BaseRepo):
                 'apartment_number': apartment_number,
                 'city_name': city_name,
                 'income': booking_income,  # Доход за конкретное бронирование
-                'created_at': booking.create_at  # Дата создания бронирования
+                'created_at': booking.create_at  # Дата создания апартамента
             })
 
+
         return bookings_with_income
-    
 
-    async def get_users_not_landlord(self):
-        # Запрос для получения пользователей, которые не являются арендодателями
-        stmt = (
-            select(Users)
-            .outerjoin(Landlords, Users.id == Landlords.user_id)  # Outer join на таблицу Landlords
-            .filter(Landlords.user_id.is_(None))  # Фильтруем только тех пользователей, которые не имеют записей в Landlords
-        )
 
-        result = await self.session.execute(stmt)
-        users_not_landlords = result.scalars().all()  # Получаем список пользователей
 
-        return users_not_landlords
-    
 
-    async def create_landlord(self, create_landlord: CreateLandlordSchema):
-        try:
-            # Проверяем, существует ли уже арендодатель с таким user_id
-            existing_landlord = await self.session.execute(
-                select(Landlords).filter(Landlords.user_id == create_landlord.user_id)
-            )
-            if existing_landlord.scalars().first() is not None:
-                # Если арендодатель уже существует, выбрасываем ошибку или возвращаем сообщение
-                raise ValueError(f"Арендодатель с user_id {create_landlord.user_id} уже существует.")
-
-            # Если арендодатель не существует, создаем нового
-            new_landlord = Landlords(
-                user_id=create_landlord.user_id,
-                company_name=create_landlord.company_name,
-                phone=create_landlord.phone
-            )
-            self.session.add(new_landlord)
-            await self.session.commit()
-            await self.session.refresh(new_landlord)
-            return new_landlord
-        except Exception as e:
-            await self.session.rollback()
-            raise e  # Перекинем исключение дальше или обработаем его как нужно
 

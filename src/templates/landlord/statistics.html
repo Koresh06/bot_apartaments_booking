@@ -5,7 +5,7 @@
     <h1 class="text-center mb-4">Статистика Арендодателя: {{ statistics.landlord.company_name }}</h1>
     
     {% if statistics %}
-        <form method="post" action="/landlord/submit-statistics/" class="d-flex justify-content-end mb-4">
+        <form method="post" action="/landlord/submit-landlord-statistics/" class="d-flex justify-content-end mb-4">
             <input type="hidden" id="landlord_id" name="landlord_id" value="{{ statistics.landlord.id }}">
             <div class="form-group mr-2">
                 <label for="start_date">Начальная дата</label>
@@ -18,56 +18,100 @@
             <button type="submit" class="btn btn-primary">Показать</button>
         </form>
 
+        <!-- Первый ряд -->
         <div class="row">
-            <div class="col-md-4">
-                <div class="card text-white bg-info mb-4">
+            <div class="col-md-6">
+                <div class="card text-white bg-info mb-4 text-center">
                     <div class="card-body">
                         <h5 class="card-title">Телеграм ID</h5>
                         <p class="card-text">{{ statistics.landlord.id }}</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-success mb-4">
+            <div class="col-md-6">
+                <div class="card text-white bg-success mb-4 text-center">
                     <div class="card-body">
                         <h5 class="card-title">Количество Апартаментов</h5>
                         <p class="card-text">{{ statistics.total_apartments }}</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-warning mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Количество Бронирований в Работе</h5>
-                        <p class="card-text">{{ statistics.total_pending_bookings }}</p>
-                    </div>
-                </div>
-            </div>
         </div>
         
+        <!-- Второй ряд: все объекты в одну строку -->
         <div class="row">
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Завершенные Бронирования</h5>
+            <!-- Количество бронирований в работе -->
+            <div class="col-md-4">
+                {% if statistics.total_pending_bookings != 'Нет данных' %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header">
+                            <h5 class="mb-0">Бронирования в Работе</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ statistics.total_pending_bookings }}</p>
+                            <a href="/landlord/{{ statistics.landlord.id }}/pending-bookings" class="btn btn-primary">Посмотреть</a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p>{{ statistics.total_completed_bookings }} ₽</p>
+                {% else %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header">
+                            <h5 class="mb-0">Бронирования в Работе</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Нет бронирований в работе</p>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Общий Доход</h5>
+
+            <!-- Завершенные бронирования -->
+            <div class="col-md-4">
+                {% if statistics.total_completed_bookings != 'Нет данных' %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header">
+                            <h5 class="mb-0">Завершенные Бронирования</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ statistics.total_completed_bookings }}</p>
+                            <a href="/landlord/{{ statistics.landlord.id }}/completed-bookings" class="btn btn-primary">Посмотреть</a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p>{{ statistics.total_income }} ₽</p>
+                {% else %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header">
+                            <h5 class="mb-0">Завершенные Бронирования</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Нет завершённых бронирований</p>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
+            </div>
+
+            <!-- Общий доход -->
+            <div class="col-md-4">
+                {% if statistics.total_income != 'Нет данных' %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header">
+                            <h5 class="mb-0">Общий Доход</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ statistics.total_income }} ₽</p>
+                            <a href="/landlord/{{ statistics.landlord.id }}/total-income-bookings" class="btn btn-primary">Посмотреть</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header">
+                            <h5 class="mb-0">Общий Доход</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Нет данных по доходу</p>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
-
     {% else %}
         <div class="alert alert-warning" role="alert">
             {{ message }}

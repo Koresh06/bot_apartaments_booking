@@ -1,4 +1,5 @@
 from typing import Annotated
+from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Request
 
@@ -19,7 +20,7 @@ router = APIRouter(
 )
 
 
-@router.get("/get-bookings")
+@router.get("/get-bookings/", response_class=HTMLResponse)
 async def get_bookings(
     request: Request,
     session: Annotated[
