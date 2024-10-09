@@ -48,7 +48,6 @@ register_name_city_dialog = Dialog(
 )
 
 
-
 @dp.message(Command("admin"))
 async def command_admin(message: Message, dialog_manager: DialogManager):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")

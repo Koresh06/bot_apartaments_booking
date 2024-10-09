@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: rental_bot_2
+      POSTGRES_DB: rental_bot
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -30,6 +30,28 @@ services:
       DATABASE_URL: postgres://postgres:12345@postgres/rental_bot  # Если необходимо передать URL для БД
     env_file:
       - .env
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:12345@postgres:5432/rental_bot
+    env_file:
+      - .env
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
 
   migrate:
     build:

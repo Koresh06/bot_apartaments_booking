@@ -90,8 +90,8 @@ async def yes_confirm_booking(callback: CallbackQuery, widget: Button, dialog_ma
         await bot.send_message(chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!")
         
         # Устанавливаем время окончания на 12:00
-        update_time = datetime.combine(booking.end_date, time(12, 0))
-        # update_time = datetime.now() + timedelta(seconds=10)  # Например, через 1 день в 12:00
+        update_time = datetime.combine(booking.end_date, time(9, 0)) # Устанавливаем время через 1 день в 12:00 (по Бишкекскому времени)
+        # update_time = datetime.now() + timedelta(seconds=10)
         # Запускаем задачу для обновления статуса бронирования
         func = partial(repo.apartment_bookings.update_booking_status, booking.id)
         scheduler.add_job(func=func, trigger='date', run_date=update_time)
