@@ -5,6 +5,8 @@ from aiogram_dialog.widgets.kbd import Button, Start, Url, Next, Back
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
 
+from src.core.models.users import Users
+from src.core.repo.requests import RequestsRepo
 from src.tgbot.dialog.apartments_landlord.handlers import error_handler
 
 from src.core.config import settings
@@ -49,7 +51,9 @@ register_name_city_dialog = Dialog(
 
 @dp.message(Command("admin"))
 async def command_admin(message: Message, dialog_manager: DialogManager):
-    if message.from_user.id == settings.bot.admin_id:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    admin: Users = await repo.admin_bot.check_is_admin(message.from_user.id)
+    if admin.is_admin:
         await dialog_manager.start(state=MainAdminSG.start, mode=StartMode.RESET_STACK)
     else:
         await message.answer("Доступ запрещен")
