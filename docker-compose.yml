@@ -19,18 +19,6 @@ services:
       - "01-simple-alchemy-postgres:/var/lib/postgresql/data"
     command: [ "sh", "-c", "apk add --no-cache musl-locales musl-locales-lang && docker-entrypoint.sh postgres" ]
 
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile # Укажите путь к вашему Dockerfile
-    restart: "always"
-    depends_on:
-      - postgres # Бот будет ждать, пока запустится PostgreSQL
-    environment:
-      DATABASE_URL: postgres://postgres:12345@postgres/rental_bot # Если необходимо передать URL для БД
-    env_file:
-      - .env
-
   web:
     build:
       context: .
@@ -40,6 +28,17 @@ services:
       - postgres
     environment:
       DATABASE_URL: postgres://postgres:12345@postgres:5432/rental_bot
+    env_file:
+      - .env
+
+  bot:
+    build:
+      context: .
+    restart: "always"
+    depends_on:
+      - postgres # Бот будет ждать, пока запустится PostgreSQL
+    environment:
+      DATABASE_URL: postgres://postgres:12345@postgres/rental_bot # Если необходимо передать URL для БД
     env_file:
       - .env
 
