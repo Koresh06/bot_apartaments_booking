@@ -9,6 +9,12 @@ from src.core.models import Users, Landlords
 
 class BotUserRepo(BaseRepo):
 
+    async def check_user_ban_status(self, tg_id):
+        stmt = select(Users).where(Users.tg_id == tg_id)
+        user = await self.session.scalar(stmt)
+        return user
+    
+
     async def add_user(
         self,
         tg_id: int,
