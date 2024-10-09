@@ -10,7 +10,7 @@ async def handle_register_name_city(callback: CallbackQuery, widget: ManagedText
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     name_city: TextInput = dialog_manager.find("name").get_value()
 
-    city = await repo.admin.register_name_city(name=name_city)
+    city = await repo.admin_bot.register_name_city(name=name_city)
     if city:
         await callback.answer(text="Поздравляем! ✅ Город зарегистрирован!")
         await dialog_manager.start(state=MainAdminSG.start, mode=StartMode.RESET_STACK)
