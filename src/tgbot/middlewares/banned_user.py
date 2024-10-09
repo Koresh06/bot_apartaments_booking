@@ -22,7 +22,12 @@ class BanCheckMiddleware(BaseMiddleware):
         tg_id = event.from_user.id
             
         repo = BotUserRepo(session)  # Используем сессию для создания репозитория
-        user = await repo.check_user_ban_status(tg_id)
+        user = await repo.check_user_ban_status(
+            tg_id=tg_id,
+            chat_id=event.chat.id,
+            username=event.from_user.username,
+            full_name=event.from_user.full_name,
+        )
 
         if user.is_banned:
             reply_text = "Вы заблокированы и не можете использовать бота."

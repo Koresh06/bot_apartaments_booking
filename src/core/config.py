@@ -4,8 +4,6 @@ env = Env()
 env.read_env()
 
 
-
-
 class ApiConfig:
     admin_login = env('ADMIN_LOGIN')
     admin_password = env('ADMIN_PASSWORD')

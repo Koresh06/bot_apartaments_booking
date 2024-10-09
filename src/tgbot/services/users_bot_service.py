@@ -29,7 +29,7 @@ class BotUserRepo(BaseRepo):
         self.session.add(stmt)
         await self.session.commit()
         await self.session.refresh(stmt)
-        return False
+        return stmt
 
     async def add_handler(
         self,
@@ -60,13 +60,9 @@ class BotUserRepo(BaseRepo):
         user = await self.session.scalar(stmt)
 
         if user is None:
-            # Если пользователь не найден, вызываем add_user для его создания
-            await self.add_user(
+
+            user = await self.add_user(
                 tg_id=tg_id, chat_id=chat_id, username=username, full_name=full_name
             )
-
-            # Получаем созданного пользователя после добавления
-            user = await self.session.scalar(stmt)
-            
 
         return user
