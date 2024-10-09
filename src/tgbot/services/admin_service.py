@@ -1,6 +1,6 @@
 from src.core.repo.base import BaseRepo
 from src.core.models import City, Users
-from sqlalchemy import select, and_
+from sqlalchemy import select
 
 
 class AdminBotRepo(BaseRepo):

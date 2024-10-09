@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Request
 
@@ -7,7 +7,6 @@ from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import db_helper
-from src.apmin_panel.conf_static import templates
 
 from ..services.users_api_service import UsersApiRepo
 

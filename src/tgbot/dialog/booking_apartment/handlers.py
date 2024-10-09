@@ -1,7 +1,6 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from functools import partial
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from aiogram import Bot
 from aiogram.types import CallbackQuery, User, Chat
 from aiogram.enums.parse_mode import ParseMode
 from aiogram_dialog import DialogManager, ShowMode, StartMode

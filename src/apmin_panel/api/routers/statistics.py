@@ -7,7 +7,6 @@ from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import db_helper
-from src.apmin_panel.conf_static import templates
 
 from ..services.statistics_api_service import StatisticsApiRepo
 from ..schemas.statistics_schemas import StatisticsDateSchema

@@ -1,7 +1,6 @@
 from typing import Optional
 
 from sqlalchemy import select, Result
-from sqlalchemy.exc import NoResultFound
 
 from src.core.repo.base import BaseRepo
 from src.core.models import Users, Landlords

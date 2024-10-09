@@ -1,8 +1,7 @@
-from datetime import date
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from src.core.models import Users, Apartment, Booking
+from src.core.models import Apartment, Booking
 
 from src.core.repo.base import BaseRepo
 

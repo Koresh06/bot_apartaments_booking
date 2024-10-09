@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from ..auth_helpers import (
@@ -60,7 +60,7 @@ async def login(
                 key="admin_token", value=hashed_cookie, httponly=True, max_age=1800
             )
         return response
-    except HTTPException as e:
+    except HTTPException:
         msg = "Unknown Error"
         return templates.TemplateResponse(
             "auth.html",

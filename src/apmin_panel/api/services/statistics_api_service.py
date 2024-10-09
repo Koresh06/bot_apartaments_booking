@@ -1,9 +1,8 @@
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
 
-from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload
-from src.core.models import Landlords, Users, Apartment, Booking, City
+from sqlalchemy import select
+from src.core.models import Users, Apartment, Booking, City
 
 from src.core.repo.base import BaseRepo
 

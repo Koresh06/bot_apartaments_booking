@@ -1,10 +1,9 @@
-from aiogram.types import ContentType, CallbackQuery
-from aiogram_dialog import DialogManager, ShowMode
+from aiogram.types import ContentType
+from aiogram_dialog import DialogManager
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram_dialog.widgets.input import TextInput
 
 from src.core.repo.requests import RequestsRepo
-from src.tgbot.dialog.apartments_users.states import FiltersApartmentsSG
 
 
 async def getter_get_city(dialog_manager: DialogManager, **kwargs) -> dict:

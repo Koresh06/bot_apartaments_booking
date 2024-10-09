@@ -3,7 +3,6 @@ from fastapi.responses import RedirectResponse
 
 from src.apmin_panel.conf_static import configure_static
 
-from src.core.config import settings
 from src.apmin_panel.api.routers.auth import router as auth_router
 from src.apmin_panel.api.routers.bookings import router as bookings_router
 from src.apmin_panel.api.routers.landlords import router as landlords_router

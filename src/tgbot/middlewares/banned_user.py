@@ -1,7 +1,6 @@
 from typing import Awaitable, Callable, Any, Dict
-from aiogram import Dispatcher, BaseMiddleware
-from aiogram.types import Message, CallbackQuery
-from aiogram.types import TelegramObject
+from aiogram import BaseMiddleware
+from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ..services.users_bot_service import BotUserRepo

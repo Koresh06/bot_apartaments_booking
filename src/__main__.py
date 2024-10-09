@@ -2,7 +2,6 @@ import asyncio
 import logging
 import uvicorn
 from aiogram_dialog import setup_dialogs
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from src.tgbot.bot import dp, bot
 from src.core.config import settings

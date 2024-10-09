@@ -7,7 +7,6 @@ from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import db_helper
-from src.apmin_panel.conf_static import templates
 
 from ..services.landlord_api_service import LandlordApiRepo
 from ..schemas.landlord_schemas import CreateLandlordSchema, LandlordDateSchema
