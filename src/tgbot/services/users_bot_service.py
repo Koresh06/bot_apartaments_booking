@@ -62,7 +62,10 @@ class BotUserRepo(BaseRepo):
         if user is None:
 
             user = await self.add_user(
-                tg_id=tg_id, chat_id=chat_id, username=username, full_name=full_name
+                tg_id=tg_id,
+                chat_id=chat_id,
+                username=username,
+                full_name=full_name,
             )
 
         return user

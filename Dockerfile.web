@@ -13,9 +13,8 @@ RUN pip install poetry && poetry config virtualenvs.create false && poetry insta
 # Копируем остальной код проекта в контейнер
 COPY . /src
 
-# Открываем порт 8000 для входа в контейнер
+# Открываем порт 8000 для FastAPI
 EXPOSE 8000
 
-# Запускаем команду для запуска бота
-CMD ["python", "-m", "src.__main__"]
-
+# Запускаем команду для запуска FastAPI
+CMD ["uvicorn", "src.run_fastapi:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
