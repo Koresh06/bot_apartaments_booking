@@ -8,12 +8,6 @@ from src.core.models import Users, Landlords
 
 class BotUserRepo(BaseRepo):
 
-    async def check_user_ban_status(self, tg_id):
-        stmt = select(Users).where(Users.tg_id == tg_id)
-        user = await self.session.scalar(stmt)
-        return user
-    
-
     async def add_user(
         self,
         tg_id: int,
@@ -37,12 +31,11 @@ class BotUserRepo(BaseRepo):
         await self.session.refresh(stmt)
         return False
 
-
     async def add_handler(
-            self, 
-            tg_id: int,
-            company_name: str,
-            phone: str,
+        self,
+        tg_id: int,
+        company_name: str,
+        phone: str,
     ):
         stmt = select(Users).where(Users.tg_id == tg_id)
         result: Users = await self.session.scalar(stmt)
@@ -52,7 +45,28 @@ class BotUserRepo(BaseRepo):
             phone=phone,
         )
 
-        self.session.add(landlord)    
+        self.session.add(landlord)
         await self.session.commit()
         await self.session.refresh(landlord)
 
+    async def check_user_ban_status(
+        self,
+        tg_id: int,
+        chat_id: int,
+        username: Optional[str] = None,
+        full_name: Optional[str] = None,
+    ) -> Users:
+        stmt = select(Users).where(Users.tg_id == tg_id)
+        user = await self.session.scalar(stmt)
+
+        if user is None:
+            # Если пользователь не найден, вызываем add_user для его создания
+            await self.add_user(
+                tg_id=tg_id, chat_id=chat_id, username=username, full_name=full_name
+            )
+
+            # Получаем созданного пользователя после добавления
+            user = await self.session.scalar(stmt)
+            
+
+        return user
