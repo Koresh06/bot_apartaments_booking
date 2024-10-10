@@ -231,16 +231,16 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
         full_name=message.from_user.full_name,
     )
     await dialog_manager.start(
-        state=FilteredCatalogApartmentsSG.start,
+        state=FiltersApartmentsSG.start,
         data={"city": None, "price_range": None, "rooms": None},
         mode=StartMode.RESET_STACK,
     )
 
 
-@dp.message(Command("filter"))
-async def command_filter_process(
-    callback: CallbackQuery, dialog_manager: DialogManager
-):
-    await dialog_manager.start(
-        state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK
-    )
+# @dp.message(Command("filter"))
+# async def command_filter_process(
+#     callback: CallbackQuery, dialog_manager: DialogManager
+# ):
+#     await dialog_manager.start(
+#         state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK
+#     )
