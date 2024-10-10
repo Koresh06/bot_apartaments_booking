@@ -6,7 +6,7 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header text-center">
-                    <h2>Admin Login</h2>
+                    <h2>Авторизация</h2>
                 </div>
                 {% if msg %}
                     {% if msg == "Logout Successful" or msg == "User successful created" %}
@@ -22,20 +22,20 @@
                 <div class="card-body">
                     <form action="/auth/login" method="post">
                         <div class="form-group mb-3">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" class="form-control" required placeholder="Enter username">
+                            <label for="username">Имя пользователя</label>
+                            <input type="text" id="username" name="username" class="form-control" required placeholder="Введите имя пользователя">
                         </div>
                         <div class="form-group mb-3">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" name="password" class="form-control" required placeholder="Enter password">
+                            <label for="password">Пароль</label>
+                            <input type="password" id="password" name="password" class="form-control" required placeholder="Введите пароль">
                         </div>
                         <div class="form-group mb-3 text-center">
-                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                            <button type="submit" class="btn btn-primary w-100">Войти</button>
                         </div>
                     </form>
                 </div>
                 <div class="card-footer text-center">
-                    <small>&copy; 2024 - Admin Panel</small>
+                    <small>&copy; 2024 - Панель администратора</small>
                 </div>
             </div>
         </div>
