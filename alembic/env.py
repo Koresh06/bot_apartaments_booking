@@ -9,7 +9,7 @@ from alembic import context
 
 from src.core.models.base import Base
 from src.core.models import Users, Landlords, Apartment, Booking, ApartmentPhoto # noqa
-from src.core.config import settings
+from src.core.config import config as db_config # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,7 +21,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-config.set_main_option("sqlalchemy.url", settings.db.url)
+config.set_main_option("sqlalchemy.url", db_config.db.construct_sqlalchemy_url())
 
 # add your model's MetaData object here
 # for 'autogenerate' support
