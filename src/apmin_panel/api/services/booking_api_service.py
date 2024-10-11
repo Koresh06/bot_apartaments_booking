@@ -1,4 +1,3 @@
-
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from src.core.models import Apartment, Booking
@@ -12,9 +11,9 @@ class BookingApiRepo(BaseRepo):
         stmt = (
             select(Booking)
             .options(
-                selectinload(Booking.user_rel),       # Подгружаем пользователя
-                selectinload(Booking.apartment_rel)    # Подгружаем квартиру
-                .selectinload(Apartment.landlord_rel)  # Подгружаем арендодателя через квартиру
+                selectinload(Booking.user_rel),     
+                selectinload(Booking.apartment_rel)   
+                .selectinload(Apartment.landlord_rel)  
             )
             .order_by(Booking.id.desc())
         )

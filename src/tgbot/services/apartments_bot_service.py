@@ -1,9 +1,8 @@
 from typing import List, Optional
-
 from sqlalchemy import delete, select
-from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 from src.core.repo.base import BaseRepo
+from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 
 class BotApartmentRepo(BaseRepo):
@@ -16,7 +15,6 @@ class BotApartmentRepo(BaseRepo):
         return result is not None
 
     async def register_apartment_landlord(self, tg_id: int, data: dict) -> bool:
-        # Получение владельца квартиры по tg_id
         stmt: Landlords = await self.session.scalar(
             select(Landlords).join(Users).where(Users.tg_id == tg_id)
         )
@@ -46,15 +44,14 @@ class BotApartmentRepo(BaseRepo):
         return True
 
     async def get_catalog_apartments_landlord(self, tg_id: int) -> Optional[List[dict]]:
-        # Получение арендодателя по tg_id
         landlord_stmt = await self.session.scalar(
             select(Landlords).join(Users).where(Users.tg_id == tg_id)
         )
 
         if not landlord_stmt:
-            return None  # Если арендодатель не найден, возвращаем None
+            return None  
 
-        # Получение всех апартаментов с фотографиями для арендодателя
+
         stmt = (
             select(Apartment, ApartmentPhoto, City.name)
             .where(Apartment.landlord_id == landlord_stmt.id)
@@ -63,21 +60,19 @@ class BotApartmentRepo(BaseRepo):
             .order_by(Apartment.id.desc())
         )
 
-        # Выполняем запрос и получаем все результаты
         result = await self.session.execute(stmt)
         apartments = result.all()
 
         if not apartments or not any(apartment for apartment, *_ in apartments):
             return False
-
-        # Форматирование результатов в удобный формат
+        
         formatted_result = []
         for apartment, photo, city_name in apartments:
             formatted_result.append(
                 {
                     "apartment_id": apartment.id,
                     "landlord_id": apartment.landlord_id,
-                    "landlord_tg_id": tg_id,  # Сохраняем tg_id арендодателя
+                    "landlord_tg_id": tg_id,  
                     "city": city_name,
                     "street": apartment.street,
                     "house_number": apartment.house_number,
@@ -88,7 +83,7 @@ class BotApartmentRepo(BaseRepo):
                     "is_available": (
                         "✅ Свободно" if apartment.is_available else "❌ Занято"
                     ),
-                    "photos": photo.photos_ids if photo else [],  # Обработка отсутствующих фотографий
+                    "photos": photo.photos_ids if photo else [], 
                 }
             )
 
@@ -100,15 +95,14 @@ class BotApartmentRepo(BaseRepo):
         tg_id: int,
         apartment_id: int,
     ) -> bool:
-        # Получаем информацию о квартире
+    
         apartment_info: Apartment = await self.session.scalar(
             select(Apartment).where(Apartment.id == apartment_id)
         )
 
         if not apartment_info:
-            return None  # Квартира не найдена
+            return None 
 
-        # Проверяем, что пользователь является владельцем квартиры
         landlord_info = await self.session.scalar(
             select(Landlords)
             .where(Landlords.id == apartment_info.landlord_id)
@@ -117,7 +111,7 @@ class BotApartmentRepo(BaseRepo):
         )
 
         if not landlord_info:
-            return None  # Пользователь не является владельцем
+            return None 
 
         return apartment_info
 
@@ -129,11 +123,11 @@ class BotApartmentRepo(BaseRepo):
         text: str | int,
     ) -> bool:
 
-        apartment_info = await self.check_apartment_landlord(
+        apartment_info: Apartment = await self.check_apartment_landlord(
             tg_id=tg_id, apartment_id=apartment_id
         )
         if not apartment_info:
-            return False  # Квартира не найдена
+            return False 
 
         # Обновляем информацию
         if widget_id == "city":
@@ -150,9 +144,9 @@ class BotApartmentRepo(BaseRepo):
             apartment_info.rooms = text
         elif widget_id == "description":
             apartment_info.description = text
-        # Добавьте другие условия для дополнительных полей
+
         await self.session.commit()
-        return True  # Успешно обновлено
+        return True  
 
     async def update_apartment_photos(
         self,
@@ -165,19 +159,17 @@ class BotApartmentRepo(BaseRepo):
             apartment_id=apartment_id,
         )
         if not apartment_info:
-            return False  # Квартира не найдена
+            return False 
 
-        # Удаляем старые фотографии, если необходимо
         await self.session.execute(
             delete(ApartmentPhoto).where(ApartmentPhoto.apartment_id == apartment_id)
         )
 
-        # Добавляем новые фотографии
         new_photo = ApartmentPhoto(apartment_id=apartment_id, photos_ids=photos_ids)
         self.session.add(new_photo)
 
         await self.session.commit()
-        return True  # Успешно обновлено
+        return True 
 
     async def delete_apartment_landlord(
         self,
@@ -189,14 +181,12 @@ class BotApartmentRepo(BaseRepo):
             apartment_id=apartment_id,
         )
         if not apartment_info:
-            return False  # Квартира не найдена
+            return False
 
-        # Удаляем все фотографии квартиры
         await self.session.execute(
             delete(ApartmentPhoto).where(ApartmentPhoto.apartment_id == apartment_id)
         )
 
-        # Удаляем квартиру
         await self.session.execute(
             delete(Apartment).where(Apartment.id == apartment_id)
         )
@@ -208,22 +198,19 @@ class BotApartmentRepo(BaseRepo):
             self,
             tg_id: int,
             apartment_id: int,
-        ) -> Optional[bool]:  # Возвращаем True или False
-        # Проверяем информацию о квартире
+        ) -> Optional[bool]: 
         apartment_info: Apartment = await self.check_apartment_landlord(
             tg_id=tg_id,
             apartment_id=apartment_id,
         )
     
         if apartment_info is None:
-            return None  # Квартира не найдена или пользователь не является владельцем
+            return None  
     
-        # Изменяем статус доступности
-        apartment_info.is_available = not apartment_info.is_available  # Меняем на противоположный статус
+        apartment_info.is_available = not apartment_info.is_available 
     
-        # Сохраняем изменения в базе данных
         await self.session.commit()
     
-        return apartment_info.is_available  # Возвращаем новый статус
+        return apartment_info.is_available 
 
 

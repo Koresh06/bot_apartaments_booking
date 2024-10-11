@@ -6,8 +6,8 @@ from aiogram_dialog.widgets.kbd import Button, Next, Back
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput
 
-
-from src.tgbot.bot import dp
+from src.core.repo.requests import RequestsRepo
+from ..apartments_landlord.states import LandlordStateSG, MenuLandlordSG
 from .getters import getter_information_registration
 from .handlers import (
     error_phone_handler,
@@ -15,10 +15,6 @@ from .handlers import (
     error_handler,
     
 )
-
-from src.core.repo.requests import RequestsRepo
-from ..apartments_landlord.states import LandlordStateSG, MenuLandlordSG
-
 
 
 router = Router()

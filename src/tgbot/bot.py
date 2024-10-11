@@ -1,26 +1,22 @@
-from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
-from aiogram.fsm.storage.redis import RedisStorage
-from aiogram.fsm.storage.base import DefaultKeyBuilder
-from redis.asyncio import Redis
-from src.core.config import settings
+from aiogram_dialog import setup_dialogs
+
+from src.tgbot import dp, bot
+from src.core.db_helper import db_helper
+from src.core.config import config
+from src.tgbot.dialog import get_all_dialogs, get_routers
+from src.tgbot.middlewares.setup import setup_middlewares
+from src.tgbot.scheduler_init import scheduler
 
 
-bot = Bot(
-    token=settings.bot.token,
-    default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-)
+async def start_bot():
+    
+    setup_middlewares(dp=dp, sessionmaker=db_helper.sessionmaker)
 
-redis = Redis(
-    host=settings.redis.host,  
-    port=settings.redis.port,       
-    db=settings.redis.db,             
-)
+    scheduler.start()
 
-storage = RedisStorage(redis=redis, key_builder=DefaultKeyBuilder(with_destiny=True))
+    dp.include_routers(*get_routers())
+    dp.include_routers(*get_all_dialogs())
+    setup_dialogs(dp)
 
-dp = Dispatcher()
-
-
-
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, config=config)

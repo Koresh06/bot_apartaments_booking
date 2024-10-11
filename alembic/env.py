@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-from src.core.base import Base
+from src.core.models.base import Base
 from src.core.models import Users, Landlords, Apartment, Booking, ApartmentPhoto # noqa
 from src.core.config import settings
 

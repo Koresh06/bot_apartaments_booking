@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Integer, String, ForeignKey, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.base import Base
+from src.core.models.base import Base
 
 if TYPE_CHECKING:
     from src.core.models import Apartment

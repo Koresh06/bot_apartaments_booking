@@ -1,10 +1,9 @@
 from datetime import date
 import logging
-
 from sqlalchemy import select
-from src.core.models import Users, Apartment, Booking
 
 from src.core.repo.base import BaseRepo
+from src.core.models import Users, Apartment, Booking
 
 
 class ApartmentBookingRepo(BaseRepo):
@@ -16,21 +15,18 @@ class ApartmentBookingRepo(BaseRepo):
         start_date: date,
         end_date: date,
     ) -> bool:
-        # Получение пользователя по user_id
         user_stmt = await self.session.scalar(select(Users).where(Users.tg_id == tg_id))
 
         if not user_stmt:
-            return False  # Если пользователь не найден, возвращаем False
+            return False  
 
-        # Получение квартиры по apartment_id
         apartment_stmt = await self.session.scalar(
             select(Apartment).where(Apartment.id == apartment_id)
         )
 
         if not apartment_stmt:
-            return False  # Если квартира не найдена, возвращаем False
-
-        # Создание объекта бронирования
+            return False  
+        
         booking = Booking(
             user_id=user_stmt.id,
             apartment_id=apartment_stmt.id,
@@ -39,14 +35,13 @@ class ApartmentBookingRepo(BaseRepo):
         )
 
         self.session.add(booking)
-        await self.session.commit()  # Сохраняем изменения
-        await self.session.refresh(booking)  # Обновляем объект с ID
+        await self.session.commit() 
+        await self.session.refresh(booking) 
 
         return booking
 
 
     async def booking_confirmation(self, booking_id: int, apartment_id: int) -> bool:
-        # Получаем текущее состояние бронирования по его ID
         booking = await self.session.scalar(
             select(Booking).where(Booking.id == booking_id)
         )
@@ -54,45 +49,39 @@ class ApartmentBookingRepo(BaseRepo):
         apartment = await self.session.scalar(select(Apartment).where(Apartment.id == apartment_id))
 
         if booking is None:
-            return False  # Бронирование не найдено
+            return False  
 
-        # Изменяем статус бронирования на подтвержденный
-        booking.is_confirmed = True  # Устанавливаем поле is_confirmed в True
+        booking.is_confirmed = True 
 
-        # Обновляем информацию о квартире
-        apartment.is_available = False  # Устанавливаем поле is_available в False
+        apartment.is_available = False 
 
-        # Сохраняем изменения в базе данных
         self.session.add(booking)
         self.session.add(apartment)
         await self.session.commit()
 
-        # Обновляем объект после сохранения
         await self.session.refresh(booking)
 
-        return True  # Возвращаем успех
+        return True  
     
 
-    async def delete_booking(self, booking_id: int, landlord_id: int) -> bool:
-        # Получаем текущее состояние бронирования по его ID
+    async def delete_booking(self, booking_id: int) -> bool:
         booking = await self.session.scalar(
             select(Booking).where(Booking.id == booking_id)
         )
+        print(booking)
 
         if booking is None:
-            return False  # Бронирование не найдено
+            return False  
         
         try:
-            # Удаляем бронирование
             await self.session.delete(booking)
 
-            # Сохраняем изменения в базе данных
             await self.session.commit()
         except Exception as e:
-            await self.session.rollback()  # Откатываем транзакцию в случае ошибки
-            raise e  # Перебрасываем исключение для обработки на более высоком уровне
+            await self.session.rollback() 
+            raise e 
 
-        return True  # Успешно удалено
+        return True 
 
 
     async def update_booking_status(self, booking_id):

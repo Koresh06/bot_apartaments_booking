@@ -7,7 +7,6 @@ from src.core.models import Users, Apartment, Booking, City
 from src.core.repo.base import BaseRepo
 
 
-
 class StatisticsApiRepo(BaseRepo):
 
     async def get_general_statistics(

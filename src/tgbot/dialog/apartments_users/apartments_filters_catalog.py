@@ -19,7 +19,6 @@ from aiogram_dialog.widgets.kbd import (
 )
 
 from src.core.repo.requests import RequestsRepo
-from src.tgbot.bot import dp
 from src.tgbot.dialog.apartments_landlord.getters import getter_apartment_details
 from .handlers import (
     handle_city_filter,

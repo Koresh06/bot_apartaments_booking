@@ -9,9 +9,15 @@ from aiogram_dialog.widgets.kbd import (
 
 from .custom_calendar import CustomCalendar
 from .states import BookingApartmentSG, ConfirmBooking
-from .handlers import back_to_catalog_apartments, handle_confirm_booking, no_confirm_booking, on_end_date_selected, on_start_date_selected, yes_confirm_booking
+from .handlers import (
+    back_to_catalog_apartments,
+    handle_confirm_booking,
+    no_confirm_booking,
+    on_end_date_selected,
+    on_start_date_selected,
+    yes_confirm_booking,
+)
 from .getters import getter_confirm_landlord_booking, getter_date
-
 
 
 booking_apartment = Dialog(
@@ -35,14 +41,15 @@ booking_apartment = Dialog(
         state=BookingApartmentSG.end_date,
     ),
     Window(
-        Format("📅 Дата начала аренды: {start_date}\n📅 Дата окончания аренды: {end_date}"),
+        Format(
+            "📅 Дата начала аренды: {start_date}\n📅 Дата окончания аренды: {end_date}"
+        ),
         Button(Const("✅ Подтвердить"), id="confirm", on_click=handle_confirm_booking),
         Back(Const("◀️ Назад")),
         state=BookingApartmentSG.confirm,
     ),
     getter=getter_date,
 )
-
 
 
 confirm_booking_landlord_dialog = Dialog(

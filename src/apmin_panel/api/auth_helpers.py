@@ -3,7 +3,6 @@ import hmac
 import hashlib
 
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

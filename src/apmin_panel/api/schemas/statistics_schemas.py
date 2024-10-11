@@ -5,16 +5,15 @@ from fastapi import Form
 
 
 class StatisticsDateSchema(BaseModel):
-    start_date: Optional[Union[date, None]] = None  # поддержка строк и None
-    end_date: Optional[Union[date, None]] = None    # поддержка строк и None
+    start_date: Optional[Union[date, None]] = None  
+    end_date: Optional[Union[date, None]] = None 
 
     @classmethod
     def as_form(
         cls,
-        start_date: Optional[str] = Form(None),  # строка по умолчанию
-        end_date: Optional[str] = Form(None),    # строка по умолчанию
+        start_date: Optional[str] = Form(None), 
+        end_date: Optional[str] = Form(None), 
     ):
-        # Преобразуем пустые строки в None
         def parse_date(date_str: Optional[str]) -> Optional[date]:
             if not date_str:
                 return None

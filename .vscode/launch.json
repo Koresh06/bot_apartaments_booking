@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Run FastAPI and Bot",
+        "type": "debugpy",
+        "request": "launch",
+        "program": "${workspaceFolder}/src/__main__.py",  // Укажите путь к вашему основному файлу
+        "python": "${command:python.interpreterPath}",
+        "cwd": "${workspaceFolder}/src",  // Рабочая директория указывает на src
+        "env": {
+          "BOT_CONFIG_FILE": "/path/to/.env"  // Переменные окружения
+        },
+        "stopOnEntry": false,
+        "console": "integratedTerminal"
+      }
+    ]
+  }
+  

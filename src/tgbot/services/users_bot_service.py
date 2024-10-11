@@ -1,5 +1,4 @@
 from typing import Optional
-
 from sqlalchemy import select, Result
 
 from src.core.repo.base import BaseRepo
@@ -31,6 +30,7 @@ class BotUserRepo(BaseRepo):
         await self.session.refresh(stmt)
         return stmt
 
+
     async def add_handler(
         self,
         tg_id: int,
@@ -48,6 +48,7 @@ class BotUserRepo(BaseRepo):
         self.session.add(landlord)
         await self.session.commit()
         await self.session.refresh(landlord)
+
 
     async def check_user_ban_status(
         self,

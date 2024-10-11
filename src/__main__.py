@@ -1,59 +1,56 @@
+import sys
+sys.dont_write_bytecode = True
+
 import asyncio
 import logging
-import uvicorn
-from aiogram_dialog import setup_dialogs
 
-from .tgbot.bot import dp, bot
-from .core.config import settings
-from .tgbot.middlewares.setup import setup_middlewares
-from .core.db_helper import db_helper
-from .tgbot.scheduler_init import scheduler
+import betterlogging as bl
 
-from .tgbot.dialog import get_routers, get_all_dialogs
+from .tgbot.bot import start_bot
+from .run_fastapi import start_app
 
 
 logger = logging.getLogger(__name__)
 
 
+def setup_logging():
+    """
+    Set up logging configuration for the application.
 
-async def start_bot():
+    This method initializes the logging configuration for the application.
+    It sets the log level to INFO and configures a basic colorized log for
+    output. The log format includes the filename, line number, log level,
+    timestamp, logger name, and log message.
+
+    Returns:
+        None
+
+    Example usage:
+        setup_logging()
+    """
+    log_level = logging.INFO
+    bl.basic_colorized_config(level=log_level)
+
     logging.basicConfig(
         level=logging.INFO,
-        format="%(filename)s:%(lineno)d #%(levelname)-8s "
-               "[%(asctime)s] - %(name)s - %(message)s",
+        format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
     )
+    logger = logging.getLogger(__name__)
     logger.info("Starting bot")
-
-    scheduler.start()
-
-    setup_middlewares(dp=dp, sessionmaker=db_helper.sessionmaker)
-
-    dp.include_routers(*get_routers())
-    dp.include_routers(*get_all_dialogs())
-    setup_dialogs(dp)
-
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
 
 
 async def main():
+    setup_logging()
 
     # Запуск бота в фоне
     asyncio.create_task(start_bot())
 
     # Запуск FastAPI приложения
-    config = uvicorn.Config(
-        "src.run_fastapi:app", 
-        host=settings.api.host,
-        port=settings.api.port,
-        log_level="info",
-        reload=True,
-    )
-    server = uvicorn.Server(config)
-    await server.serve()
+    await start_app()
+
 
 if __name__ == "__main__":
     try:
         asyncio.run(main())
-    except KeyboardInterrupt as exxit:
-        logger.info(f"Бот закрыт: {exxit}")
+    except (KeyboardInterrupt, SystemExit):
+        logging.error("Bot has been stopped")

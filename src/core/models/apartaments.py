@@ -3,7 +3,7 @@ from sqlalchemy import DateTime, Integer, String, Boolean, ForeignKey, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 
-from src.core.base import Base
+from src.core.models.base import Base
 
 if TYPE_CHECKING:
     from src.core.models import Landlords, Booking, ApartmentPhoto, City

@@ -10,8 +10,7 @@ from src.core.models.users import Users
 from src.core.repo.requests import RequestsRepo
 from src.tgbot.dialog.apartments_landlord.handlers import error_handler
 
-from src.core.config import settings
-from src.tgbot.bot import dp
+from src.core.config import config
 from .states import MainAdminSG, RegisterNameCitysSG
 from .getters import getter_name_city
 from .handlers import handle_register_name_city
@@ -24,7 +23,7 @@ main_admin_dialog = Dialog(
     Window(
         Const("🛠️ Администратор"),
         Start(Const("🌆 Добавить город"), id="add_city", state=RegisterNameCitysSG.start, show_mode=StartMode.RESET_STACK),
-        Url(Const("🔗 Панель администратора"), url=Const(settings.api.web_server_admin)),
+        Url(Const("🔗 Панель администратора"), url=Const(config.api.web_url)),
         state=MainAdminSG.start,
     )
 )

@@ -11,6 +11,6 @@ def setup_middlewares(
     dp: Dispatcher,
     sessionmaker: sqlalchemy.orm.sessionmaker,
 ):
-    dp.update.middleware(DbSessionMiddleware(sessionmaker=sessionmaker))
+    dp.update.outer_middleware(DbSessionMiddleware(sessionmaker=sessionmaker))
     dp.update.middleware(SchedulerMiddleware(scheduler=scheduler))
     dp.message.middleware(BanCheckMiddleware(sessionmaker=sessionmaker))

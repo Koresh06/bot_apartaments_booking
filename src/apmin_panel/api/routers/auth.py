@@ -8,7 +8,7 @@ from ..depandencies import check_admin_auth
 from ..schemas.auth_schemas import LoginData
 from src.apmin_panel.conf_static import templates
 
-from src.core.config import settings
+from src.core.config import config
 
 
 
@@ -42,7 +42,7 @@ async def login(
     login_data: LoginData = Depends(LoginData.as_form),
 ):
     try:
-        if not (login_data.username == settings.api.admin_login and login_data.password == settings.api.admin_password):
+        if not (login_data.username == config.api.admin_login and login_data.password == config.api.admin_password):
             msg = "Неверное имя пользователя или пароль"
             return templates.TemplateResponse(
                 "auth.html",
@@ -53,11 +53,11 @@ async def login(
             )
         else:
         # Генерация зашифрованной куки
-            hashed_cookie = create_hashed_cookie(login_data.username, settings.api.seckret_key)
+            hashed_cookie = create_hashed_cookie(login_data.username, config.api.secret_key)
             response = RedirectResponse(url="/statistics/get-statistics/",  status_code=status. HTTP_302_FOUND)
             # Устанавливаем зашифрованную куку
             response.set_cookie(
-                key="admin_token", value=hashed_cookie, httponly=True, max_age=1800
+                key="admin_token", value=hashed_cookie, httponly=True, max_age=1800 
             )
         return response
     except HTTPException:

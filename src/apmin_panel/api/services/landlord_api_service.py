@@ -25,7 +25,6 @@ class LandlordApiRepo(BaseRepo):
             return "Нет доступных арендодателей"
 
         return landlords
-
     
 
     async def get_statistics_by_landlord_id(

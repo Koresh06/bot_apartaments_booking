@@ -1,16 +1,15 @@
 from typing import List, Optional
-
 from sqlalchemy import select, Result
-from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 from src.core.repo.base import BaseRepo
+from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 
 
 class FilterApartmentRepo(BaseRepo):
 
     async def get_citys(self) -> List[tuple]:
-        query = select(City.id, City.name).order_by(City.id)  # Сортировка по убыванию id
-        result: Result = await self.session.execute(query)  # Выполнение запроса
+        query = select(City.id, City.name).order_by(City.id) 
+        result: Result = await self.session.execute(query)
 
         citys = result.all()  
         return [(city_name, city_id) for city_id, city_name in citys]
@@ -34,10 +33,10 @@ class FilterApartmentRepo(BaseRepo):
         query = (
             select(Apartment, ApartmentPhoto, Users.tg_id, Users.chat_id, City.name)
             .outerjoin(ApartmentPhoto, ApartmentPhoto.apartment_id == Apartment.id)
-            .join(Landlords, Landlords.id == Apartment.landlord_id)  # Присоединяем таблицу Landlords
-            .join(Users, Users.id == Landlords.user_id)  # Присоединяем таблицу Users
+            .join(Landlords, Landlords.id == Apartment.landlord_id) 
+            .join(Users, Users.id == Landlords.user_id)
             .join(City, City.id == Apartment.city_id)
-            .where(Apartment.is_available)  # Проверяем статус
+            .where(Apartment.is_available)  
             .order_by(Apartment.id.desc())
         )
 
@@ -70,7 +69,7 @@ class FilterApartmentRepo(BaseRepo):
                 "rooms": apartment.rooms,
                 "description": apartment.description,
                 "is_available": apartment.is_available,
-                "photos": photo.photos_ids if photo else []  # Обрабатываем случай, если фотографий нет
+                "photos": photo.photos_ids if photo else []
             })
 
         return formatted_result
