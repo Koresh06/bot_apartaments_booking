@@ -1,3 +1,4 @@
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 from aiogram_dialog import StartMode, Dialog, Window, DialogManager
@@ -14,6 +15,9 @@ from src.tgbot.bot import dp
 from .states import MainAdminSG, RegisterNameCitysSG
 from .getters import getter_name_city
 from .handlers import handle_register_name_city
+
+
+router = Router()
 
 
 main_admin_dialog = Dialog(
@@ -48,7 +52,7 @@ register_name_city_dialog = Dialog(
 )
 
 
-@dp.message(Command("admin"))
+@router.message(Command("admin"))
 async def command_admin(message: Message, dialog_manager: DialogManager):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     admin: Users = await repo.admin_bot.check_is_admin(message.from_user.id)

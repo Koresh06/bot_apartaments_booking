@@ -1,3 +1,4 @@
+from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, DialogManager, StartMode, Window
@@ -18,6 +19,9 @@ from .handlers import (
 from src.core.repo.requests import RequestsRepo
 from ..apartments_landlord.states import LandlordStateSG, MenuLandlordSG
 
+
+
+router = Router()
 
 
 register_landlord_dialog = Dialog(
@@ -57,7 +61,7 @@ register_landlord_dialog = Dialog(
 )
 
 
-@dp.message(Command("landlord"))
+@router.message(Command("landlord"))
 async def command_landlord_process(callback: CallbackQuery, dialog_manager: DialogManager):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     check_landlord = await repo.bot_apartments.check_landlord(callback.from_user.id)
