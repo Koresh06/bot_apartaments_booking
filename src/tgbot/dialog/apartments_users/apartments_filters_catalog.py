@@ -1,7 +1,7 @@
 from operator import itemgetter
 from aiogram import F
-from aiogram.filters import CommandStart, Command
-from aiogram.types import CallbackQuery, Message
+from aiogram.filters import CommandStart
+from aiogram.types import Message
 from aiogram_dialog import Dialog, DialogManager, StartMode, Window
 from aiogram_dialog.widgets.text import Format, Const
 from aiogram_dialog.widgets.media import DynamicMedia
