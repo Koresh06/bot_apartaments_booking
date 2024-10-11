@@ -1,5 +1,5 @@
 from operator import itemgetter
-from aiogram import F
+from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 from aiogram_dialog import Dialog, DialogManager, StartMode, Window
@@ -45,6 +45,9 @@ from src.tgbot.dialog.apartments_landlord.handlers import (
     on_next,
     on_prev,
 )
+
+
+router = Router()
 
 
 filter_catalog_apartments_dialog = Dialog(
@@ -221,7 +224,7 @@ catalog_users_apartments_dialog = Dialog(
 )
 
 
-@dp.message(CommandStart())
+@router.message(CommandStart())
 async def command_start_process(message: Message, dialog_manager: DialogManager):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     await repo.bot_users.add_user(
@@ -235,6 +238,10 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
         data={"city": None, "price_range": None, "rooms": None},
         mode=StartMode.RESET_STACK,
     )
+
+# @router.message(CommandStart())
+# async def cmd_start(message: Message):
+#     await message.answer("Привет!")
 
 
 # @dp.message(Command("filter"))

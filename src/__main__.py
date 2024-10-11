@@ -3,13 +3,13 @@ import logging
 import uvicorn
 from aiogram_dialog import setup_dialogs
 
-from src.tgbot.bot import dp, bot
-from src.core.config import settings
-from src.tgbot.middlewares.setup import setup_middlewares
-from src.core.db_helper import db_helper
-from src.tgbot.scheduler_init import scheduler
+from .tgbot.bot import dp, bot
+from .core.config import settings
+from .tgbot.middlewares.setup import setup_middlewares
+from .core.db_helper import db_helper
+from .tgbot.scheduler_init import scheduler
 
-from src.tgbot.dialog import get_routers
+from .tgbot.dialog import get_routers, get_all_dialogs
 
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ async def start_bot():
     setup_middlewares(dp=dp, sessionmaker=db_helper.sessionmaker)
 
     dp.include_routers(*get_routers())
+    dp.include_routers(*get_all_dialogs())
     setup_dialogs(dp)
 
     await bot.delete_webhook(drop_pending_updates=True)
