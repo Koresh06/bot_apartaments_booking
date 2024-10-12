@@ -34,17 +34,15 @@ async def get_users(
 
     if isinstance(users, str):
         return templates.TemplateResponse(
-            "users/get-users.html",
-            {
-                "request": request,
-                "message": users,
-            },
+            request=request,
+            name="users/get-users.html",
+            context={"message": users},
         )
 
     return templates.TemplateResponse(
-        "users/get-users.html",
-        {
-            "request": request,
+        request=request,
+        name="users/get-users.html",
+        context={
             "users": users,
             "user": is_authenticated,
         },
@@ -67,17 +65,15 @@ async def get_user_detail(
 
     if isinstance(user_by_id, str):
         return templates.TemplateResponse(
-            "users/get-user-detail.html",
-            {
-                "request": request,
-                "message": user_by_id,
-            },
+            request=request,
+            name="users/get-users.html",
+            context={"message": "user not found"},
         )
 
     return templates.TemplateResponse(
-        "users/get-user-detail.html",
-        {
-            "request": request,
+        request=request,
+        name="users/get-user-detail.html",
+        context={
             "by_user": user_by_id,
             "user": is_authenticated,
         },
@@ -101,17 +97,15 @@ async def banned_user(
 
     if isinstance(user_by_id, str):
         return templates.TemplateResponse(
-            "users/get-user-detail.html",
-            {
-                "request": request,
-                "message": user_by_id,
-            },
+            request=request,
+            name="users/get-user-detail.html",
+            context={"message": user_by_id},
         )
 
     return templates.TemplateResponse(
-        "users/get-user-detail.html",
-        {
-            "request": request,
+        request=request, 
+        name="users/get-user-detail.html",
+        context={
             "by_user": user_by_id,
             "user": is_authenticated,
         },
@@ -130,22 +124,20 @@ async def unbanned_user(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
-    unbanned = await UsersApiRepo(session).unbanned_user_by_id(user_id)
+    await UsersApiRepo(session).unbanned_user_by_id(user_id)
     user_by_id = await UsersApiRepo(session).get_user_by_id(user_id)    
 
     if isinstance(user_by_id, str):
         return templates.TemplateResponse(
-            "users/get-user-detail.html",
-            {
-                "request": request,
-                "message": user_by_id,
-            },
+            request=request,
+            name="users/get-user-detail.html",
+            context={"message": user_by_id},
         )
 
     return templates.TemplateResponse(
-        "users/get-user-detail.html",
-        {
-            "request": request,
+        request=request,
+        name="users/get-user-detail.html",
+        context={
             "by_user": user_by_id,
             "user": is_authenticated,
         },

@@ -11,14 +11,13 @@ from src.apmin_panel.conf_static import templates
 from src.core.config import config
 
 
-
 router = APIRouter(
     prefix="/auth",
     tags=["auth"],
     responses={404: {"description": "Not found"}},
 )
 
-# OAuth2 схема
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="admin/login")
 
 
@@ -28,11 +27,9 @@ async def login_form(
     is_authenticated: bool = Depends(check_admin_auth),
 ):
     return templates.TemplateResponse(
-        "auth.html",
-        {
-            "request": request,
-            "user": is_authenticated,
-        },
+        request=request,
+        name="auth.html",
+        context={"user": is_authenticated},
     )
 
 
@@ -45,11 +42,9 @@ async def login(
         if not (login_data.username == config.api.admin_login and login_data.password == config.api.admin_password):
             msg = "Неверное имя пользователя или пароль"
             return templates.TemplateResponse(
-                "auth.html",
-                {
-                    "request": request,
-                    "msg": msg,
-                },
+                request=request,
+                name="auth.html",
+                context={"msg": msg},
             )
         else:
         # Генерация зашифрованной куки
@@ -63,11 +58,9 @@ async def login(
     except HTTPException:
         msg = "Unknown Error"
         return templates.TemplateResponse(
-            "auth.html",
-            {
-                "request": request,
-                "msg": msg,
-            },
+            request=request,
+            name="auth.html",
+            context={"msg": msg},
         )
 
 
@@ -75,12 +68,10 @@ async def login(
 async def logout(request: Request):
     msg = "Успешный выход из системы"
     response = templates.TemplateResponse(
-        "auth.html",
-        {
-            "request": request,
-            "msg": msg,
-        },
-    )
+            request=request,
+            name="auth.html",
+            context={"msg": msg},
+        )
 
     response.delete_cookie(key="admin_token")
     return response
