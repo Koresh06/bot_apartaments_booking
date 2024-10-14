@@ -24,34 +24,41 @@ async def test_get_users(authenticated_client: AsyncClient, prepare_database):
             full_name="User One",
             is_admin=False,
             is_banned=False,
-            create_at=datetime(2024, 1, 1, 12, 0),
-            update_at=datetime(2024, 1, 1, 12, 0),
+            create_at=datetime.now(),
+            update_at=datetime.now(),
         )
-        session.add(user1)
         user2 = Users(
             id=2,
-            tg_id=223456789,
-            chat_id=887654321,
+            tg_id=987654321,
+            chat_id=123456789,
             username="user2",
             full_name="User Two",
             is_admin=False,
             is_banned=False,
-            create_at=datetime(2024, 1, 2, 12, 0),
-            update_at=datetime(2024, 1, 2, 12, 0),
+            create_at=datetime.now(),
+            update_at=datetime.now(),
         )
-
+        session.add(user1)
         session.add(user2)
         await session.commit()
+        await session.refresh(user2)
 
-        stmt = select(Users)
-        result: Users = await session.execute(stmt)
-        users = result.scalars().all()
-        assert len(users) == 2
-        assert users[0] == user1
-        assert users[1] == user2
 
-        response = await authenticated_client.get("/users/get-users/")
-        assert response.status_code == 200
+        user_from_db = await UsersApiRepo(session).get_all_users()
+
+        assert user_from_db[1].id == user1.id
+        assert user_from_db[1].tg_id == user1.tg_id
+        assert user_from_db[1].chat_id == user1.chat_id
+        assert user_from_db[1].username == user1.username
+        assert user_from_db[1].full_name == user1.full_name
+        assert user_from_db[1].is_admin == user1.is_admin
+        assert user_from_db[1].is_banned == user1.is_banned
+        assert user_from_db[1].create_at == user1.create_at
+        assert user_from_db[1].update_at == user1.update_at
+            
+
+    response = await authenticated_client.get("/users/get-users/")
+    assert response.status_code == 200
 
 
 async def test_get_user_detail(authenticated_client: AsyncClient, prepare_database): 

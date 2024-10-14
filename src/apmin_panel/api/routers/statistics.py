@@ -33,17 +33,14 @@ async def get_general_statistics(
 
     if isinstance(general_statistics, str):
         return templates.TemplateResponse(
-            "statistics/general-statistics.html",
-            {
-                "request": request,
-                "message": general_statistics,
-            },
-        )
+            request=request,
+            name="statistics/general-statistics.html",
+            context={"message": general_statistics})
     
     return templates.TemplateResponse(
-        "statistics/general-statistics.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/general-statistics.html",
+        context={
             "statistics": general_statistics,
             "user": is_authenticated,
         },
@@ -67,17 +64,14 @@ async def general_statistics_date(
     
     if isinstance(general_statistics, str):
         return templates.TemplateResponse(
-            "statistics/general-statistics.html",
-            {
-                "request": request,
-                "message": general_statistics,
-            },
-        )
+            request=request,
+            name="statistics/general-statistics.html",
+            context={"message": general_statistics})
     
     return templates.TemplateResponse(
-        "statistics/general-statistics.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/general-statistics.html",
+        context={
             "statistics": general_statistics,
             "user": is_authenticated,
             "start_date": date_data.start_date,
@@ -99,17 +93,14 @@ async def get_completed_bookings(
 
     if isinstance(pending_bookings, str):
         return templates.TemplateResponse(
-            "statistics/pending-bookings.html",
-            {
-                "request": request,
-                "message": pending_bookings,
-            },
-        )
+            request=request,
+            name="statistics/pending-bookings.html",
+            context={"message": pending_bookings})
     
     return templates.TemplateResponse(
-        "statistics/pending-bookings.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/pending-bookings.html",
+        context={
             "bookings": pending_bookings,
             "user": is_authenticated,
         },
@@ -129,17 +120,14 @@ async def get_completed_bookings(
 
     if isinstance(completed_bookings, str):
         return templates.TemplateResponse(
-            "statistics/completed-bookings.html",
-            {
-                "request": request,
-                "message": completed_bookings,
-            },
-        )
+            request=request,
+            name="statistics/completed-bookings.html",
+            context={"message": completed_bookings})
     
     return templates.TemplateResponse(
-        "statistics/completed-bookings.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/completed-bookings.html",
+        context={
             "bookings": completed_bookings,
             "user": is_authenticated,
         },
@@ -159,17 +147,14 @@ async def get_total_income_bookings(
 
     if isinstance(total_income_bookings, str):
         return templates.TemplateResponse(
-            "statistics/total-income-bookings.html",
-            {
-                "request": request,
-                "message": total_income_bookings,
-            },
-        )
+            request=request,
+            name="statistics/total-income-bookings.html",
+            context={"message": total_income_bookings})
     
     return templates.TemplateResponse(
-        "statistics/total-income-bookings.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/total-income-bookings.html",
+        context={
             "bookings": total_income_bookings,
             "user": is_authenticated,
         },

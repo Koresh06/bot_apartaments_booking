@@ -15,7 +15,7 @@ router = APIRouter(
     prefix="/booking",
     tags=["booking"],
     responses={404: {"description": "Not found"}},
-    dependencies=[Depends(admin_auth)],
+    # dependencies=[Depends(admin_auth)],
 )
 
 
@@ -29,17 +29,14 @@ async def get_bookings(
 
     if isinstance(bookings, str):
         return templates.TemplateResponse(
-            "bookings.html",
-            {
-                "request": request,
-                "message": bookings,
-            },
-        )
+            request=request,
+            name="bookings.html",
+            context={"message": bookings})
 
     return templates.TemplateResponse(
-        "bookings.html",
-        {
-            "request": request,
+        request=request,
+        name="bookings.html",
+        context={
             "bookings": bookings,
             "user": is_authenticated,
         },

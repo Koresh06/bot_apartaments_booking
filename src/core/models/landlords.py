@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class Landlords(Base):
     __tablename__ = "landlords"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     company_name: Mapped[str] = mapped_column(String(100))
     phone: Mapped[str] = mapped_column(String(100))

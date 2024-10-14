@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class ApartmentPhoto(Base):
     __tablename__ = "apartment_photos"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     apartment_id: Mapped[int] = mapped_column(Integer, ForeignKey("apartments.id"), nullable=False)
     photos_ids: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
 

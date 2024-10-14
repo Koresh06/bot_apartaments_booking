@@ -16,7 +16,7 @@ router = APIRouter(
     prefix="/landlord",
     tags=["landlord"],
     responses={404: {"description": "Not found"}},
-    dependencies=[Depends(admin_auth)],
+    # dependencies=[Depends(admin_auth)],
 )
 
 
@@ -33,17 +33,14 @@ async def get_landlords(
 
     if isinstance(landlords, str):
         return templates.TemplateResponse(
-            "landlord/get-landlords.html",
-            {
-                "request": request,
-                "message": landlords,
-            },
-        )
+            request=request,
+            name="landlord/get-landlords.html",
+            context={"message": landlords})
 
     return templates.TemplateResponse(
-        "landlord/get-landlords.html",
-        {
-            "request": request,
+        request=request,
+        name="landlord/get-landlords.html",
+        context={
             "landlords": landlords,
             "user": is_authenticated,
         },
@@ -65,17 +62,14 @@ async def statistics_landlord_by_id(
     )
     if isinstance(statistics, str):
         return templates.TemplateResponse(
-            "landlord/statistics.html",
-            {
-                "request": request,
-                "message": statistics,
-            },
-        )
+            request=request,
+            name="landlord/statistics.html",
+            context={"message": statistics})
 
     return templates.TemplateResponse(
-        "landlord/statistics.html",
-        {
-            "request": request,
+        request=request,
+        name="landlord/statistics.html",
+        context={
             "statistics": statistics,
             "user": is_authenticated,
         },
@@ -99,17 +93,14 @@ async def statistics_landlord_date_by_id(
     )
     if isinstance(statistics, str):
         return templates.TemplateResponse(
-            "landlord/statistics.html",
-            {
-                "request": request,
-                "message": statistics,
-            },
-        )
+            request=request,
+            name="landlord/statistics.html",
+            context={"message": statistics})
 
     return templates.TemplateResponse(
-        "landlord/statistics.html",
-        {
-            "request": request,
+        request=request,
+        name="landlord/statistics.html",
+        context={
             "statistics": statistics,
             "user": is_authenticated,
             "start_date": date_data.start_date,
@@ -128,23 +119,18 @@ async def get_completed_bookings(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
-    completed_bookings = await LandlordApiRepo(
-        session
-    ).get_completed_bookings_by_landlord_id(landlord_id)
+    completed_bookings = await LandlordApiRepo(session).get_completed_bookings_by_landlord_id(landlord_id)
 
     if isinstance(completed_bookings, str):
         return templates.TemplateResponse(
-            "statistics/completed-bookings.html",
-            {
-                "request": request,
-                "message": completed_bookings,
-            },
-        )
+            request=request,
+            name="statistics/completed-bookings.html",
+            context={"message": completed_bookings})
 
     return templates.TemplateResponse(
-        "statistics/completed-bookings.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/completed-bookings.html",
+        context={
             "bookings": completed_bookings,
             "user": is_authenticated,
         },
@@ -152,7 +138,7 @@ async def get_completed_bookings(
 
 
 @router.get("/{landlord_id}/pending-bookings", response_class=HTMLResponse)
-async def get_completed_bookings(
+async def get_pending_bookings(
     request: Request,
     landlord_id: int,
     session: Annotated[
@@ -167,17 +153,14 @@ async def get_completed_bookings(
 
     if isinstance(pending_bookings, str):
         return templates.TemplateResponse(
-            "statistics/pending-bookings.html",
-            {
-                "request": request,
-                "message": pending_bookings,
-            },
-        )
+            request=request,
+            name="statistics/pending-bookings.html",
+            context={"message": pending_bookings})
 
     return templates.TemplateResponse(
-        "statistics/pending-bookings.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/pending-bookings.html",
+        context={
             "bookings": pending_bookings,
             "user": is_authenticated,
         },
@@ -200,17 +183,14 @@ async def get_total_income_bookings(
 
     if isinstance(total_income_bookings, str):
         return templates.TemplateResponse(
-            "statistics/total-income-bookings.html",
-            {
-                "request": request,
-                "message": total_income_bookings,
-            },
-        )
+            request=request,
+            name="statistics/total-income-bookings.html",
+            context={"message": total_income_bookings})
 
     return templates.TemplateResponse(
-        "statistics/total-income-bookings.html",
-        {
-            "request": request,
+        request=request,
+        name="statistics/total-income-bookings.html",
+        context={
             "bookings": total_income_bookings,
             "user": is_authenticated,
         },
@@ -222,23 +202,20 @@ async def show_create_landlord_form(
     request: Request,
     session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
-    message: str = None,  # Добавлен параметр для сообщения
+    message: str = None,
 ):
     not_landlords = await LandlordApiRepo(session).get_users_not_landlord()
 
     if isinstance(not_landlords, str):
         return templates.TemplateResponse(
-            "landlord/create-landlord.html",
-            {
-                "request": request,
-                "message": not_landlords,
-            },
-        )
+            request=request,    
+            name="landlord/create-landlord.html",
+            context={"message": not_landlords})
 
     return templates.TemplateResponse(
-        "landlord/create-landlord.html",
-        {
-            "request": request,
+        request=request,
+        name="landlord/create-landlord.html",
+        context={
             "users": not_landlords,
             "user": is_authenticated,
             "message": message,  # Передаем сообщение в шаблон
@@ -249,15 +226,13 @@ async def show_create_landlord_form(
 @router.post("/submit-create-landlord")
 async def submit_create_landlord(
     session: Annotated[AsyncSession, Depends(get_db)],
-    create_landlord: CreateLandlordSchema = Depends(CreateLandlordSchema.as_form),
+    from_data: CreateLandlordSchema = Depends(CreateLandlordSchema.as_form),
     is_authenticated: bool = Depends(admin_auth),
 ):
-    landlord = await LandlordApiRepo(session).create_landlord(create_landlord)
+    landlord = await LandlordApiRepo(session).create_landlord(from_data)
     
     if not landlord:
-        # Если не удалось создать, перенаправляем с сообщением об ошибке
         return RedirectResponse("/landlord/create-landlord?message=Не удалось создать арендодателя.", status_code=303)
 
-    # Если успешно создан, перенаправляем с сообщением об успехе
     return RedirectResponse("/landlord/create-landlord?message=Арендодатель успешно добавлен!", status_code=303)
 

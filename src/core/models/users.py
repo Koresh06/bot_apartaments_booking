@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class Users(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     tg_id: Mapped[int] = mapped_column(Integer, unique=True, nullable=False)
     chat_id: Mapped[int] = mapped_column(Integer, nullable=True)
     username: Mapped[str] = mapped_column(String(100), nullable=True)

@@ -24,7 +24,8 @@ async def get_users(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(get_db)],
+        Depends(get_db)
+    ],
     is_authenticated: bool = Depends(admin_auth),
 ):
     users = await UsersApiRepo(session).get_all_users()
