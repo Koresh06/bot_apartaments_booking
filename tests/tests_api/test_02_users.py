@@ -1,7 +1,5 @@
 from datetime import datetime
-import pytest
 from httpx import AsyncClient
-from sqlalchemy import select
 
 from src.apmin_panel.api.services.users_api_service import UsersApiRepo
 from src.core.models import Users

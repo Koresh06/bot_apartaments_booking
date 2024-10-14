@@ -1,10 +1,7 @@
-from datetime import datetime, date
-import pytest
+from datetime import date
 from httpx import AsyncClient
-from sqlalchemy import select
 
 from src.apmin_panel.api.services.landlord_api_service import LandlordApiRepo
-from src.core.models import Booking, Apartment, City
 from ..conftest import async_session_maker
 
 

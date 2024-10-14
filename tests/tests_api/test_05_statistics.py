@@ -1,10 +1,8 @@
 from datetime import datetime, date
-import pytest
 from httpx import AsyncClient
-from sqlalchemy import select
 
 from src.apmin_panel.api.services.statistics_api_service import StatisticsApiRepo
-from src.core.models import Booking, Apartment, City
+from src.core.models import Booking
 from ..conftest import async_session_maker
 
 

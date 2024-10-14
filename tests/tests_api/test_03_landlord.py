@@ -1,11 +1,9 @@
 from datetime import datetime
-import pytest
 from httpx import AsyncClient
 from sqlalchemy import select, delete
 
 from src.apmin_panel.api.services.landlord_api_service import LandlordApiRepo
-from src.apmin_panel.api.services.users_api_service import UsersApiRepo
-from src.core.models import Landlords, Users
+from src.core.models import Landlords
 from ..conftest import async_session_maker
 
 

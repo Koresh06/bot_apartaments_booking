@@ -2,7 +2,6 @@ from datetime import date, datetime, time
 from functools import partial
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram.types import CallbackQuery, User, Chat
-from aiogram.enums.parse_mode import ParseMode
 from aiogram_dialog import DialogManager, ShowMode, StartMode
 from aiogram_dialog.manager.bg_manager import BgManager
 from aiogram_dialog.widgets.kbd import Button
@@ -42,12 +41,6 @@ async def back_to_catalog_apartments(callback: CallbackQuery, widget: Button, di
     await dialog_manager.start(state=FilteredCatalogApartmentsSG.start, mode=StartMode.RESET_STACK, data=apartment)
 
 
-async def handle_confirm_booking(
-    callback: CallbackQuery,
-    widget: Button,
-    dialog_manager: DialogManager,
-):
-    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
 async def handle_confirm_booking(
     callback: CallbackQuery,
     widget: Button,

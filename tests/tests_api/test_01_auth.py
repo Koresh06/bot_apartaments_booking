@@ -1,4 +1,3 @@
-import pytest
 from bs4 import BeautifulSoup
 from fastapi import status
 from httpx import AsyncClient

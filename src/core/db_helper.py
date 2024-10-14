@@ -1,14 +1,11 @@
-from loguru import logger
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
 
-from src.core.config import DbConfig, config
-from src.core.models.base import Base
+from src.core.config import config
 
 
 # class DatabaseHelper:
@@ -65,5 +62,5 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         try:
             yield session
-        except Exception as e:
+        except Exception:
             session.close()

@@ -1,14 +1,12 @@
-import asyncio
 from typing import AsyncGenerator
 import pytest
 import pytest_asyncio
 
-from asyncio import current_task
 
 from httpx import ASGITransport, AsyncClient
 from aiogram import Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker, async_scoped_session
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
@@ -18,7 +16,6 @@ from src.tgbot.dialog import get_routers
 from tests.mocked_aiogram import MockedBot, MockedSession
 
 from src.core.db_helper import get_db
-from src.core.config import Config, load_config
 from src.core.models.base import Base
 from src.run_fastapi import app
 from src.core.config import config
