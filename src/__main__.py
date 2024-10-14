@@ -6,8 +6,8 @@ import logging
 
 import betterlogging as bl
 
-from .tgbot.bot import start_bot
-from .run_fastapi import start_app
+from src.tgbot.bot import start_bot
+from src.run_fastapi import start_app
 
 
 logger = logging.getLogger(__name__)

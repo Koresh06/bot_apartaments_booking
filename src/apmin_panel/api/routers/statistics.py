@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
 
-from src.core.db_helper import db_helper
+from src.core.db_helper import get_db
 
 from ..services.statistics_api_service import StatisticsApiRepo
 from ..schemas.statistics_schemas import StatisticsDateSchema
@@ -25,7 +25,7 @@ async def get_general_statistics(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -55,7 +55,7 @@ async def general_statistics_date(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
     date_data: StatisticsDateSchema = Depends(StatisticsDateSchema.as_form),
@@ -91,7 +91,7 @@ async def get_completed_bookings(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -121,7 +121,7 @@ async def get_completed_bookings(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -151,7 +151,7 @@ async def get_total_income_bookings(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):

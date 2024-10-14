@@ -1,3 +1,4 @@
+from loguru import logger
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -7,24 +8,27 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.core.config import DbConfig, config
+from src.core.models.base import Base
 
 
 # class DatabaseHelper:
-#     def __init__(self, config: DbConfig):
+#     def __init__(self, config: DbConfig, is_test: bool = False):
 #         self.config = config
+#         self.is_test = is_test  # Флаг для выбора тестовой базы
 #         self.engine = self.create_engine(config, echo=False)
 #         self.sessionmaker = self.create_session_pool(self.engine)
 
 
 #     def create_engine(self, db: DbConfig, echo=False) -> AsyncEngine:
 #         return create_async_engine(
-#             db.construct_sqlalchemy_url(),
+#             db.construct_sqlalchemy_url(is_test=self.is_test),
 #             query_cache_size=1200,
-#             pool_size=20,          
-#             max_overflow=200,        
+#             pool_size=20,
+#             max_overflow=200,
 #             future=True,
 #             echo=echo
 #         )
+    
 
 
 #     def create_session_pool(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
@@ -33,42 +37,33 @@ from src.core.config import DbConfig, config
 #             expire_on_commit=False
 #         )
 
+
 #     async def get_db(self) -> AsyncGenerator[AsyncSession, None]:
 #         async with self.sessionmaker() as session:
 #             yield session
 
-class DatabaseHelper:
-    def __init__(self, config: DbConfig, is_test: bool = False):
-        self.config = config
-        self.is_test = is_test  # Флаг для выбора тестовой базы
-        self.engine = self.create_engine(config, echo=False)
-        self.sessionmaker = self.create_session_pool(self.engine)
+
+# db_helper = DatabaseHelper(config=config.db)
+
+engine = create_async_engine(
+    url=config.db.construct_sqlalchemy_url(),
+    query_cache_size=1200,
+    pool_size=20,
+    max_overflow=200,
+    future=True,
+    echo=False,
+)
 
 
-    def create_engine(self, db: DbConfig, echo=False) -> AsyncEngine:
-        return create_async_engine(
-            db.construct_sqlalchemy_url(is_test=self.is_test),
-            query_cache_size=1200,
-            pool_size=20,
-            max_overflow=200,
-            future=True,
-            echo=echo
-        )
-    
+async_session_maker = async_sessionmaker(
+    bind=engine,
+    expire_on_commit=False
+)
 
 
-    def create_session_pool(self, engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
-        print(engine.url)
-        return async_sessionmaker(
-            bind=engine,
-            expire_on_commit=False
-        )
-
-
-    async def get_db(self) -> AsyncGenerator[AsyncSession, None]:
-        async with self.sessionmaker() as session:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        try:
             yield session
-
-
-
-db_helper = DatabaseHelper(config=config.db)
+        except Exception as e:
+            session.close()

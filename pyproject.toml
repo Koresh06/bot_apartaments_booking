@@ -30,6 +30,7 @@ pandas = "^2.2.3"
 itsdangerous = "^2.2.0"
 betterlogging = "^1.0.0"
 beautifulsoup4 = "^4.12.3"
+loguru = "^0.7.2"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -37,6 +38,7 @@ pytest = "^8.3.3"
 pytest-asyncio = "^0.24.0"
 httpx = "^0.27.2"
 pytest-mock = "^3.14.0"
+sqlalchemy-utils = "^0.41.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -45,4 +47,5 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 pythonpath = [".", "src",]
 asyncio_mode = "auto"
+
 

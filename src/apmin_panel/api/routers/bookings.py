@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
 
-from src.core.db_helper import db_helper
+from src.core.db_helper import get_db
 
 from ..services.booking_api_service import BookingApiRepo
 
@@ -22,10 +22,7 @@ router = APIRouter(
 @router.get("/get-bookings/", response_class=HTMLResponse)
 async def get_bookings(
     request: Request,
-    session: Annotated[
-        AsyncSession,
-        Depends(db_helper.get_db),
-    ],
+    session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
     bookings = await BookingApiRepo(session).get_all_bookings()

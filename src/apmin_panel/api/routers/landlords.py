@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
 
-from src.core.db_helper import db_helper
+from src.core.db_helper import get_db
 
 from ..services.landlord_api_service import LandlordApiRepo
 from ..schemas.landlord_schemas import CreateLandlordSchema, LandlordDateSchema
@@ -25,7 +25,7 @@ async def get_landlords(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -56,7 +56,7 @@ async def statistics_landlord_by_id(
     landlord_id: int,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -87,7 +87,7 @@ async def statistics_landlord_date_by_id(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
     date_data: LandlordDateSchema = Depends(LandlordDateSchema.as_form),
@@ -124,7 +124,7 @@ async def get_completed_bookings(
     landlord_id: int,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -157,7 +157,7 @@ async def get_completed_bookings(
     landlord_id: int,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -190,7 +190,7 @@ async def get_total_income_bookings(
     landlord_id: int,
     session: Annotated[
         AsyncSession,
-        Depends(db_helper.get_db),
+        Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
@@ -220,7 +220,7 @@ async def get_total_income_bookings(
 @router.get("/create-landlord", response_class=HTMLResponse)
 async def show_create_landlord_form(
     request: Request,
-    session: Annotated[AsyncSession, Depends(db_helper.get_db)],
+    session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
     message: str = None,  # Добавлен параметр для сообщения
 ):
@@ -248,7 +248,7 @@ async def show_create_landlord_form(
 
 @router.post("/submit-create-landlord")
 async def submit_create_landlord(
-    session: Annotated[AsyncSession, Depends(db_helper.get_db)],
+    session: Annotated[AsyncSession, Depends(get_db)],
     create_landlord: CreateLandlordSchema = Depends(CreateLandlordSchema.as_form),
     is_authenticated: bool = Depends(admin_auth),
 ):

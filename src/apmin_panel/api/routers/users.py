@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
 
-from src.core.db_helper import db_helper
+from src.core.db_helper import get_db
 
 from ..services.users_api_service import UsersApiRepo
 
@@ -15,7 +15,7 @@ router = APIRouter(
     prefix="/users",
     tags=["users"],
     responses={404: {"description": "Not found"}},
-    dependencies=[Depends(admin_auth)],
+    # dependencies=[Depends(admin_auth)],
 )
 
 
@@ -24,10 +24,7 @@ async def get_users(
     request: Request,
     session: Annotated[
         AsyncSession,
-        Depends(
-            db_helper.get_db,
-        ),
-    ],
+        Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
     users = await UsersApiRepo(session).get_all_users()
@@ -53,12 +50,7 @@ async def get_users(
 async def get_user_detail(
     user_id: int,    
     request: Request,
-    session: Annotated[
-        AsyncSession,
-        Depends(
-            db_helper.get_db,
-        ),
-    ],
+    session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
     user_by_id = await UsersApiRepo(session).get_user_by_id(user_id)
@@ -84,12 +76,7 @@ async def get_user_detail(
 async def banned_user(
     request: Request,
     user_id: int,
-    session: Annotated[
-        AsyncSession,
-        Depends(
-            db_helper.get_db,
-        ),
-    ],
+    session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
     banned = await UsersApiRepo(session).banned_user_by_id(user_id)
@@ -116,12 +103,7 @@ async def banned_user(
 async def unbanned_user(
     request: Request,
     user_id: int,
-    session: Annotated[
-        AsyncSession,
-        Depends(
-            db_helper.get_db,
-        ),
-    ],
+    session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
     await UsersApiRepo(session).unbanned_user_by_id(user_id)

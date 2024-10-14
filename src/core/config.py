@@ -47,6 +47,16 @@ class DbConfig:
         
         test_database = env.str("TEST_POSTGRES_DB")
 
+        if is_test:
+            return DbConfig(
+                host=host, 
+                password=password, 
+                user=user, 
+                database=database, 
+                port=port,
+                test_database=test_database
+            )
+
         return DbConfig(
             host=host, 
             password=password, 
