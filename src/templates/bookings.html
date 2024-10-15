@@ -34,7 +34,7 @@
                             <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Не подтверждено</span>
                         {% endif %}
                     </td>
-                    <td>{{ booking.create_at.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ booking.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

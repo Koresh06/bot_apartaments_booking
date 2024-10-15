@@ -139,6 +139,7 @@ class LandlordApiRepo(BaseRepo):
         )
         result = await self.session.execute(stmt)
         bookings_with_details = result.all()
+
         return bookings_with_details
     
 
@@ -164,6 +165,7 @@ class LandlordApiRepo(BaseRepo):
         )
         result = await self.session.execute(stmt)
         bookings_with_details = result.all()
+
         return bookings_with_details
 
 
@@ -195,6 +197,7 @@ class LandlordApiRepo(BaseRepo):
         bookings_with_income = []
 
         for booking, username, street, house_number, apartment_number, city_name, price_per_day in bookings_with_details:
+            print(booking.__dict__)
      
             days_booked = (booking.end_date - booking.start_date).days
 

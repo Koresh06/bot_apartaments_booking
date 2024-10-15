@@ -43,7 +43,7 @@
                         <td>{{ username }}</td>
                         <td>{{ booking.start_date.strftime('%d.%m.%Y') }}</td>
                         <td>{{ booking.end_date.strftime('%d.%m.%Y') }}</td>
-                        <td>{{ booking.create_at.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

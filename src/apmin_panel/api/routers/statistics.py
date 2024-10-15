@@ -105,6 +105,7 @@ async def get_completed_bookings(
         return RedirectResponse("/auth/login", status_code=303)
     
     pending_bookings = await StatisticsApiRepo(session).get_pending_bookings()
+    print(pending_bookings)
 
     if isinstance(pending_bookings, str):
         return templates.TemplateResponse(

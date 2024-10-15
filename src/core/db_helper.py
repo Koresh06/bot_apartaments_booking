@@ -1,4 +1,5 @@
 from typing import AsyncGenerator
+from fastapi import logger
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -62,5 +63,5 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         try:
             yield session
-        except Exception:
-            session.close()
+        except Exception as e:
+            await session.close() 

@@ -18,22 +18,22 @@
                 </tr>
             </thead>
             <tbody>
-                {% for booking_info in bookings %}
+                {% for booking in bookings %}
                     <tr class="text-center">
                         <td>{{ loop.index }}</td>
                         <td>
                             <table class="table table-sm table-borderless mb-0">
-                                <tr><td>Город:</td><td>{{ booking_info.city_name }}</td></tr>
-                                <tr><td>Улица:</td><td>{{ booking_info.street }}</td></tr>
-                                <tr><td>Дом:</td><td>{{ booking_info.house_number }}</td></tr>
-                                <tr><td>Квартира:</td><td>{{ booking_info.apartment_number or '—' }}</td></tr>
+                                <tr><td>Город:</td><td>{{ booking.city_name }}</td></tr>
+                                <tr><td>Улица:</td><td>{{ booking.street }}</td></tr>
+                                <tr><td>Дом:</td><td>{{ booking.house_number }}</td></tr>
+                                <tr><td>Квартира:</td><td>{{ booking.apartment_number or '—' }}</td></tr>
                             </table>
                         </td>
-                        <td>{{ booking_info.username }}</td>
-                        <td>{{ booking_info.booking.start_date }}</td>
-                        <td>{{ booking_info.booking.end_date }}</td>
-                        <td>{{ booking_info.income }} руб.</td> <!-- Вывод дохода -->
-                        <td>{{ booking_info.created_at.strftime('%d.%m.%Y') }}</td> <!-- Дата создания апартамента -->
+                        <td>{{ booking.username }}</td>
+                        <td>{{ booking.booking.start_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.booking.end_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.income }} руб.</td> <!-- Вывод дохода -->
+                        <td>{{ booking.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td> <!-- Дата создания апартамента -->
                     </tr>
                 {% endfor %}
             </tbody>

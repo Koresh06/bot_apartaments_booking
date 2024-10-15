@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,9 @@ from src.core.db_helper import get_db
 
 from ..services.landlord_api_service import LandlordApiRepo
 from ..schemas.landlord_schemas import CreateLandlordSchema, LandlordDateSchema
+
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter(
@@ -134,29 +138,60 @@ async def statistics_landlord_date_by_id(
     )
 
 
-@router.get("/{landlord_id}/completed-bookings", response_class=HTMLResponse)
-async def get_completed_bookings(
+@router.get("/{landlord_id}/pending-bookings", response_class=HTMLResponse)
+async def get_pending_bookings(
     request: Request,
     landlord_id: int,
-    session: Annotated[
-        AsyncSession,
-        Depends(get_db),
-    ],
+    session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
     if not is_authenticated:
         return RedirectResponse("/auth/login", status_code=303)
-    
-    completed_bookings = await LandlordApiRepo(session).get_completed_bookings_by_landlord_id(landlord_id)
 
-    if isinstance(completed_bookings, str):
+    pending_bookings = await LandlordApiRepo(session).get_pending_bookings_by_landlord_id(landlord_id)
+    logger.info(f"Получены ожидающие бронирования: {pending_bookings}")
+    
+    if not pending_bookings:
+        return templates.TemplateResponse(
+            request=request,
+            name="statistics/pending-bookings.html",
+            context={
+                "message": "Нет ожидающих бронирований.",
+                "user": is_authenticated,
+            },
+        )
+    return templates.TemplateResponse(
+        request=request,
+        name="statistics/pending-bookings.html",
+        context={
+            "bookings": pending_bookings,
+            "user": is_authenticated,
+        },
+    )
+
+
+@router.get("/{landlord_id}/completed-bookings", response_class=HTMLResponse)
+async def get_completed_bookings(
+    request: Request,
+    landlord_id: int,
+    session: Annotated[AsyncSession, Depends(get_db)],
+    is_authenticated: bool = Depends(admin_auth),
+):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+
+    completed_bookings = await LandlordApiRepo(session).get_completed_bookings_by_landlord_id(landlord_id)
+    logger.info(f"Получены завершенные бронирования: {completed_bookings}")
+
+    if not completed_bookings:
         return templates.TemplateResponse(
             request=request,
             name="statistics/completed-bookings.html",
             context={
-                "message": completed_bookings,
+                "message": "Нет завершенных бронирований.",
                 "user": is_authenticated,
-            })
+            },
+        )
 
     return templates.TemplateResponse(
         request=request,
@@ -168,58 +203,18 @@ async def get_completed_bookings(
     )
 
 
-@router.get("/{landlord_id}/pending-bookings", response_class=HTMLResponse)
-async def get_pending_bookings(
-    request: Request,
-    landlord_id: int,
-    session: Annotated[
-        AsyncSession,
-        Depends(get_db),
-    ],
-    is_authenticated: bool = Depends(admin_auth),
-):
-    if not is_authenticated:
-        return RedirectResponse("/auth/login", status_code=303)
-    
-    pending_bookings = await LandlordApiRepo(
-        session
-    ).get_pending_bookings_by_landlord_id(landlord_id)
-
-    if isinstance(pending_bookings, str):
-        return templates.TemplateResponse(
-            request=request,
-            name="statistics/pending-bookings.html",
-            context={
-                "message": pending_bookings,
-                "user": is_authenticated,
-            })
-
-    return templates.TemplateResponse(
-        request=request,
-        name="statistics/pending-bookings.html",
-        context={
-            "bookings": pending_bookings,
-            "user": is_authenticated,
-        },
-    )
-
-
 @router.get("/{landlord_id}/total-income-bookings", response_class=HTMLResponse)
 async def get_total_income_bookings(
     request: Request,
     landlord_id: int,
-    session: Annotated[
-        AsyncSession,
-        Depends(get_db),
-    ],
+    session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
     if not is_authenticated:
         return RedirectResponse("/auth/login", status_code=303)
-    
-    total_income_bookings = await LandlordApiRepo(
-        session
-    ).get_total_income_bookings_by_landlord_id(landlord_id)
+
+    total_income_bookings = await LandlordApiRepo(session).get_total_income_bookings_by_landlord_id(landlord_id)
+    logger.info(f"Получен общий доход от бронирований для арендатора {landlord_id}: {total_income_bookings}")
 
     if isinstance(total_income_bookings, str):
         return templates.TemplateResponse(
@@ -228,16 +223,17 @@ async def get_total_income_bookings(
             context={
                 "message": total_income_bookings,
                 "user": is_authenticated,
-            })
-
+            }
+        )
     return templates.TemplateResponse(
         request=request,
         name="statistics/total-income-bookings.html",
         context={
             "bookings": total_income_bookings,
             "user": is_authenticated,
-        },
+        }
     )
+
 
 
 @router.get("/create-landlord", response_class=HTMLResponse)
