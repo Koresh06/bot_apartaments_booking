@@ -38,7 +38,10 @@ async def get_general_statistics(
         return templates.TemplateResponse(
             request=request,
             name="statistics/general-statistics.html",
-            context={"message": general_statistics})
+            context={
+                "message": general_statistics,
+                "user": is_authenticated,
+            })
     
     return templates.TemplateResponse(
         request=request,
@@ -72,7 +75,10 @@ async def general_statistics_date(
         return templates.TemplateResponse(
             request=request,
             name="statistics/general-statistics.html",
-            context={"message": general_statistics})
+            context={
+                "message": general_statistics,
+                "user": is_authenticated,
+            })
     
     return templates.TemplateResponse(
         request=request,
@@ -104,7 +110,10 @@ async def get_completed_bookings(
         return templates.TemplateResponse(
             request=request,
             name="statistics/pending-bookings.html",
-            context={"message": pending_bookings})
+            context={
+                "message": pending_bookings,
+                "user": is_authenticated,
+            })
     
     return templates.TemplateResponse(
         request=request,
@@ -134,7 +143,10 @@ async def get_completed_bookings(
         return templates.TemplateResponse(
             request=request,
             name="statistics/completed-bookings.html",
-            context={"message": completed_bookings})
+            context={
+                "message": completed_bookings,
+                "user": is_authenticated,
+            })
     
     return templates.TemplateResponse(
         request=request,
@@ -164,7 +176,10 @@ async def get_total_income_bookings(
         return templates.TemplateResponse(
             request=request,
             name="statistics/total-income-bookings.html",
-            context={"message": total_income_bookings})
+            context={
+                "message": total_income_bookings,
+                "user": is_authenticated,
+            })
     
     return templates.TemplateResponse(
         request=request,

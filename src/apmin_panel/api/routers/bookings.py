@@ -24,17 +24,25 @@ async def get_bookings(
     request: Request,
     session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
+    page: int = 1,
+    size: int = 10,
 ):
     if not is_authenticated:
         return RedirectResponse("/auth/login", status_code=303)
     
-    bookings = await BookingApiRepo(session).get_all_bookings()
+    bookings = await BookingApiRepo(session).get_paginated_bookings(page, size)
+
+    total_bookings = await BookingApiRepo(session).count_all_bookings()
+    total_pages = (total_bookings + size - 1) // size
 
     if isinstance(bookings, str):
         return templates.TemplateResponse(
             request=request,
             name="bookings.html",
-            context={"message": bookings})
+            context={
+                "message": bookings,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -42,5 +50,7 @@ async def get_bookings(
         context={
             "bookings": bookings,
             "user": is_authenticated,
+            "page": page,
+            "total_pages": total_pages
         },
     )

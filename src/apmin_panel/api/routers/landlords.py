@@ -43,7 +43,10 @@ async def get_landlords(
         return templates.TemplateResponse(
             request=request,
             name="landlord/get-landlords.html",
-            context={"message": landlords})
+            context={
+                "message": landlords,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -77,7 +80,10 @@ async def statistics_landlord_by_id(
         return templates.TemplateResponse(
             request=request,
             name="landlord/statistics.html",
-            context={"message": statistics})
+            context={
+                "message": statistics,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -111,7 +117,10 @@ async def statistics_landlord_date_by_id(
         return templates.TemplateResponse(
             request=request,
             name="landlord/statistics.html",
-            context={"message": statistics})
+            context={
+                "message": statistics,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -144,7 +153,10 @@ async def get_completed_bookings(
         return templates.TemplateResponse(
             request=request,
             name="statistics/completed-bookings.html",
-            context={"message": completed_bookings})
+            context={
+                "message": completed_bookings,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -177,7 +189,10 @@ async def get_pending_bookings(
         return templates.TemplateResponse(
             request=request,
             name="statistics/pending-bookings.html",
-            context={"message": pending_bookings})
+            context={
+                "message": pending_bookings,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -210,7 +225,10 @@ async def get_total_income_bookings(
         return templates.TemplateResponse(
             request=request,
             name="statistics/total-income-bookings.html",
-            context={"message": total_income_bookings})
+            context={
+                "message": total_income_bookings,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -237,7 +255,10 @@ async def show_create_landlord_form(
         return templates.TemplateResponse(
             request=request,    
             name="landlord/create-landlord.html",
-            context={"message": not_landlords})
+            context={
+                "message": not_landlords,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,

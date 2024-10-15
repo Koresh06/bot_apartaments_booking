@@ -40,7 +40,10 @@ async def get_users(
         return templates.TemplateResponse(
             request=request,
             name="users/get-users.html",
-            context={"message": users},
+            context={
+                "message": users,
+                "user": is_authenticated,
+            },
         )
 
     return templates.TemplateResponse(
@@ -71,7 +74,10 @@ async def get_user_detail(
         return templates.TemplateResponse(
             request=request,
             name="users/get-users.html",
-            context={"message": "user not found"},
+            context={
+                "message": "user not found",
+                "user": is_authenticated,
+            },
         )
 
     return templates.TemplateResponse(
@@ -100,7 +106,10 @@ async def show_create_admin_form(
         return templates.TemplateResponse(
             request=request,    
             name="users/create-admin.html",
-            context={"message": not_landlords})
+            context={
+                "message": not_landlords,
+                "user": is_authenticated,
+            })
 
     return templates.TemplateResponse(
         request=request,
@@ -147,7 +156,10 @@ async def banned_user(
         return templates.TemplateResponse(
             request=request,
             name="users/get-user-detail.html",
-            context={"message": user_by_id},
+            context={
+                "message": user_by_id,
+                "user": is_authenticated,
+            },
         )
 
     return templates.TemplateResponse(
@@ -177,7 +189,10 @@ async def unbanned_user(
         return templates.TemplateResponse(
             request=request,
             name="users/get-user-detail.html",
-            context={"message": user_by_id},
+            context={
+                "message": user_by_id,
+                "user": is_authenticated,
+            },
         )
 
     return templates.TemplateResponse(
