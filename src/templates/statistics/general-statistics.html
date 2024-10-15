@@ -43,41 +43,74 @@
         <div class="row">
             <!-- Количество бронирований в работе -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Общее количество бронирования в работе</h5>
+                {% if statistics.total_pending_bookings != 'Нет данных' %}
+                    <div class="card text-center">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Общее количество бронирования в    работе</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ statistics. total_pending_bookings or 'Нет данных' }}</p>
+                            <a href="/statistics/pending-bookings" class="btn   btn-primary">Посмотреть</a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">{{ statistics.total_pending_bookings or 'Нет данных' }}</p>
-                        <a href="/statistics/pending-bookings" class="btn btn-primary">Посмотреть</a>
+                {% else %}
+                    <div class="card text-center">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Общее количество бронирования в    работе</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Нет данных по бронированиям</p>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
 
             <!-- Завершенные бронирования -->
             <div class="col-md-4 mb-4">
-                <div class="card text-center">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Общее количество завершенных бронирований</h5>
+                {% if statistics.total_completed_bookings != 'Нет данных' %}
+                    <div class="card text-center">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Общее количество завершенных   бронирований</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ statistics. total_completed_bookings or 'Нет данных' }}</p>
+                            <a href="/statistics/completed-bookings"    class="btn btn-primary">Посмотреть</a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">{{ statistics.total_completed_bookings or 'Нет данных' }}</p>
-                        <a href="/statistics/completed-bookings" class="btn btn-primary">Посмотреть</a>
+                {% else %}
+                    <div class="card text-center">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Общее количество завершенных   бронирований</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Нет данных по бронированиям</p>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
 
             <!-- Общий доход -->
             <div class="col-md-4 mb-4">
-                <div class="card mb-4 text-center">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-4">Общий доход</h5>
+                {% if statistics.total_income != 'Нет данных' %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-4">Общий доход</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ statistics.total_income     or 'Нет данных' }} ₽</p>
+                            <a href="/statistics/total-income-bookings"     class="btn btn-primary">Посмотреть</a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">{{ statistics.total_income or 'Нет данных' }} ₽</p>
-                        <a href="/statistics/total-income-bookings" class="btn btn-primary">Посмотреть</a>
+                {% else %}
+                    <div class="card mb-4 text-center">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-4">Общий доход</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Нет данных по доходу</p>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     {% else %}

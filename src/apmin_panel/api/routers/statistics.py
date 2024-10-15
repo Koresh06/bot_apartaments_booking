@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Request
 
@@ -29,6 +29,9 @@ async def get_general_statistics(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     general_statistics = await StatisticsApiRepo(session).get_general_statistics()
 
     if isinstance(general_statistics, str):
@@ -57,6 +60,9 @@ async def general_statistics_date(
     is_authenticated: bool = Depends(admin_auth),
     date_data: StatisticsDateSchema = Depends(StatisticsDateSchema.as_form),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     general_statistics = await StatisticsApiRepo(session).get_general_statistics(
         start_date=date_data.start_date,
         end_date=date_data.end_date,
@@ -89,6 +95,9 @@ async def get_completed_bookings(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     pending_bookings = await StatisticsApiRepo(session).get_pending_bookings()
 
     if isinstance(pending_bookings, str):
@@ -116,6 +125,9 @@ async def get_completed_bookings(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     completed_bookings = await StatisticsApiRepo(session).get_completed_bookings()
 
     if isinstance(completed_bookings, str):
@@ -143,6 +155,9 @@ async def get_total_income_bookings(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     total_income_bookings = await StatisticsApiRepo(session).get_total_income_bookings()
 
     if isinstance(total_income_bookings, str):

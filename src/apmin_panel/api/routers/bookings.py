@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Request
 
@@ -25,6 +25,9 @@ async def get_bookings(
     session: Annotated[AsyncSession, Depends(get_db)],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     bookings = await BookingApiRepo(session).get_all_bookings()
 
     if isinstance(bookings, str):

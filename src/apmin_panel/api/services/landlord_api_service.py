@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 from src.core.models import Landlords, Users, Apartment, Booking, City
 
@@ -11,11 +11,14 @@ from ..schemas.landlord_schemas import CreateLandlordSchema
 
 class LandlordApiRepo(BaseRepo):
 
-    async def get_all_landlords(self):
+    async def get_paginated_landlords(self, page: int, size: int):
+        offset = (page - 1) * size
         stmt = (
             select(Landlords)
             .options(selectinload(Landlords.user_rel))
             .order_by(Landlords.id.desc()) 
+            .offset(offset)
+            .limit(size)
         )
 
         result = await self.session.execute(stmt)
@@ -25,6 +28,14 @@ class LandlordApiRepo(BaseRepo):
             return "Нет доступных арендодателей"
 
         return landlords
+    
+
+    async def count_all_landlords(self):
+        query = select(func.count(Landlords.id))
+        result = await self.session.execute(query)
+        total = result.scalar()
+
+        return total
     
 
     async def get_statistics_by_landlord_id(
@@ -217,23 +228,19 @@ class LandlordApiRepo(BaseRepo):
     
 
     async def create_landlord(self, create_landlord: CreateLandlordSchema):
-        try:
-            existing_landlord = await self.session.execute(
-                select(Landlords).filter(Landlords.user_id == create_landlord.user_id)
-            )
-            if existing_landlord.scalars().first() is not None:
-                raise ValueError(f"Арендодатель с user_id {create_landlord.user_id} уже существует.")
+        existing_landlord = await self.session.execute(
+            select(Landlords).filter(Landlords.user_id == create_landlord.user_id)
+        )
+        if existing_landlord.scalars().first() is not None:
+            raise ValueError(f"Арендодатель с user_id {create_landlord.user_id} уже существует.")
+        new_landlord = Landlords(
+            user_id=create_landlord.user_id,
+            company_name=create_landlord.company_name,
+            phone=create_landlord.phone
+        )
+        self.session.add(new_landlord)
+        await self.session.commit()
+        await self.session.refresh(new_landlord)
+        return new_landlord
 
-            new_landlord = Landlords(
-                user_id=create_landlord.user_id,
-                company_name=create_landlord.company_name,
-                phone=create_landlord.phone
-            )
-            self.session.add(new_landlord)
-            await self.session.commit()
-            await self.session.refresh(new_landlord)
-            return new_landlord
-        except Exception as e:
-            await self.session.rollback()
-            raise e 
 

@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from ..depandencies import admin_auth
 from src.apmin_panel.conf_static import templates
@@ -28,8 +28,16 @@ async def get_landlords(
         Depends(get_db),
     ],
     is_authenticated: bool = Depends(admin_auth),
+    page: int = 1,
+    size: int = 10,
 ):
-    landlords = await LandlordApiRepo(session).get_all_landlords()
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
+    landlords = await LandlordApiRepo(session).get_paginated_landlords(page, size)
+
+    total_landlords = await LandlordApiRepo(session).count_all_landlords()
+    total_pages = (total_landlords + size - 1) // size
 
     if isinstance(landlords, str):
         return templates.TemplateResponse(
@@ -43,6 +51,8 @@ async def get_landlords(
         context={
             "landlords": landlords,
             "user": is_authenticated,
+            "page": page,
+            "total_pages": total_pages,
         },
     )
 
@@ -57,6 +67,9 @@ async def statistics_landlord_by_id(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     statistics = await LandlordApiRepo(session).get_statistics_by_landlord_id(
         landlord_id=landlord_id,
     )
@@ -86,6 +99,9 @@ async def statistics_landlord_date_by_id(
     is_authenticated: bool = Depends(admin_auth),
     date_data: LandlordDateSchema = Depends(LandlordDateSchema.as_form),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     statistics = await LandlordApiRepo(session).get_statistics_by_landlord_id(
         landlord_id=date_data.landlord_id,
         start_date=date_data.start_date,
@@ -119,6 +135,9 @@ async def get_completed_bookings(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     completed_bookings = await LandlordApiRepo(session).get_completed_bookings_by_landlord_id(landlord_id)
 
     if isinstance(completed_bookings, str):
@@ -147,6 +166,9 @@ async def get_pending_bookings(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     pending_bookings = await LandlordApiRepo(
         session
     ).get_pending_bookings_by_landlord_id(landlord_id)
@@ -177,6 +199,9 @@ async def get_total_income_bookings(
     ],
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     total_income_bookings = await LandlordApiRepo(
         session
     ).get_total_income_bookings_by_landlord_id(landlord_id)
@@ -204,8 +229,10 @@ async def show_create_landlord_form(
     is_authenticated: bool = Depends(admin_auth),
     message: str = None,
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     not_landlords = await LandlordApiRepo(session).get_users_not_landlord()
-
     if isinstance(not_landlords, str):
         return templates.TemplateResponse(
             request=request,    
@@ -218,7 +245,7 @@ async def show_create_landlord_form(
         context={
             "users": not_landlords,
             "user": is_authenticated,
-            "message": message,  # Передаем сообщение в шаблон
+            "message": message, 
         },
     )
 
@@ -229,6 +256,9 @@ async def submit_create_landlord(
     from_data: CreateLandlordSchema = Depends(CreateLandlordSchema.as_form),
     is_authenticated: bool = Depends(admin_auth),
 ):
+    if not is_authenticated:
+        return RedirectResponse("/auth/login", status_code=303)
+    
     landlord = await LandlordApiRepo(session).create_landlord(from_data)
     
     if not landlord:

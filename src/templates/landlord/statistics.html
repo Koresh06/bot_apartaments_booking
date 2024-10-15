@@ -24,7 +24,7 @@
                 <div class="card text-white bg-info mb-4 text-center">
                     <div class="card-body">
                         <h5 class="card-title">Телеграм ID</h5>
-                        <p class="card-text">{{ statistics.landlord.id }}</p>
+                        <p class="card-text">{{ statistics.landlord.id or 'Нет данных'}}</p>
                     </div>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                 <div class="card text-white bg-success mb-4 text-center">
                     <div class="card-body">
                         <h5 class="card-title">Количество Апартаментов</h5>
-                        <p class="card-text">{{ statistics.total_apartments }}</p>
+                        <p class="card-text">{{ statistics.total_apartments or 'Нет данных'}}</p>
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@
                             <h5 class="mb-0">Бронирования в Работе</h5>
                         </div>
                         <div class="card-body">
-                            <p class="card-text">{{ statistics.total_pending_bookings }}</p>
+                            <p class="card-text">{{ statistics.total_pending_bookings or 'Нет данных'}}</p>
                             <a href="/landlord/{{ statistics.landlord.id }}/pending-bookings" class="btn btn-primary">Посмотреть</a>
                         </div>
                     </div>

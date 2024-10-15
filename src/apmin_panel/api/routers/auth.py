@@ -39,7 +39,7 @@ async def login(
     login_data: LoginData = Depends(LoginData.as_form),
 ):
     try:
-        if not (login_data.username == config.api.admin_login and login_data.password == config.api.admin_password):
+        if not (login_data.username == config.api.superuser_login and login_data.password == config.api.superuser_password) and not (login_data.username == config.api.admin_login and login_data.password == config.api.admin_password):
             msg = "Неверное имя пользователя или пароль"
             return templates.TemplateResponse(
                 request=request,
@@ -47,12 +47,17 @@ async def login(
                 context={"msg": msg},
             )
         else:
-        # Генерация зашифрованной куки
             hashed_cookie = create_hashed_cookie(login_data.username, config.api.secret_key)
-            response = RedirectResponse(url="/statistics/get-statistics/",  status_code=status. HTTP_302_FOUND)
-            # Устанавливаем зашифрованную куку
+
+            role = "superuser" if login_data.username == config.api.superuser_login and login_data.password == config.api.superuser_password else "admin"
+        
+            response = RedirectResponse(url="/statistics/get-statistics/", status_code=status.HTTP_302_FOUND)
+
             response.set_cookie(
-                key="admin_token", value=hashed_cookie, httponly=True, max_age=1800 
+                key="admin_token", value=hashed_cookie, httponly=True, max_age=1800
+            )
+            response.set_cookie(
+                key="user_role", value=role, httponly=True, max_age=1800
             )
         return response
     except HTTPException:
