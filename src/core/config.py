@@ -146,6 +146,7 @@ class ApiConfig:
     superuser_login: str
     superuser_password: str
     secret_key: str
+    access_token_expire_minutes: int
     web_url: str
     host: str = "127.0.0.1"
     port: int = 8000
@@ -160,6 +161,7 @@ class ApiConfig:
         superuser_login = env.str("SUPERUSER_LOGIN")
         superuser_password = env.str("SUPERUSER_PASSWORD")
         secret_key = env.str("SECRET_KEY")
+        access_token_expire_minutes = env.int("ACCESS_TOKEN_EXPIRE_MINUTES")
         host = env.str("API_HOST")
         port = env.int("API_PORT")
         web_url = env.str("WEB_URL")
@@ -169,6 +171,7 @@ class ApiConfig:
             superuser_login=superuser_login,
             superuser_password=superuser_password,
             secret_key=secret_key,
+            access_token_expire_minutes=access_token_expire_minutes,
             host=host,
             port=port,
             web_url=web_url,

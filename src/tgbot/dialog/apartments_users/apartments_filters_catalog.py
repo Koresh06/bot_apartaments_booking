@@ -230,6 +230,8 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
         tg_id=message.from_user.id,
         chat_id=message.chat.id,
         username=message.from_user.username,
+        first_name=message.from_user.first_name,
+        last_name=message.from_user.last_name,
         full_name=message.from_user.full_name,
     )
     await dialog_manager.start(

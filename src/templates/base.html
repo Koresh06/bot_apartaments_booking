@@ -10,7 +10,7 @@
 
 </head>
 <body>
-    {% if user == "superuser" or user == "admin" %}
+    {% if user %}
         {% include 'navbar.html' %}
     {% endif %}
 

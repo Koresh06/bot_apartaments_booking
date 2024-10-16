@@ -3,7 +3,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Request
 
-from ..depandencies import admin_auth
+from src.apmin_panel.api.auth.permissions import get_current_user
+from src.core.models.users import Users
+
 from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import get_db
@@ -16,7 +18,6 @@ router = APIRouter(
     prefix="/statistics",
     tags=["statistics"],
     responses={404: {"description": "Not found"}},
-    dependencies=[Depends(admin_auth)],
 )
 
 
@@ -27,10 +28,10 @@ async def get_general_statistics(
         AsyncSession,
         Depends(get_db),
     ],
-    is_authenticated: bool = Depends(admin_auth),
+    user: Users = Depends(get_current_user)
 ):
-    if not is_authenticated:
-        return RedirectResponse("/auth/login", status_code=303)
+    if not user:
+        return RedirectResponse("/auth/", status_code=303)
     
     general_statistics = await StatisticsApiRepo(session).get_general_statistics()
 
@@ -40,7 +41,7 @@ async def get_general_statistics(
             name="statistics/general-statistics.html",
             context={
                 "message": general_statistics,
-                "user": is_authenticated,
+                "user": user,
             })
     
     return templates.TemplateResponse(
@@ -48,7 +49,7 @@ async def get_general_statistics(
         name="statistics/general-statistics.html",
         context={
             "statistics": general_statistics,
-            "user": is_authenticated,
+            "user": user,
         },
     )
 
@@ -60,11 +61,11 @@ async def general_statistics_date(
         AsyncSession,
         Depends(get_db),
     ],
-    is_authenticated: bool = Depends(admin_auth),
+    user: Users = Depends(get_current_user),
     date_data: StatisticsDateSchema = Depends(StatisticsDateSchema.as_form),
 ):
-    if not is_authenticated:
-        return RedirectResponse("/auth/login", status_code=303)
+    if not user:
+        return RedirectResponse("/auth/", status_code=303)
     
     general_statistics = await StatisticsApiRepo(session).get_general_statistics(
         start_date=date_data.start_date,
@@ -77,7 +78,7 @@ async def general_statistics_date(
             name="statistics/general-statistics.html",
             context={
                 "message": general_statistics,
-                "user": is_authenticated,
+                "user": user,
             })
     
     return templates.TemplateResponse(
@@ -85,7 +86,7 @@ async def general_statistics_date(
         name="statistics/general-statistics.html",
         context={
             "statistics": general_statistics,
-            "user": is_authenticated,
+            "user": user,
             "start_date": date_data.start_date,
             "end_date": date_data.end_date,
         },
@@ -99,10 +100,10 @@ async def get_completed_bookings(
         AsyncSession,
         Depends(get_db),
     ],
-    is_authenticated: bool = Depends(admin_auth),
+    user: Users = Depends(get_current_user),
 ):
-    if not is_authenticated:
-        return RedirectResponse("/auth/login", status_code=303)
+    if not user:
+        return RedirectResponse("/auth/", status_code=303)
     
     pending_bookings = await StatisticsApiRepo(session).get_pending_bookings()
     print(pending_bookings)
@@ -113,7 +114,7 @@ async def get_completed_bookings(
             name="statistics/pending-bookings.html",
             context={
                 "message": pending_bookings,
-                "user": is_authenticated,
+                "user": user,
             })
     
     return templates.TemplateResponse(
@@ -121,7 +122,7 @@ async def get_completed_bookings(
         name="statistics/pending-bookings.html",
         context={
             "bookings": pending_bookings,
-            "user": is_authenticated,
+            "user": user,
         },
     )
 
@@ -133,10 +134,10 @@ async def get_completed_bookings(
         AsyncSession,
         Depends(get_db),
     ],
-    is_authenticated: bool = Depends(admin_auth),
+    user: Users = Depends(get_current_user),
 ):
-    if not is_authenticated:
-        return RedirectResponse("/auth/login", status_code=303)
+    if not user:
+        return RedirectResponse("/auth/", status_code=303)
     
     completed_bookings = await StatisticsApiRepo(session).get_completed_bookings()
 
@@ -146,7 +147,7 @@ async def get_completed_bookings(
             name="statistics/completed-bookings.html",
             context={
                 "message": completed_bookings,
-                "user": is_authenticated,
+                "user": user,
             })
     
     return templates.TemplateResponse(
@@ -154,7 +155,7 @@ async def get_completed_bookings(
         name="statistics/completed-bookings.html",
         context={
             "bookings": completed_bookings,
-            "user": is_authenticated,
+            "user": user,
         },
     )
 
@@ -166,10 +167,10 @@ async def get_total_income_bookings(
         AsyncSession,
         Depends(get_db),
     ],
-    is_authenticated: bool = Depends(admin_auth),
+    user: Users = Depends(get_current_user),
 ):
-    if not is_authenticated:
-        return RedirectResponse("/auth/login", status_code=303)
+    if not user:
+        return RedirectResponse("/auth/", status_code=303)
     
     total_income_bookings = await StatisticsApiRepo(session).get_total_income_bookings()
 
@@ -179,7 +180,7 @@ async def get_total_income_bookings(
             name="statistics/total-income-bookings.html",
             context={
                 "message": total_income_bookings,
-                "user": is_authenticated,
+                "user": user,
             })
     
     return templates.TemplateResponse(
@@ -187,6 +188,6 @@ async def get_total_income_bookings(
         name="statistics/total-income-bookings.html",
         context={
             "bookings": total_income_bookings,
-            "user": is_authenticated,
+            "user": user,
         },
     )

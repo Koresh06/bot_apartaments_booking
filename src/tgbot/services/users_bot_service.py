@@ -11,6 +11,8 @@ class BotUserRepo(BaseRepo):
         self,
         tg_id: int,
         chat_id: int,
+        first_name: str,
+        last_name: str,
         username: Optional[str] = None,
         full_name: Optional[str] = None,
     ):
@@ -23,6 +25,8 @@ class BotUserRepo(BaseRepo):
             tg_id=tg_id,
             chat_id=chat_id,
             username=username,
+            first_name=first_name,
+            last_name=last_name,
             full_name=full_name,
         )
         self.session.add(stmt)
@@ -54,6 +58,8 @@ class BotUserRepo(BaseRepo):
         self,
         tg_id: int,
         chat_id: int,
+        first_name: str,
+        last_name: str,
         username: Optional[str] = None,
         full_name: Optional[str] = None,
     ) -> Users:
@@ -66,6 +72,8 @@ class BotUserRepo(BaseRepo):
                 tg_id=tg_id,
                 chat_id=chat_id,
                 username=username,
+                first_name=first_name,
+                last_name=last_name,
                 full_name=full_name,
             )
 
