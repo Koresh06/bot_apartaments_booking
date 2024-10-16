@@ -54,8 +54,8 @@ register_name_city_dialog = Dialog(
 @router.message(Command("admin"))
 async def command_admin(message: Message, dialog_manager: DialogManager):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    admin: Users = await repo.admin_bot.check_is_admin(message.from_user.id)
-    if admin.is_admin:
+    user: Users = await repo.admin_bot.check_is_admin(message.from_user.id)
+    if user.is_admin or user.is_superuser:
         await dialog_manager.start(state=MainAdminSG.start, mode=StartMode.RESET_STACK)
     else:
         await message.answer("Доступ запрещен")

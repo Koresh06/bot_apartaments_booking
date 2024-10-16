@@ -1,7 +1,7 @@
 from datetime import date
 from httpx import AsyncClient
 
-from src.apmin_panel.api.services.landlord_api_service import LandlordApiRepo
+from src.apmin_panel.api.landlord.service import LandlordApiRepo
 from ..conftest import async_session_maker
 
 

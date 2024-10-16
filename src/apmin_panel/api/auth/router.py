@@ -100,7 +100,7 @@ async def login(
         key="access_token",
         value=validate_user_cookie["access_token"],
         httponly=True,
-        expires=config.api.access_token_expire_minutes,
+        expires=config.api.access_token_expire_minutes * 60,
     )
 
     return response

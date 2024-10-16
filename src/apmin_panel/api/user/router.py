@@ -4,13 +4,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Form, Request
 
 from src.apmin_panel.api.auth.permissions import get_current_user
+from src.apmin_panel.api.auth.schemas import UserCreateInRegistration
+from src.apmin_panel.api.auth.service import AuthApiRepo
 from src.core.models.users import Users
 
 from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import get_db
-
-from ..services.users_api_service import UsersApiRepo
+from .service import UsersApiRepo
+from .schemas import CreateAdminSchema
 
 
 router = APIRouter(
@@ -109,7 +111,8 @@ async def show_create_admin_form(
             context={
                 "message": not_landlords,
                 "user": user,
-            })
+            }
+        )
 
     return templates.TemplateResponse(
         request=request,
@@ -118,20 +121,21 @@ async def show_create_admin_form(
             "users": not_landlords,
             "user": user,
             "message": message, 
-        },
+        }
     )
+
 
 
 @router.post("/submit-create-admin")
 async def submit_create_admin(
     session: Annotated[AsyncSession, Depends(get_db)],
-    user_id: int = Form(...),
     user: Users = Depends(get_current_user),
+    schemas: CreateAdminSchema = Depends(CreateAdminSchema.as_form),
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
     
-    admin = await UsersApiRepo(session).create_admin(user_id)
+    admin = await AuthApiRepo(session).create_admin(schema=schemas)
 
     if not admin:
         return RedirectResponse("/users/create-admin?message=Не удалось создать админа.", status_code=303)

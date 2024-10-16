@@ -7,10 +7,10 @@ from src.core.config import config
 
 from src.apmin_panel.api.auth.router import router as auth_router
 # from src.apmin_panel.api.routers.auth import router as auth_router
-from src.apmin_panel.api.routers.bookings import router as bookings_router
-from src.apmin_panel.api.routers.landlords import router as landlords_router
-from src.apmin_panel.api.routers.statistics import router as statistics_router
-from src.apmin_panel.api.routers.users import router as users_router
+from src.apmin_panel.api.booking.router import router as bookings_router
+from src.apmin_panel.api.landlord.router import router as landlords_router
+from src.apmin_panel.api.statistic.router import router as statistics_router
+from src.apmin_panel.api.user.router import router as users_router
 
 
 app = FastAPI()

@@ -1,7 +1,7 @@
 from datetime import datetime
 from httpx import AsyncClient
 
-from src.apmin_panel.api.services.booking_api_service import BookingApiRepo
+from src.apmin_panel.api.booking.service import BookingApiRepo
 from src.core.models import Booking, Apartment, City
 from ..conftest import async_session_maker
 

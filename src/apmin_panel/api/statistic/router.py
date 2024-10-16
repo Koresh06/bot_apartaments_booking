@@ -10,8 +10,8 @@ from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import get_db
 
-from ..services.statistics_api_service import StatisticsApiRepo
-from ..schemas.statistics_schemas import StatisticsDateSchema
+from .service import StatisticsApiRepo
+from .schemas import StatisticsDateSchema
 
 
 router = APIRouter(

@@ -2,7 +2,6 @@ from fastapi.templating import Jinja2Templates
 from starlette.staticfiles import StaticFiles
 
 
-
 templates = Jinja2Templates(directory="src/templates")
 
 

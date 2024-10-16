@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from src.core.models import Landlords, Users, Apartment, Booking, City
 
 from src.core.repo.base import BaseRepo
-from ..schemas.landlord_schemas import CreateLandlordSchema
+from .schemas import CreateLandlordSchema
 
 
 class LandlordApiRepo(BaseRepo):
@@ -24,18 +24,16 @@ class LandlordApiRepo(BaseRepo):
         result = await self.session.execute(stmt)
         landlords = result.scalars().all()
 
-        if not landlords:
-            return "Нет доступных арендодателей"
-
-        return landlords
-    
+        # Возвращаем пустой список, если арендодателей нет
+        return landlords if landlords else []
 
     async def count_all_landlords(self):
         query = select(func.count(Landlords.id))
         result = await self.session.execute(query)
         total = result.scalar()
-
-        return total
+    
+        # Если нет арендодателей, возвращаем 0
+        return total if total else 0
     
 
     async def get_statistics_by_landlord_id(

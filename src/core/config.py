@@ -141,10 +141,6 @@ class ApiConfig:
     Creates the ApiConfig object from environment variables.
     """
 
-    admin_login: str
-    admin_password: str
-    superuser_login: str
-    superuser_password: str
     secret_key: str
     access_token_expire_minutes: int
     web_url: str
@@ -156,20 +152,12 @@ class ApiConfig:
         """
         Creates the ApiConfig object from environment variables.
         """
-        admin_login = env.str("ADMIN_LOGIN")
-        admin_password = env.str("ADMIN_PASSWORD")
-        superuser_login = env.str("SUPERUSER_LOGIN")
-        superuser_password = env.str("SUPERUSER_PASSWORD")
         secret_key = env.str("SECRET_KEY")
         access_token_expire_minutes = env.int("ACCESS_TOKEN_EXPIRE_MINUTES")
         host = env.str("API_HOST")
         port = env.int("API_PORT")
         web_url = env.str("WEB_URL")
         return ApiConfig(
-            admin_login=admin_login,
-            admin_password=admin_password,
-            superuser_login=superuser_login,
-            superuser_password=superuser_password,
             secret_key=secret_key,
             access_token_expire_minutes=access_token_expire_minutes,
             host=host,

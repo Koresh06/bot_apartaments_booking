@@ -10,7 +10,7 @@ from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import get_db
 
-from ..services.booking_api_service import BookingApiRepo
+from .service import BookingApiRepo
 
 
 router = APIRouter(

@@ -1,5 +1,6 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
+from src.apmin_panel.api.auth.schemas import UserCreateInRegistration
 from src.core.models import Landlords, Users
 
 from src.core.repo.base import BaseRepo
@@ -42,7 +43,7 @@ class UsersApiRepo(BaseRepo):
     async def get_users_not_admin(self):
         stmt = (
             select(Users)
-            .filter(Users.is_admin == False)
+            .filter(Users.is_admin == False or Users.is_superuser == False)
             .order_by(Users.id.desc())
         )
 
@@ -51,17 +52,17 @@ class UsersApiRepo(BaseRepo):
 
         return users
     
-    async def create_admin(self, user_id):
-        existing_admin = await self.session.scalar(
-            select(Users).filter(Users.id == user_id)
-        )
-        if existing_admin.is_admin:
-            raise ValueError(f"Админ с user_id {user_id} уже существует.")
+    # async def create_admin(self, schema: UserCreateInRegistration):
+    #     existing_admin = await self.session.scalar(
+    #         select(Users).filter(Users.id == user_id)
+    #     )
+    #     if existing_admin.is_admin:
+    #         raise ValueError(f"Админ с user_id {user_id} уже существует.")
         
-        existing_admin.is_admin = True
-        await self.session.commit()
-        await self.session.refresh(existing_admin)
-        return existing_admin
+    #     existing_admin.is_admin = True
+    #     await self.session.commit()
+    #     await self.session.refresh(existing_admin)
+    #     return existing_admin
         
         
 

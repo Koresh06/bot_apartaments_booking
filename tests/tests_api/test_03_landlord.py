@@ -2,7 +2,7 @@ from datetime import datetime
 from httpx import AsyncClient
 from sqlalchemy import select, delete
 
-from src.apmin_panel.api.services.landlord_api_service import LandlordApiRepo
+from src.apmin_panel.api.landlord.service import LandlordApiRepo
 from src.core.models import Landlords
 from ..conftest import async_session_maker
 
