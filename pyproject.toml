@@ -17,7 +17,7 @@ python-multipart = "^0.0.9"
 fastapi = "^0.114.2"
 asyncpg = "^0.29.0"
 python-jose = "^3.3.0"
-passlib = "^1.7.4"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 aioredis = "^2.0.1"
 redis = "^5.0.8"
 babel = "^2.16.0"

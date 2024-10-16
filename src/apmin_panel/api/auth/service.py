@@ -40,3 +40,28 @@ class AuthApiRepo(BaseRepo):
         if not verify_password(password, user.hashed_password):
             return None
         return user
+    
+
+    async def get_by_email(self, email: EmailStr):
+        stmt = select(Users).where(Users.email == email)
+        user: Users = await self.session.scalar(stmt)
+
+        return user
+
+
+    async def create_superuser(
+            self, 
+            email: EmailStr,
+    ):
+        stmt = select(Users).where(Users.email == email)
+        user: Users = await self.session.scalar(stmt)
+
+        if not user:
+            return None
+        
+        user.is_superuser = True
+        await self.session.commit()
+        await self.session.refresh(user)
+        return user
+
+        

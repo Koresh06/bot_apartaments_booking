@@ -46,18 +46,3 @@ async def get_current_user(
 
     return user
 
-
-# def get_admin(current_user: Users = Security(get_current_user)):
-#     """Проверка активный юзер или нет"""
-#     if not current_user.is_admin:
-#         raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
-#     return current_user
-
-
-# def get_superuser(current_user: Users = Security(get_current_user)):
-#     """Проверка суперюзер или нет"""
-#     if not current_user.is_superuser:
-#         raise HTTPException(
-#             status_code=400, detail="The user doesn't have enough privileges"
-#         )
-#     return current_user
