@@ -17,7 +17,7 @@ from .handlers import (
     on_start_date_selected,
     yes_confirm_booking,
 )
-from .getters import getter_confirm_landlord_booking, getter_date
+from .getters import getter_date_and_booked_dates
 
 
 booking_apartment = Dialog(
@@ -48,7 +48,7 @@ booking_apartment = Dialog(
         Back(Const("◀️ Назад")),
         state=BookingApartmentSG.confirm,
     ),
-    getter=getter_date,
+    getter=getter_date_and_booked_dates
 )
 
 
@@ -85,5 +85,5 @@ confirm_booking_landlord_dialog = Dialog(
         Back(Const("◀️ Назад"), id="back"),
         state=ConfirmBooking.cancle_сonfirm,
     ),
-    getter=getter_confirm_landlord_booking,
+    getter=getter_date_and_booked_dates,
 )

@@ -118,3 +118,23 @@ class ApartmentBookingRepo(BaseRepo):
 
         except Exception as e:
             logging.error(f"Ошибка при обновлении статусов бронирований: {e}")
+
+
+    async def get_current_date_bookings(self, apartment_id):
+        stmt = (
+            select(Booking)
+            .where(Booking.apartment_id == apartment_id)
+            .where(Booking.is_completed == False) 
+        )
+
+        result = await self.session.execute(stmt)
+        bookings = result.scalars().all() 
+
+        current_bookings = []
+        for booking in bookings:
+            current_bookings.append({
+                "booking": booking,
+            })
+
+
+        return current_bookings

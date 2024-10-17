@@ -34,10 +34,11 @@ class WeekDay(Text):
 
 
 class MarkedDay(Text):
-    def __init__(self, mark: str, other: Text):
+    def __init__(self, mark: str, other: Text, busy_mark: str = "🚫"):
         super().__init__()
         self.mark = mark
         self.other = other
+        self.busy_mark = busy_mark  # эмодзи для занятых дат
 
     async def _render_text(self, data, manager: DialogManager) -> str:
         current_date: date = data["date"]
@@ -45,10 +46,21 @@ class MarkedDay(Text):
         selected = manager.dialog_data.get(SELECTED_DAYS_KEY, [])
         today = date.today()
 
+        # Получаем список бронирований
+        bookings = manager.dialog_data.get("bookings", [])
+
+        # Если список бронирований не пустой, проверяем занятость
+        if bookings:
+            for booking in bookings:
+                booking_start_date = booking["booking"].start_date.date()  # Приводим к типу date
+                booking_end_date = booking["booking"].end_date.date()  # Приводим к типу date
+                if booking_start_date <= current_date <= booking_end_date:
+                    return self.busy_mark  # Если дата занята, возвращаем эмодзи занятости
+
         if current_date < today:
-            return "❌"
+            return "❌"  # Прошедшие даты
         elif serial_date in selected:
-            return self.mark
+            return self.mark  # Выбранные пользователем даты
         return await self.other.render_text(data, manager)
 
 
@@ -68,8 +80,8 @@ class CustomCalendar(Calendar):
         return {
             CalendarScope.DAYS: CalendarDaysView(
                 self._item_callback_data,
-                date_text=MarkedDay("🔴", DATE_TEXT),
-                today_text=MarkedDay("⭕", TODAY_TEXT),
+                date_text=MarkedDay("🔴", DATE_TEXT, busy_mark="🚫"),  # Эмодзи для занятых дней
+                today_text=MarkedDay("⭕", TODAY_TEXT, busy_mark="🚫"),  # Эмодзи для занятых дней
                 header_text="~~~~~ " + Month() + " ~~~~~",
                 weekday_text=WeekDay(),
                 next_month_text=Month() + " >>",
@@ -85,3 +97,4 @@ class CustomCalendar(Calendar):
                 self._item_callback_data,
             ),
         }
+
