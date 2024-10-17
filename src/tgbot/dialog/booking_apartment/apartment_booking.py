@@ -22,7 +22,7 @@ from .getters import getter_confirm_landlord_booking, getter_date
 
 booking_apartment = Dialog(
     Window(
-        Const("📅 Выберите дату начала аренды"),
+        Const("📅 Выберите дату начала бронирования"),
         CustomCalendar(
             id="start_calendar",
             on_click=on_start_date_selected,
@@ -31,8 +31,8 @@ booking_apartment = Dialog(
         state=BookingApartmentSG.start_date,
     ),
     Window(
-        Const("📅 Выберите дату окончания аренды"),
-        Format("🗓️ Дата окончания аренды: {start_date}"),
+        Const("📅 Выберите дату окончания бронирования"),
+        Format("🗓️ Дата начала бронирования: {start_date}"),
         CustomCalendar(
             id="end_calendar",
             on_click=on_end_date_selected,
@@ -42,7 +42,7 @@ booking_apartment = Dialog(
     ),
     Window(
         Format(
-            "📅 Дата начала аренды: {start_date}\n📅 Дата окончания аренды: {end_date}"
+            "📅 Дата начала бронирования: {start_date}\n📅 Дата окончания бронирования: {end_date}"
         ),
         Button(Const("✅ Подтвердить"), id="confirm", on_click=handle_confirm_booking),
         Back(Const("◀️ Назад")),

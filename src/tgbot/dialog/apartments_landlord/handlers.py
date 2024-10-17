@@ -1,11 +1,16 @@
+from datetime import datetime, time
+from functools import partial
 from aiogram.types import CallbackQuery, Message
 from aiogram.enums.parse_mode import ParseMode
 from aiogram_dialog import DialogManager, StartMode, ShowMode
 from aiogram_dialog.widgets.common import ManagedScroll
 from aiogram_dialog.widgets.input import MessageInput, ManagedTextInput, TextInput
 from aiogram_dialog.widgets.kbd import Button
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from src.core.models.bookings import Booking
 from src.core.repo.requests import RequestsRepo
+from src.tgbot import bot
 from src.tgbot.dialog.apartments_landlord.states import MenuLandlordSG, EditApartmentSG
 
 
@@ -46,7 +51,7 @@ async def handle_city(
     item_id: str
 ):
     list_citys = dialog_manager.dialog_data.get("citys")
-    city_id = list_citys[int(item_id) - 1][1]  
+    city_id = list_citys[len(list_citys) - 1][1]  
     dialog_manager.dialog_data["city"] = city_id
     await dialog_manager.next()
     
@@ -286,3 +291,66 @@ async def handle_update_is_available(
 
 async def close_dialog(_, __, dialog_manager: DialogManager, **kwargs):
     await dialog_manager.done()
+
+
+async def yes_confirm_booking(
+    callback: CallbackQuery, widget: Button, dialog_manager: DialogManager
+):
+    booking: Booking = dialog_manager.dialog_data.get("booking")
+    user_id = dialog_manager.dialog_data.get("user_id")
+    apartment_id = dialog_manager.dialog_data.get("apartment")["apartment_id"]
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    scheduler: AsyncIOScheduler = dialog_manager.middleware_data.get("scheduler")
+
+    confirm = await repo.apartment_bookings.booking_is_confirmation(
+        booking_id=booking.id
+    )
+
+    if confirm:
+        await bot.send_message(
+            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!"
+        )
+
+        # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)
+        start_time = datetime.date(booking.start_date)
+        # start_time = datetime.now() + timedelta(seconds=15) # Тестовое время начала бронирования
+        func_apartment = partial(
+            repo.apartment_bookings.installation_false_is_available_apartment,
+            apartment_id,
+        )
+        scheduler.add_job(func=func_apartment, trigger="date", run_date=start_time)
+
+        # Устанавливаем время завершения бронирования end_date (дата окончания бронирования) - 12:00 (по Бишкекскому времени) + зменение статуса на завершонную бронь
+        end_time = datetime.combine(booking.end_date, time(9, 0))
+        # end_time = datetime.now() + timedelta(seconds=30) # Тестовое время окончания бронирования
+        func_booking = partial(
+            repo.apartment_bookings.update_is_completed_booking, booking.id
+        )
+        scheduler.add_job(func=func_booking, trigger="date", run_date=end_time)
+
+        await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
+    else:
+        await callback.answer(
+            text="Не удалось подтвердить бронирование. Попробуйте еще раз."
+        )
+
+
+async def no_confirm_booking(
+    callback: CallbackQuery, widget: Button, dialog_manager: DialogManager
+):
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    booking: Booking = dialog_manager.dialog_data.get("booking")
+    user_id = dialog_manager.dialog_data.get("user_id")
+    message: TextInput = dialog_manager.find("cancel_reason").get_value()
+    del_bookint = await repo.apartment_bookings.delete_booking(booking_id=booking.id)
+    if del_bookint:
+        await bot.send_message(
+            chat_id=user_id,
+            text=f"⚠️ К сожалению, ваше бронирование отменено. \n\n📖 Причина: <b>{message}</b>",
+        )
+        await callback.answer(text="Бронирование отменено.")
+        await dialog_manager.done(show_mode=ShowMode.DELETE_AND_SEND)
+    else:
+        await callback.answer(
+            text="Не удалось отменить бронирование. Попробуйте еще раз."
+        )

@@ -39,11 +39,7 @@ from .getters import (
     getter_get_rooms,
     getter_min_max_price,
 )
-from src.tgbot.dialog.apartments_landlord.handlers import (
-    error_handler,
-    on_next,
-    on_prev,
-)
+from src.tgbot.dialog.apartments_landlord.handlers import error_handler, on_next, on_prev
 
 
 router = Router()
@@ -239,6 +235,7 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
         data={"city": None, "price_range": None, "rooms": None},
         mode=StartMode.RESET_STACK,
     )
+
 
 # @router.message(CommandStart())
 # async def cmd_start(message: Message):

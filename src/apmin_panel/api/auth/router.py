@@ -47,19 +47,19 @@ async def login_access_token(
     return token
 
 
-@router.post("/registration")
-async def admin_registration(
-    session: Annotated[
-        AsyncSession,
-        Depends(get_db),
-    ],
-    new_admin: UserCreateInRegistration,
-):
-    """Регистрация администратора"""
-    admin = await AuthApiRepo(session).create_admin(schema=new_admin)
-    if not admin:
-        raise HTTPException(status_code=400, detail="Не удалось создать админа.")
-    return admin
+# @router.post("/registration")
+# async def admin_registration(
+#     session: Annotated[
+#         AsyncSession,
+#         Depends(get_db),
+#     ],
+#     new_admin: UserCreateInRegistration,
+# ):
+#     """Регистрация администратора"""
+#     admin = await AuthApiRepo(session).create_admin(schema=new_admin)
+#     if not admin:
+#         raise HTTPException(status_code=400, detail="Не удалось создать админа.")
+#     return admin
 
 
 @router.get("/", response_class=HTMLResponse)

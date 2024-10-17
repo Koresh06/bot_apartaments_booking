@@ -5,12 +5,16 @@ from babel.dates import get_day_names, get_month_names
 
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import (
-    Calendar, CalendarScope,
+    Calendar,
+    CalendarScope,
 )
 from aiogram_dialog.widgets.kbd.calendar_kbd import (
-    CalendarDaysView, CalendarMonthView,
-    CalendarScopeView, CalendarYearsView,
-    DATE_TEXT, TODAY_TEXT,
+    CalendarDaysView,
+    CalendarMonthView,
+    CalendarScopeView,
+    CalendarYearsView,
+    DATE_TEXT,
+    TODAY_TEXT,
 )
 from aiogram_dialog.widgets.text import Format, Text
 
@@ -23,7 +27,9 @@ class WeekDay(Text):
         selected_date: date = data["date"]
         locale = manager.event.from_user.language_code
         return get_day_names(
-            width="short", context='stand-alone', locale=locale,
+            width="short",
+            context="stand-alone",
+            locale=locale,
         )[selected_date.weekday()].title()
 
 
@@ -40,7 +46,7 @@ class MarkedDay(Text):
         today = date.today()
 
         if current_date < today:
-            return "❌"  
+            return "❌"
         elif serial_date in selected:
             return self.mark
         return await self.other.render_text(data, manager)
@@ -51,7 +57,9 @@ class Month(Text):
         selected_date: date = data["date"]
         locale = manager.event.from_user.language_code
         return get_month_names(
-            'wide', context='stand-alone', locale=locale,
+            "wide",
+            context="stand-alone",
+            locale=locale,
         )[selected_date.month].title()
 
 

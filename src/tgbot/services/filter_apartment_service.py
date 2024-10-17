@@ -8,6 +8,7 @@ from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
 class FilterApartmentRepo(BaseRepo):
 
     async def get_citys(self) -> List[tuple]:
+
         query = select(City.id, City.name).order_by(City.id) 
         result: Result = await self.session.execute(query)
 
@@ -64,7 +65,7 @@ class FilterApartmentRepo(BaseRepo):
                 "city": city_name,
                 "street": apartment.street,
                 "house_number": apartment.house_number,
-                "apartment_number": apartment.apartment_number,
+                "apartment_number": apartment.apartment_number if apartment.apartment_number else "-",
                 "price_per_day": apartment.price_per_day,
                 "rooms": apartment.rooms,
                 "description": apartment.description,

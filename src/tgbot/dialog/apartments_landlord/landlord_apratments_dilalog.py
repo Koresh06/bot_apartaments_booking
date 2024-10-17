@@ -18,11 +18,13 @@ from aiogram_dialog.widgets.kbd import (
     Select,
 )
 
+
 from .states import (
     EditApartmentSG,
     MenuLandlordSG,
     RegisterApartmentSG,
     LandlordApartmentsSG,
+    OrdersBookingSG,
 )
 from .getters import (
     getter_catalog_landlord_apartments,
@@ -33,6 +35,7 @@ from .getters import (
     getter_apartment_details,
     getter_is_available,
     getter_get_city,
+    getter_orders_booking,
 )
 from .handlers import (
     confirm_photos,
@@ -40,6 +43,7 @@ from .handlers import (
     handle_city,
     handle_edit_city,
     handle_update_is_available,
+    no_confirm_booking,
     on_delete,
     on_delete_apartment,
     on_input_photo,
@@ -50,6 +54,7 @@ from .handlers import (
     update_apartment_information,
     close_dialog,
     handle_update_apartment_photos,
+    yes_confirm_booking,
 )
 
 
@@ -65,6 +70,11 @@ menu_loandlord_dialog = Dialog(
             Const("📋 Мои апартаменты"),
             id="current_apartments",
             state=LandlordApartmentsSG.catalog,
+        ),
+        Start(
+            Const("📝 Заказы бронирования"),
+            id="orders_booking",
+            state=OrdersBookingSG.orders,
         ),
         state=MenuLandlordSG.start,
     ),
@@ -524,4 +534,55 @@ edit_apartment_dialog = Dialog(
     ),
     getter=getter_edit_apartment,
     on_close=close_dialog,
+)
+
+
+
+view_booking_orders_landlord = Dialog(
+    Window(
+        Const("Заказов нет", when=~F["data"],),
+        Format(
+            "<b>ID:{booking.id}</b>\n"
+            "<b>🏙️ Город: {apartment[city]}</b>\n"
+            "<b>🛣️ Улица: {apartment[street]}</b>\n"
+            "<b>🏠 Дом: {apartment[house_number]}</b>\n"
+            "<b>🏢 Квартира: {apartment[apartment_number]}</b>\n"
+            "<b>💰 Цена за день: {apartment[price_per_day]} ₽</b>\n"
+            "<b>🛏️ Комнат: {apartment[rooms]}</b>\n"
+            "<b>📝 Описание: {apartment[description]}</b>\n"
+            "<b>📅 Дата начала бронирования: {apartment[booking_start_date]}</b>\n"
+            "<b>📅 Дата окончания бронирования: {apartment[booking_end_date]}</b>\n",
+            when=F["data"],
+        ),
+        Group(
+            Button(Const("✅ Подтвердить"), id="confirm", on_click=yes_confirm_booking),
+            Next(Const("❌ Отменить"), id="cancel"),
+            Row(
+                Button(Const("◀️ Назад"), id="next", on_click=on_prev),
+                Button(
+                    Format("{current_page}/{count_page}"),
+                    id="paginator",
+                ),
+                Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
+            ),
+        ),
+        state=OrdersBookingSG.orders,
+        getter=getter_orders_booking,
+    ),
+    Window(
+        Const("✏️ Укажите причину отмены бронирования:"),
+        TextInput(
+            id="cancel_reason",
+            type_factory=str,
+            on_success=Next(),
+        ),
+        Back(Const("◀️ Назад"), id="back"),
+        state=OrdersBookingSG.cancel_message,
+    ),
+    Window(
+        Const("⚠️ Вы уверены, что хотите отменить бронирование?"),
+        Button(Const("✅ Подтвердить"), id="confirm", on_click=no_confirm_booking),
+        Back(Const("◀️ Назад"), id="back"),
+        state=OrdersBookingSG.cancle_сonfirm,
+    ),
 )

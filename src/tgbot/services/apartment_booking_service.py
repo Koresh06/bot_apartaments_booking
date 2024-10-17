@@ -41,24 +41,19 @@ class ApartmentBookingRepo(BaseRepo):
         return booking
 
 
-    async def booking_confirmation(self, booking_id: int, apartment_id: int) -> bool:
+    async def booking_is_confirmation(self, booking_id: int) -> bool:
         booking = await self.session.scalar(
             select(Booking).where(Booking.id == booking_id)
         )
-
-        apartment = await self.session.scalar(select(Apartment).where(Apartment.id == apartment_id))
 
         if booking is None:
             return False  
 
         booking.is_confirmed = True 
 
-        apartment.is_available = False 
-
         self.session.add(booking)
-        self.session.add(apartment)
-        await self.session.commit()
 
+        await self.session.commit()
         await self.session.refresh(booking)
 
         return True  
@@ -84,7 +79,24 @@ class ApartmentBookingRepo(BaseRepo):
         return True 
 
 
-    async def update_booking_status(self, booking_id):
+    async def installation_false_is_available_apartment(self, apartment_id: int) -> bool:
+        apartment = await self.session.scalar(
+            select(Apartment).where(Apartment.id == apartment_id)
+        )
+
+        if apartment is None:
+            return False
+
+        apartment.is_available = False
+
+        self.session.add(apartment)
+        await self.session.commit()
+        await self.session.refresh(apartment)
+
+        return True
+
+
+    async def update_is_completed_booking(self, booking_id: int) -> None:
         try:
             booking = await self.session.scalar(select(Booking).where(Booking.id == booking_id))
             
@@ -93,13 +105,14 @@ class ApartmentBookingRepo(BaseRepo):
                 apartment = await self.session.scalar(select(Apartment).where(Apartment.id == booking.apartment_id))
 
                 if apartment:
+                    apartment.is_available = True
                     apartment.rating += 1
                     self.session.add(apartment)
 
                 self.session.add(booking)
                 await self.session.commit()
                 
-                logging.info("Статусы бронирований обновлены успешно.")
+                logging.info("Статус бронирования обновлены успешно.")
             else:
                 logging.warning(f"Бронирование с ID {booking_id} не найдено.")
 

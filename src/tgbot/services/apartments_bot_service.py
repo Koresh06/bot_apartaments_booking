@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy import delete, select
 
 from src.core.repo.base import BaseRepo
-from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City
+from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City, Booking
 
 
 class BotApartmentRepo(BaseRepo):
@@ -76,7 +76,7 @@ class BotApartmentRepo(BaseRepo):
                     "city": city_name,
                     "street": apartment.street,
                     "house_number": apartment.house_number,
-                    "apartment_number": apartment.apartment_number,
+                    "apartment_number": apartment.apartment_number if apartment.apartment_number else "-",
                     "price_per_day": apartment.price_per_day,
                     "rooms": apartment.rooms,
                     "description": apartment.description,
@@ -212,5 +212,43 @@ class BotApartmentRepo(BaseRepo):
         await self.session.commit()
     
         return apartment_info.is_available 
+    
 
+    async def get_orders_bookings(self, tg_id: int) -> Optional[List[dict]]:
+        landlord_stmt = await self.session.scalar(
+            select(Landlords).join(Users).where(Users.tg_id == tg_id)
+        )
 
+        if not landlord_stmt:
+            return None
+
+        stmt = (
+            select(Booking, Apartment, City.name)
+            .join(Apartment, Booking.apartment_id == Apartment.id)
+            .join(City, Apartment.city_id == City.id)
+            .where(Apartment.landlord_id == landlord_stmt.id)
+            .where(Booking.is_confirmed == False) 
+            .order_by(Booking.create_at.desc())   
+        )
+
+        result = await self.session.execute(stmt)
+
+        apartments_info = []
+        for booking, apartment, city_name in result.all():
+            apartments_info.append({
+                "booking": booking,
+                "apartment_id": apartment.id,
+                "landlord_id": apartment.landlord_id,
+                "landlord_tg_id": tg_id,
+                "city": city_name,
+                "street": apartment.street,
+                "house_number": apartment.house_number,
+                "apartment_number": apartment.apartment_number if apartment.apartment_number else "-",
+                "price_per_day": apartment.price_per_day,
+                "rooms": apartment.rooms,
+                "description": apartment.description,
+                "booking_start_date": booking.start_date.strftime("%d.%m.%Y"),
+                "booking_end_date": booking.end_date.strftime("%d.%m.%Y"),
+            })
+
+        return apartments_info if apartments_info else None

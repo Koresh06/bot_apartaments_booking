@@ -4,6 +4,7 @@ from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram_dialog.widgets.common import ManagedScroll
 from aiogram_dialog.widgets.input import TextInput
 
+from src.core.models.bookings import Booking
 from src.core.models.landlords import Landlords
 from src.core.repo.requests import RequestsRepo
 
@@ -188,3 +189,29 @@ async def getter_is_available(dialog_manager: DialogManager, **kwargs) -> dict:
         "apartment_id": apartment["apartment_id"],
     }
 
+
+
+async def getter_orders_booking(dialog_manager: DialogManager, event_from_user: User, **kwargs) -> dict:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+    apartments = await repo.bot_apartments.get_orders_bookings(tg_id=event_from_user.id)
+
+    if not apartments:
+        return {"data": apartments}
+    
+    dialog_manager.dialog_data["count_page"] = len(apartments)
+    current_page = dialog_manager.dialog_data.get("page", 1)
+    apartment = apartments[current_page - 1]
+    dialog_manager.dialog_data["apartment"] = apartment
+    
+    booking: Booking = apartment["booking"]
+    dialog_manager.dialog_data["booking"] = booking
+
+    dialog_manager.dialog_data["user_id"] = apartment["landlord_tg_id"]
+
+    return {
+        "data": True,
+        "apartment": apartment,
+        "count_page": len(apartments),
+        "current_page": current_page,
+        "booking": booking,
+    }

@@ -24,15 +24,14 @@ class LandlordApiRepo(BaseRepo):
         result = await self.session.execute(stmt)
         landlords = result.scalars().all()
 
-        # Возвращаем пустой список, если арендодателей нет
         return landlords if landlords else []
+
 
     async def count_all_landlords(self):
         query = select(func.count(Landlords.id))
         result = await self.session.execute(query)
         total = result.scalar()
     
-        # Если нет арендодателей, возвращаем 0
         return total if total else 0
     
 

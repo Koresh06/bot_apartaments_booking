@@ -49,3 +49,9 @@ class LandlordApartmentsSG(StatesGroup):
     details = State()
 
 
+class OrdersBookingSG(StatesGroup):
+    orders = State()
+    cancel_message = State()
+    cancle_сonfirm = State()
+
+
