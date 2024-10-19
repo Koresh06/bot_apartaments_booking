@@ -1,5 +1,4 @@
 from typing import AsyncGenerator
-from fastapi import logger
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,

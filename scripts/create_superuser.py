@@ -4,9 +4,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import asyncio
-from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.db_helper import async_session_maker
-from src.core.models import Users
 from src.apmin_panel.api.auth.service import AuthApiRepo
 
 

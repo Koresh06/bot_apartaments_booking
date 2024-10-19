@@ -1,5 +1,4 @@
 from typing import Optional
-from uuid import UUID
 from fastapi import Request
 from pydantic import BaseModel, EmailStr
 

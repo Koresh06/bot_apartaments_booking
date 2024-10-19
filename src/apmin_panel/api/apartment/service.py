@@ -1,11 +1,8 @@
 from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload, joinedload
-from src.core.models import Apartment, Booking
-
-from src.core.models.landlords import Landlords
-from src.core.repo.base import BaseRepo
+from sqlalchemy.orm import selectinload
 from src.core.models import Apartment
-from .utils import get_photos_urls
+
+from src.core.repo.base import BaseRepo
 
 
 class ApartmentApiRepo(BaseRepo):

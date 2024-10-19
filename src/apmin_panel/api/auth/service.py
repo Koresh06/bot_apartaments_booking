@@ -1,7 +1,6 @@
 from typing import Optional
 from pydantic import EmailStr
-from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import select
 from src.core.models import Users
 
 from src.core.repo.base import BaseRepo

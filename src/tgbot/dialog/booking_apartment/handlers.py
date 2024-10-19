@@ -1,4 +1,4 @@
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from functools import partial
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram.types import CallbackQuery, User, Chat

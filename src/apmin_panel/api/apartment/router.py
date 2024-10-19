@@ -10,7 +10,6 @@ from src.apmin_panel.conf_static import templates
 
 from src.core.db_helper import get_db
 from .service import ApartmentApiRepo
-from .utils import get_photo_url
 
 
 

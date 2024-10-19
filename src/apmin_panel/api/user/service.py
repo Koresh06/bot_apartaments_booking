@@ -1,6 +1,5 @@
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.orm import selectinload
-from src.apmin_panel.api.auth.schemas import UserCreateInRegistration
 from src.core.models import Landlords, Users, Apartment
 
 from src.core.repo.base import BaseRepo

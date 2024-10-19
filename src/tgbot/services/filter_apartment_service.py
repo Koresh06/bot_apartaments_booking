@@ -1,4 +1,3 @@
-from operator import is_not
 from typing import List, Optional, Tuple
 from sqlalchemy import between, func, select, Result
 

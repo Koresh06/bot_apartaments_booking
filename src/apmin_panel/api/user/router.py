@@ -1,10 +1,9 @@
 from typing import Annotated
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Request
 
 from src.apmin_panel.api.auth.permissions import get_current_user
-from src.apmin_panel.api.auth.schemas import UserCreateInRegistration
 from src.apmin_panel.api.auth.service import AuthApiRepo
 from src.core.models.users import Users
 

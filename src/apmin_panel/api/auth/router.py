@@ -1,13 +1,13 @@
 from typing import Annotated
-from fastapi import BackgroundTasks, Response
+from fastapi import Response
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi import APIRouter, Depends, Request, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.db_helper import get_db
-from .schemas import UserCreateInRegistration, Token, LoginForm
+from .schemas import Token, LoginForm
 from .service import AuthApiRepo
 from .jwt import create_token
 from src.apmin_panel.conf_static import templates

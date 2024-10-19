@@ -15,8 +15,7 @@ from aiogram_dialog.widgets.kbd import (
     Start,
     NumberedPager,
     StubScroll,
-    Select,
-    SwitchTo
+    Select
 )
 
 from src.core.repo.requests import RequestsRepo
@@ -31,7 +30,6 @@ from .states import (
     # FilterCitysSG,
     # FilterPricePerDaySG,
     # FilterRoomsSG,
-    FiltersApartmentsSG,
     FilteredCatalogApartmentsSG,
     FiltersSG
 )

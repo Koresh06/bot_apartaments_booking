@@ -1,9 +1,7 @@
 from typing import Annotated
-from fastapi.responses import RedirectResponse
 from jose import jwt, JWTError
-from fastapi import Depends, HTTPException, Security, Request
+from fastapi import Depends, Security, Request
 from fastapi.security import APIKeyCookie
-from starlette.status import HTTP_403_FORBIDDEN
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import config
@@ -37,7 +35,7 @@ async def get_current_user(
     try:
         payload = jwt.decode(token, config.api.secret_key, algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)
-    except JWTError as e:
+    except JWTError:
         False
         
     user: Users = await AuthApiRepo(session).get_user_by_id(user_id=token_data.user_id)
