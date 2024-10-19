@@ -38,18 +38,17 @@ async def on_start_date_selected(
     
     for booked in booked_dates:
         if booked["start_date"] <= start_date <= booked["end_date"]:
-            await callback.answer("Эта дата уже занята.", show_alert=True)
+            await callback.answer("🛑 Эта дата уже занята.", show_alert=True)
             return 
     
     if start_date < today:
-        await callback.answer("Эта дата недоступна.", show_alert=True)
+        await callback.answer("🚫 Эта дата недоступна.", show_alert=True)
     else:
         dialog_manager.dialog_data["start_date"] = start_date
         await callback.answer(
-            f"Дата начала бронирования: {start_date}", show_alert=True
+            f"📅 Дата начала бронирования: {start_date}", show_alert=True
         )
         await dialog_manager.next()
-
 
 
 async def on_end_date_selected(
@@ -57,13 +56,13 @@ async def on_end_date_selected(
 ):
     today = date.today()
     start_date = dialog_manager.dialog_data.get("start_date")
-    
+
     apartment_id = dialog_manager.start_data.get("apartment")["apartment_id"]
-    
+
     bookings = dialog_manager.dialog_data.get("bookings")
-    
+
     booked_dates = []
-    
+
     for booking_data in bookings:
         booking = booking_data["booking"]
         if booking.apartment_id == apartment_id:
@@ -71,26 +70,27 @@ async def on_end_date_selected(
                 "start_date": booking.start_date.date(), 
                 "end_date": booking.end_date.date()      
             })
-    
+
+    # Проверка на занятость новой конечной даты
     for booked in booked_dates:
-        if booked["start_date"] <= end_date <= booked["end_date"]:
-            await callback.answer("Эта дата уже занята.", show_alert=True)
+        # Проверяем пересечения
+        if (start_date and booked["start_date"] <= end_date <= booked["end_date"]) or \
+           (start_date and start_date <= booked["end_date"] and end_date >= booked["start_date"]):
+            await callback.answer("❌ Невозможно выбрать эти даты, так как в указанном промежутке уже есть забронированные дни.", show_alert=True)
             return  
 
     if end_date < today:
-        await callback.answer("Эта дата недоступна.", show_alert=True)
-
+        await callback.answer("🚫 Эта дата недоступна.", show_alert=True)
     elif start_date and end_date <= start_date:
         await callback.answer(
-            "Дата выезда должна быть позже даты заезда.", show_alert=True
+            "⚠️ Дата выезда должна быть позже даты заезда.", show_alert=True
         )
     else:
         dialog_manager.dialog_data["end_date"] = end_date
         await callback.answer(
-            f"Дата окончания бронирования: {end_date}", show_alert=True
+            f"📅 Дата окончания бронирования: {end_date}", show_alert=True
         )
         await dialog_manager.next()
-
 
 
 async def back_to_catalog_apartments(
