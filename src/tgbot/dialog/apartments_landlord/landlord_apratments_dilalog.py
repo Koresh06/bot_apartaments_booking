@@ -552,7 +552,7 @@ view_booking_orders_landlord = Dialog(
             "<b>📝 Описание: {apartment[description]}</b>\n"
             "<b>📅 Дата начала бронирования: {apartment[booking_start_date]}</b>\n"
             "<b>📅 Дата окончания бронирования: {apartment[booking_end_date]}</b>\n",
-            when=F["data"],
+            when='data',
         ),
         Group(
             Button(Const("✅ Подтвердить"), id="confirm", on_click=yes_confirm_booking),
@@ -565,6 +565,7 @@ view_booking_orders_landlord = Dialog(
                 ),
                 Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
             ),
+            when="data",
         ),
         state=OrdersBookingSG.orders,
         getter=getter_orders_booking,

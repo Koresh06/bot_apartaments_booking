@@ -251,4 +251,4 @@ class BotApartmentRepo(BaseRepo):
                 "booking_end_date": booking.end_date.strftime("%d.%m.%Y"),
             })
 
-        return apartments_info if apartments_info else None
+        return apartments_info if apartments_info else False
