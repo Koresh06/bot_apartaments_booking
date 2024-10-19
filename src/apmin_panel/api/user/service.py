@@ -1,7 +1,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 from src.apmin_panel.api.auth.schemas import UserCreateInRegistration
-from src.core.models import Landlords, Users
+from src.core.models import Landlords, Users, Apartment
 
 from src.core.repo.base import BaseRepo
 
@@ -32,7 +32,7 @@ class UsersApiRepo(BaseRepo):
     async def get_user_by_id(self, user_id: int):
         query = (
             select(Users)
-            .options(selectinload(Users.landlord_rel).selectinload(Landlords.apartment_rel)) 
+            .options(selectinload(Users.landlord_rel).selectinload(Landlords.apartment_rel).selectinload(Apartment.city_rel)) 
             .where(Users.id == user_id)
         )
         result = await self.session.execute(query)

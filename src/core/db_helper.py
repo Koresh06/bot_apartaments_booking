@@ -64,4 +64,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         try:
             yield session
         except Exception as e:
-            await session.close() 
+            # Обработка исключения (если нужно, например, логирование)
+            print(f"Ошибка при работе с сессией: {e}")
+            raise  # Перебрасываем исключение, чтобы FastAPI мог его обработать
+        finally:
+            await session.close()  # Закрываем сессию в любом случае

@@ -73,7 +73,7 @@
                     {% for apartment in by_user.landlord_rel.apartment_rel %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td>{{ apartment.street }} {{ apartment.house_number }}{% if apartment.apartment_number %}, кв. {{ apartment.apartment_number }}{% endif %}</td>
+                        <td>{{ apartment.city_rel.name }}, {{ apartment.street }} {{ apartment.house_number }}{% if apartment.apartment_number %}, кв. {{ apartment.apartment_number }}{% endif %}</td>
                         <td>{{ apartment.price_per_day }} ₽</td>
                         <td>{{ apartment.rooms }}</td>
                         <td>{{ 'Да' if apartment.is_available else 'Нет' }}</td>
@@ -89,7 +89,7 @@
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="modalDescriptionLabel{{ apartment.id }}">Описание апартаментов (№: {{ loop.index }})</h5>
+                                            <h5 class="modal-title" id="modalDescriptionLabel{{ apartment.id }}">Описание апартамента</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                                         </div>
                                         <div class="modal-body">

@@ -6,11 +6,11 @@ from src.apmin_panel.conf_static import configure_static
 from src.core.config import config
 
 from src.apmin_panel.api.auth.router import router as auth_router
-# from src.apmin_panel.api.routers.auth import router as auth_router
 from src.apmin_panel.api.booking.router import router as bookings_router
 from src.apmin_panel.api.landlord.router import router as landlords_router
 from src.apmin_panel.api.statistic.router import router as statistics_router
 from src.apmin_panel.api.user.router import router as users_router
+from src.apmin_panel.api.apartment.router import router as apartment_router
 
 
 app = FastAPI()
@@ -27,6 +27,7 @@ async def root():
 
 
 app.include_router(auth_router)
+app.include_router(apartment_router)
 app.include_router(bookings_router)
 app.include_router(landlords_router)
 app.include_router(statistics_router)

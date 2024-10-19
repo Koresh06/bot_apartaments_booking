@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Список Аппартаментов</h1>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Адрес</th>
+                    <th>Цена за день</th>
+                    <th>Количество комнат</th>
+                    <th>Доступен</th>
+                    <th>Дата создания</th>
+                    <th>Описание</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if apartments and apartments | length > 0 %}
+                    {% for apartment in apartments %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ apartment.city_rel.name }}, {{ apartment.street }} {{ apartment.house_number }}{% if apartment.apartment_number %}, кв. {{ apartment.apartment_number }}{% endif %}</td>
+                        <td>{{ apartment.price_per_day }} ₽</td>
+                        <td>{{ apartment.rooms }}</td>
+                        <td>{{ 'Да' if apartment.is_available else 'Нет' }}</td>
+                        <td>{{ apartment.create_at.strftime('%d.%m.%Y') }}</td>
+                        <td>
+                            <!-- Кнопка для открытия модального окна с описанием -->
+                            <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#modalDescription{{ apartment.id }}">
+                                Показать описание
+                            </button>
+                            
+                            <!-- Модальное окно с описанием -->
+                            <div class="modal fade" id="modalDescription{{ apartment.id }}" tabindex="-1" aria-labelledby="modalDescriptionLabel{{ apartment.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalDescriptionLabel{{ apartment.id }}">Описание апартамента</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>{{ apartment.description }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">Нет доступных апартаментов.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

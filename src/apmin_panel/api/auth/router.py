@@ -38,13 +38,11 @@ async def login_access_token(
         email=from_data.username,
         password=from_data.password,
     )
-    print(user)
 
     if not user:
         return None
     
     token = create_token(user_id=user.id)
-    print(token)
 
     return token
 
@@ -88,7 +86,6 @@ async def login(
         from_data=form,
         session=session,
     )
-    print(validate_user_cookie)
     if validate_user_cookie is None:
         msg = "Неверное имя пользователя или пароль"
         # Возвращаем корректный ответ с кодом 400

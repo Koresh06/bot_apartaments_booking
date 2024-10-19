@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.apmin_panel.api.apartment.service import ApartmentApiRepo
 from src.apmin_panel.api.auth.service import AuthApiRepo
 from src.apmin_panel.api.booking.service import BookingApiRepo
 from src.apmin_panel.api.landlord.service import LandlordApiRepo
@@ -75,4 +76,10 @@ class RequestsRepo:
     def users_api(self) -> UsersApiRepo:
 
         return UsersApiRepo(self.session)
+    
+
+    @property
+    def apartments_api(self) -> ApartmentApiRepo:
+
+        return ApartmentApiRepo(self.session)
 

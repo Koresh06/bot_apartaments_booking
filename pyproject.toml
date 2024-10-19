@@ -32,6 +32,8 @@ betterlogging = "^1.0.0"
 beautifulsoup4 = "^4.12.3"
 loguru = "^0.7.2"
 pydantic = {extras = ["email"], version = "^2.9.2"}
+requests = "^2.32.3"
+pillow = "^11.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
