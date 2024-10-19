@@ -33,6 +33,8 @@ async def get_bookings(
     
     bookings = await BookingApiRepo(session).get_paginated_bookings(page, size)
 
+    print([booking.apartment_rel.landlord_rel.company_name for booking in bookings])
+
     total_bookings = await BookingApiRepo(session).count_all_bookings()
     total_pages = (total_bookings + size - 1) // size
 

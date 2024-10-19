@@ -99,7 +99,7 @@ async def show_create_admin_form(
     user: Users = Depends(get_current_user),
     message: str = None,
 ):
-    if not user:
+    if not user.is_superuser:
         return RedirectResponse("/auth/", status_code=303)
     
     not_landlords = await UsersApiRepo(session).get_users_not_admin()
@@ -132,7 +132,7 @@ async def submit_create_admin(
     user: Users = Depends(get_current_user),
     schemas: CreateAdminSchema = Depends(CreateAdminSchema.as_form),
 ):
-    if not user:
+    if not user.is_superuser:
         return RedirectResponse("/auth/", status_code=303)
     
     admin = await AuthApiRepo(session).create_admin(schema=schemas)

@@ -139,12 +139,18 @@ async def get_pending_bookings(
     landlord_id: int,
     session: Annotated[AsyncSession, Depends(get_db)],
     user: Users = Depends(get_current_user),
+    page: int = 1,
+    size: int = 10,
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
 
-    pending_bookings = await LandlordApiRepo(session).get_pending_bookings_by_landlord_id(landlord_id)
-    logger.info(f"Получены ожидающие бронирования: {pending_bookings}")
+    pending_bookings = await LandlordApiRepo(session).get_paginated_pending_bookings_by_landlord_id(landlord_id, page, size)
+
+    total_pending_bookings = await LandlordApiRepo(session).count_all_pending_bookings_by_landlord_id(landlord_id)
+    total_pages = (total_pending_bookings + size - 1) // size
+
+
     
     if not pending_bookings:
         return templates.TemplateResponse(
@@ -161,6 +167,8 @@ async def get_pending_bookings(
         context={
             "bookings": pending_bookings,
             "user": user,
+            "page": page,
+            "total_pages": total_pages,
         },
     )
 
@@ -171,12 +179,16 @@ async def get_completed_bookings(
     landlord_id: int,
     session: Annotated[AsyncSession, Depends(get_db)],
     user: Users = Depends(get_current_user),
+    page: int = 1,
+    size: int = 10,
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
 
-    completed_bookings = await LandlordApiRepo(session).get_completed_bookings_by_landlord_id(landlord_id)
-    logger.info(f"Получены завершенные бронирования: {completed_bookings}")
+    completed_bookings = await LandlordApiRepo(session).get_paginated_completed_bookings_by_landlord_id(landlord_id, page, size)
+
+    total_completed_bookings = await LandlordApiRepo(session).count_all_completed_bookings_by_landlord_id(landlord_id)
+    total_pages = (total_completed_bookings + size - 1) // size
 
     if not completed_bookings:
         return templates.TemplateResponse(
@@ -194,6 +206,8 @@ async def get_completed_bookings(
         context={
             "bookings": completed_bookings,
             "user": user,
+            "page": page,
+            "total_pages": total_pages,
         },
     )
 
@@ -204,12 +218,16 @@ async def get_total_income_bookings(
     landlord_id: int,
     session: Annotated[AsyncSession, Depends(get_db)],
     user: Users = Depends(get_current_user),
+    page: int = 1,
+    size: int = 10,
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
 
-    total_income_bookings = await LandlordApiRepo(session).get_total_income_bookings_by_landlord_id(landlord_id)
-    logger.info(f"Получен общий доход от бронирований для арендатора {landlord_id}: {total_income_bookings}")
+    total_income_bookings = await LandlordApiRepo(session).get_paginated_total_income_bookings_by_landlord_id(landlord_id, page, size)
+    
+    total_total_income_bookings = await LandlordApiRepo(session).count_all_total_income_bookings_by_landlord_id(landlord_id)
+    total_pages = (total_total_income_bookings + size - 1) // size
 
     if isinstance(total_income_bookings, str):
         return templates.TemplateResponse(
@@ -226,6 +244,8 @@ async def get_total_income_bookings(
         context={
             "bookings": total_income_bookings,
             "user": user,
+            "page": page,
+            "total_pages": total_pages,
         }
     )
 

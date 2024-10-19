@@ -41,7 +41,7 @@ class LandlordApiRepo(BaseRepo):
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ):
-        stmt = select(Landlords).join(Users).where(Landlords.id == landlord_id)
+        stmt = select(Landlords).join(Users).options(selectinload(Landlords.user_rel)).where(Landlords.id == landlord_id)
         result = await self.session.execute(stmt)
         landlord = result.scalar()
 
@@ -117,7 +117,8 @@ class LandlordApiRepo(BaseRepo):
         }
     
 
-    async def get_completed_bookings_by_landlord_id(self, landlord_id: int):
+    async def get_paginated_completed_bookings_by_landlord_id(self, landlord_id: int, page: int, size: int):
+        offset = (page - 1) * size
         stmt = (
             select(
                 Booking,
@@ -133,6 +134,8 @@ class LandlordApiRepo(BaseRepo):
             .where(Booking.is_completed == True)
             .where(Apartment.landlord_id == landlord_id)  
             .order_by(Booking.id.desc())
+            .offset(offset)
+            .limit(size)
         )
         result = await self.session.execute(stmt)
         bookings_with_details = result.all()
@@ -140,7 +143,21 @@ class LandlordApiRepo(BaseRepo):
         return bookings_with_details
     
 
-    async def get_pending_bookings_by_landlord_id(self, landlord_id: int):
+    async def count_all_completed_bookings_by_landlord_id(self, landlord_id: int):
+        query = (
+            select(func.count(Booking.id))
+            .join(Apartment, Booking.apartment_id == Apartment.id)  # Соединяем таблицы
+            .where(Apartment.landlord_id == landlord_id)
+            .where(Booking.is_completed == True)
+        )
+        result = await self.session.execute(query)
+        total = result.scalar()
+
+        return total
+
+
+    async def get_paginated_pending_bookings_by_landlord_id(self, landlord_id: int, page: int, size: int):
+        offset = (page - 1) * size
         stmt = (
             select(
                 Booking,
@@ -159,14 +176,30 @@ class LandlordApiRepo(BaseRepo):
                 Landlords.id == landlord_id 
             )
             .order_by(Booking.id.desc())
+            .offset(offset)
+            .limit(size)
         )
         result = await self.session.execute(stmt)
         bookings_with_details = result.all()
 
         return bookings_with_details
+    
+
+    async def count_all_pending_bookings_by_landlord_id(self, landlord_id: int):
+        query = (
+            select(func.count(Booking.id))
+            .join(Apartment, Booking.apartment_id == Apartment.id)  # Соединяем таблицы
+            .where(Apartment.landlord_id == landlord_id)
+            .where(Booking.is_completed == False)
+        )
+        result = await self.session.execute(query)
+        total = result.scalar()
+
+        return total
 
 
-    async def get_total_income_bookings_by_landlord_id(self, landlord_id: int):
+    async def get_paginated_total_income_bookings_by_landlord_id(self, landlord_id: int, page: int, size: int):
+        offset = (page - 1) * size
         stmt = (
             select(
                 Booking,
@@ -186,6 +219,8 @@ class LandlordApiRepo(BaseRepo):
                 Landlords.id == landlord_id 
             )
             .order_by(Booking.id.desc())
+            .offset(offset)
+            .limit(size)
         )
         
         result = await self.session.execute(stmt)
@@ -194,7 +229,6 @@ class LandlordApiRepo(BaseRepo):
         bookings_with_income = []
 
         for booking, username, street, house_number, apartment_number, city_name, price_per_day in bookings_with_details:
-            print(booking.__dict__)
      
             days_booked = (booking.end_date - booking.start_date).days
 
@@ -212,6 +246,19 @@ class LandlordApiRepo(BaseRepo):
             })
 
         return bookings_with_income
+    
+
+    async def count_all_total_income_bookings_by_landlord_id(self, landlord_id: int):
+        query = (
+            select(func.count(Booking.id))
+            .join(Apartment, Booking.apartment_id == Apartment.id)  # Соединяем таблицы
+            .where(Apartment.landlord_id == landlord_id)
+            .where(Booking.is_completed == True)
+        )
+        result = await self.session.execute(query)
+        total = result.scalar()
+
+        return total
     
 
     async def get_users_not_landlord(self):

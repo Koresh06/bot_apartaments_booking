@@ -1,4 +1,4 @@
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import selectinload
 from src.apmin_panel.api.auth.schemas import UserCreateInRegistration
 from src.core.models import Landlords, Users, Apartment
@@ -43,7 +43,7 @@ class UsersApiRepo(BaseRepo):
     async def get_users_not_admin(self):
         stmt = (
             select(Users)
-            .filter(Users.is_admin == False or Users.is_superuser == False)
+            .where(and_(Users.is_admin == False, Users.is_superuser == False))
             .order_by(Users.id.desc())
         )
 
