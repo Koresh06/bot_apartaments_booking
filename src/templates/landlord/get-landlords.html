@@ -24,9 +24,9 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ landlord.company_name }}</td>
-                <td>{{ landlord.user_rel.username }}</td>
+                <td>{{ landlord.user_rel.username if landlord.user_rel.username else landlord.user_rel.full_name }}</td>
                 <td>{{ landlord.phone }}</td>
-                <td>{{ landlord.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ landlord.create_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
                 <td>
                     <a href="/landlord/statistics/{{ landlord.id }}" class="btn btn-outline-primary">Статистика</a>
                 </td>

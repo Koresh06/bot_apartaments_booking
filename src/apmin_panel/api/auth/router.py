@@ -38,11 +38,13 @@ async def login_access_token(
         email=from_data.username,
         password=from_data.password,
     )
+    print(user)
 
     if not user:
-        return JSONResponse(status_code=401, content={"message": "Неверное имя пользователя или пароль"})
+        return None
     
     token = create_token(user_id=user.id)
+    print(token)
 
     return token
 
@@ -86,14 +88,16 @@ async def login(
         from_data=form,
         session=session,
     )
-
-    if not validate_user_cookie:
+    print(validate_user_cookie)
+    if validate_user_cookie is None:
         msg = "Неверное имя пользователя или пароль"
+        # Возвращаем корректный ответ с кодом 400
         return templates.TemplateResponse(
             request=request,
-            name="login.html",
-            context={"msg": msg})
-    
+            name="auth.html",
+            context={"msg": msg},
+        )
+
     response = RedirectResponse(url="/statistics/get-statistics/", status_code=status.HTTP_302_FOUND)
 
     response.set_cookie(
@@ -104,6 +108,7 @@ async def login(
     )
 
     return response
+
 
 
 @router.get("/logout", response_class=HTMLResponse)

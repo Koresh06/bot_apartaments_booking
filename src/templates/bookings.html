@@ -25,8 +25,8 @@
                     <td><span class="badge bg-info text-dark">{{ booking.id }}</span></td>
                     <td>{{ booking.user_rel.username }}</td>
                     <td>{{ booking.apartment_rel.landlord_rel.user_rel.username}}</td>
-                    <td>{{ booking.start_date.strftime('%Y-%m-%d') }}</td>
-                    <td>{{ booking.end_date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ booking.start_date.strftime('%d.%m.%Y') }}</td>
+                    <td>{{ booking.end_date.strftime('%d.%m.%Y') }}</td>
                     <td>
                         {% if booking.is_confirmed %}
                             <span class="badge bg-success"><i class="fas fa-check-circle"></i> Подтверждено</span>
@@ -34,7 +34,7 @@
                             <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Не подтверждено</span>
                         {% endif %}
                     </td>
-                    <td>{{ booking.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ booking.create_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -45,17 +45,17 @@
             <ul class="pagination justify-content-center">
                 {% if page > 1 %}
                 <li class="page-item">
-                    <a class="page-link" href="/bookings/get-bookings/?page={{ page   - 1 }}">Предыдущая</a>
+                    <a class="page-link" href="/booking/get-bookings/?page={{ page   - 1 }}">Предыдущая</a>
                 </li>
                 {% endif %}
                 {% for p in range(1, total_pages + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="/bookings/get-bookings/?page={{ p }}">{{ p }}</a>
+                        <a class="page-link" href="/booking/get-bookings/?page={{ p }}">{{ p }}</a>
                     </li>
                 {% endfor %}
                 {% if page < total_pages %}
                 <li class="page-item">
-                    <a class="page-link" href="/bookings/get-bookings/?page={{ page   + 1 }}">Следующая</a>
+                    <a class="page-link" href="/booking/get-bookings/?page={{ page   + 1 }}">Следующая</a>
                 </li>
                 {% endif %}
             </ul>

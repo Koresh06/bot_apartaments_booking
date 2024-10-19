@@ -33,7 +33,7 @@
                         <td>{{ booking.booking.start_date.strftime('%d.%m.%Y') }}</td>
                         <td>{{ booking.booking.end_date.strftime('%d.%m.%Y') }}</td>
                         <td>{{ booking.income }} руб.</td> <!-- Вывод дохода -->
-                        <td>{{ booking.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td> <!-- Дата создания апартамента -->
+                        <td>{{ booking.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td> <!-- Дата создания апартамента -->
                     </tr>
                 {% endfor %}
             </tbody>

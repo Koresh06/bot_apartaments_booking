@@ -3,20 +3,22 @@
 {% block content %}
 
 <div class="container mt-4 text-center">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="text-center flex-grow-1">Список пользователей</h2>
-            {% if user.is_superuser %}
-                <a href="/users/create-admin" class="btn btn-primary">Добавить админа</a>
-            {% endif %}
-        </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-center flex-grow-1">Список пользователей</h2>
+        {% if user.is_superuser %}
+            <a href="/users/create-admin" class="btn btn-primary">Добавить админа</a>
+        {% endif %}
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>№</th>
                 <th>Имя пользователя</th>
                 <th>Роль</th>
+                <th>Телефон</th>
                 <th>Статус</th>
                 <th>Дата создания</th>
+                <th>Действие</th>
             </tr>
         </thead>
         <tbody>
@@ -24,27 +26,31 @@
                 <tr class="{% if user.is_blocked %}table-danger{% endif %}">
                     <td>{{ loop.index }}</td>
                     <td>
-                        <a class="text-decoration-none">{{ user.username }}</a>
+                        <a class="text-decoration-none">{{ user.username if user.username else user.full_name }}</a>
                     </td>
                     <td>
                         {% if user.is_superuser %}
-                        <span class="badge bg-danger">Суперпользователь</span>
+                            <span class="badge bg-danger">Суперпользователь</span>
                         {% elif user.is_admin %}
-                        <span class="badge bg-info">Администратор</span>
+                            <span class="badge bg-info">Администратор</span>
                         {% elif user.landlord_rel %}
-                        <span class="badge bg-primary">Арендодатель</span>
+                            <span class="badge bg-primary">Арендодатель</span>
                         {% else %}
-                        <span class="badge bg-secondary">Пользователь</span>
+                            <span class="badge bg-secondary">Пользователь</span>
                         {% endif %}
                     </td>
                     <td>
+                        <!-- Телефон показывается только если пользователь арендодатель -->
+                        {{ user.landlord_rel.phone if user.landlord_rel else '—' }}
+                    </td>
+                    <td>
                         {% if user.is_banned %}
-                        <span class="badge bg-danger">Заблокирован</span>
+                            <span class="badge bg-danger">Заблокирован</span>
                         {% else %}
-                        <span class="badge bg-success">Активен</span>
+                            <span class="badge bg-success">Активен</span>
                         {% endif %}
                     </td>
-                    <td>{{ user.create_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
                     <td>
                         <a href="/users/get-user-detail/{{ user.id }}" class="btn btn-info btn-sm">Подробнее</a>
                     </td>
@@ -57,24 +63,23 @@
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 {% if page > 1 %}
-                <li class="page-item">
-                    <a class="page-link" href="/users/get-users/?page={{ page   - 1 }}">Предыдущая</a>
-                </li>
+                    <li class="page-item">
+                        <a class="page-link" href="/users/get-users/?page={{ page - 1 }}">Предыдущая</a>
+                    </li>
                 {% endif %}
                 {% for p in range(1, total_pages + 1) %}
                     <li class="page-item {% if p == page %}active{% endif %}">
-                        <a class="page-link" href="/users/get-users/?page={{    p }}">{{ p }}</a>
+                        <a class="page-link" href="/users/get-users/?page={{ p }}">{{ p }}</a>
                     </li>
                 {% endfor %}
                 {% if page < total_pages %}
-                <li class="page-item">
-                    <a class="page-link" href="/users/get-users/?page={{ page   + 1 }}">Следующая</a>
-                </li>
+                    <li class="page-item">
+                        <a class="page-link" href="/users/get-users/?page={{ page + 1 }}">Следующая</a>
+                    </li>
                 {% endif %}
             </ul>
         </nav>
     {% endif %}
-
 </div>
 
 {% endblock %}

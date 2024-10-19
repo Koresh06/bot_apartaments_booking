@@ -42,8 +42,8 @@
                             </table>
                         </td>
                         <td>{{ username }}</td>
-                        <td>{{ booking.end_date.strftime('%Y-%m-%d') }}</td>
-                        <td>{{ booking.end_date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ booking.end_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.end_date.strftime('%d.%m.%Y') }}</td>
                         <td class="text-center">
                             {% if booking.is_confirmed %}
                                 <span class="text-success">&#10004;</span> <!-- Зеленая галочка -->
@@ -51,7 +51,7 @@
                                 <span class="text-danger">&#10008;</span> <!-- Красный крестик -->
                             {% endif %}
                         </td>
-                        <td class="text-center">{{ booking.create_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td class="text-center">{{ booking.create_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
