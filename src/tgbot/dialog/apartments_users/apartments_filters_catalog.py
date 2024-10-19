@@ -16,6 +16,7 @@ from aiogram_dialog.widgets.kbd import (
     NumberedPager,
     StubScroll,
     Select,
+    SwitchTo
 )
 
 from src.core.repo.requests import RequestsRepo
@@ -27,14 +28,16 @@ from .handlers import (
     on_booking,
 )
 from .states import (
-    FilterCitysSG,
-    FilterPricePerDaySG,
-    FilterRoomsSG,
+    # FilterCitysSG,
+    # FilterPricePerDaySG,
+    # FilterRoomsSG,
     FiltersApartmentsSG,
     FilteredCatalogApartmentsSG,
+    FiltersSG
 )
 from .getters import (
     getter_apartments_data,
+    getter_filters,
     getter_get_city,
     getter_get_rooms,
     getter_min_max_price,
@@ -47,25 +50,7 @@ router = Router()
 
 filter_catalog_apartments_dialog = Dialog(
     Window(
-        Const("🔍 Фильтр каталога апартаментов"),
-        Group(
-            Start(Const("🌆 Город"), id="city", state=FilterCitysSG.start),
-            Start(
-                Const("💰 Диапазон цен"),
-                id="price_per_day",
-                state=FilterPricePerDaySG.min_price,
-            ),
-            Start(Const("🛏️ Комнаты"), id="rooms", state=FilterRoomsSG.start),
-            width=2,
-        ),
-        state=FiltersApartmentsSG.start,
-    ),
-)
-
-
-city_filter_apartment_dialog = Dialog(
-    Window(
-        Const("🌆 Фильтр по городам"),
+        Const("🌆 Выберите город"),
         Group(
             Select(
                 Format("{item[0]}"),
@@ -76,34 +61,20 @@ city_filter_apartment_dialog = Dialog(
             ),
             width=4,
         ),
-        Start(
-            Const("◀️ Назад"),
-            id="back",
-            state=FiltersApartmentsSG.start,
-            mode=StartMode.RESET_STACK,
-        ),
-        state=FilterCitysSG.start,
+        state=FiltersSG.city,
         getter=getter_get_city,
     ),
-)
-
-
-price_range_filter_dialog = Dialog(
     Window(
-        Const("💰 Укажите минимальную цену:"),
+        Const("⚠️ Внимание! На данный момент информация по данному городу отсутствует. Попробуйте позже. Нажмите - /start", when=~F["count"]),
+        Const("💰 Укажите минимальную цену:", when="count"),
         TextInput(
             id="min_price",
             type_factory=float,
             on_success=Next(),
             on_error=error_handler,
         ),
-        Start(
-            Const("◀️ Назад"),
-            id="back",
-            state=FiltersApartmentsSG.start,
-            mode=StartMode.RESET_STACK,
-        ),
-        state=FilterPricePerDaySG.min_price,
+        Back(Const("◀️ Назад"), when="count"),
+        state=FiltersSG.min_price,
     ),
     Window(
         Const("💸 Укажите максимальную цену:"),
@@ -114,7 +85,7 @@ price_range_filter_dialog = Dialog(
             on_error=error_handler,
         ),
         Back(Const("◀️ Назад")),
-        state=FilterPricePerDaySG.max_price,
+        state=FiltersSG.max_price,
     ),
     Window(
         Format("📊 Указанный диапазон цен: <b>{min_price}-{max_price}</b>"),
@@ -122,15 +93,12 @@ price_range_filter_dialog = Dialog(
             Const("✅ Подтвердить"), id="confirm", on_click=handle_confirm_min_max_price
         ),
         Back(Const("◀️ Назад")),
-        state=FilterPricePerDaySG.confirm,
+        state=FiltersSG.confirm_range,
         getter=getter_min_max_price,
     ),
-)
-
-
-rooms_filter_dialog = Dialog(
     Window(
-        Const("🏠 Выберите количество комнат:"),
+        Const("⚠️ Внимание! На данный момент информация по данному диапазону цен отсутствует. Попробуйте позже.\nВернитесь назад и укажите новый диапазон или нажмите - /start", when=~F["count"]),
+        Const("🏠 Выберите количество комнат:", when="count"),
         Group(
             Select(
                 Format("{item[0]}"),
@@ -140,17 +108,137 @@ rooms_filter_dialog = Dialog(
                 on_click=handle_room_filter,
             ),
             width=4,
+            when="count"
         ),
-        Start(
-            Const("◀️ Назад"),
-            id="back",
-            state=FiltersApartmentsSG.start,
-            mode=StartMode.RESET_STACK,
-        ),
-        state=FilterRoomsSG.start,
+        Back(Const("◀️ Назад")),
+        state=FiltersSG.rooms,
         getter=getter_get_rooms,
-    )
+    ),
+    # Window(
+    #     Const("Подтвердите ваш фильтр"),
+    #     Format(
+    #         "<b>🌆 Город: {city}</b>\n"
+    #         "<b>💰 Диапазон цен: {price_range}</b>\n"
+    #         "<b>🛏️ Комнат: {rooms}</b>\n"
+    #     ),
+    #     Group(
+    #         Button(Const("✅ Подтвердить"), id="confirm", on_click=confirm_filters),
+    #         SwitchTo(Const("❌ Отмена"), id="cancel", state=FiltersSG.city),
+    #         Next(Const("◀️ Назад"), id="back"),
+    #         width=1
+    #     ),
+    #     state=FiltersSG.confirm,
+    # ),
+    getter=getter_filters,
 )
+
+
+# filter_catalog_apartments_dialog = Dialog(
+#     Window(
+#         Const("🔍 Фильтр каталога апартаментов"),
+#         Group(
+#             Start(Const("🌆 Город"), id="city", state=FilterCitysSG.start),
+#             Start(
+#                 Const("💰 Диапазон цен"),
+#                 id="price_per_day",
+#                 state=FilterPricePerDaySG.min_price,
+#             ),
+#             Start(Const("🛏️ Комнаты"), id="rooms", state=FilterRoomsSG.start),
+#             width=2,
+#         ),
+#         state=FiltersApartmentsSG.start,
+#     ),
+# )
+
+
+# city_filter_apartment_dialog = Dialog(
+#     Window(
+#         Const("🌆 Фильтр по городам"),
+#         Group(
+#             Select(
+#                 Format("{item[0]}"),
+#                 id="city",
+#                 items="citys",
+#                 item_id_getter=itemgetter(1),
+#                 on_click=handle_city_filter,
+#             ),
+#             width=4,
+#         ),
+#         Start(
+#             Const("◀️ Назад"),
+#             id="back",
+#             state=FiltersApartmentsSG.start,
+#             mode=StartMode.RESET_STACK,
+#         ),
+#         state=FilterCitysSG.start,
+#         getter=getter_get_city,
+#     ),
+# )
+
+
+# price_range_filter_dialog = Dialog(
+#     Window(
+#         Const("💰 Укажите минимальную цену:"),
+#         TextInput(
+#             id="min_price",
+#             type_factory=float,
+#             on_success=Next(),
+#             on_error=error_handler,
+#         ),
+#         Start(
+#             Const("◀️ Назад"),
+#             id="back",
+#             state=FiltersApartmentsSG.start,
+#             mode=StartMode.RESET_STACK,
+#         ),
+#         state=FilterPricePerDaySG.min_price,
+#     ),
+#     Window(
+#         Const("💸 Укажите максимальную цену:"),
+#         TextInput(
+#             id="max_price",
+#             type_factory=float,
+#             on_success=Next(),
+#             on_error=error_handler,
+#         ),
+#         Back(Const("◀️ Назад")),
+#         state=FilterPricePerDaySG.max_price,
+#     ),
+#     Window(
+#         Format("📊 Указанный диапазон цен: <b>{min_price}-{max_price}</b>"),
+#         Button(
+#             Const("✅ Подтвердить"), id="confirm", on_click=handle_confirm_min_max_price
+#         ),
+#         Back(Const("◀️ Назад")),
+#         state=FilterPricePerDaySG.confirm,
+#         getter=getter_min_max_price,
+#     ),
+# )
+
+
+# rooms_filter_dialog = Dialog(
+#     Window(
+#         Const("🏠 Выберите количество комнат:"),
+#         Group(
+#             Select(
+#                 Format("{item[0]}"),
+#                 id="room",
+#                 items="rooms",
+#                 item_id_getter=itemgetter(1),
+#                 on_click=handle_room_filter,
+#             ),
+#             width=4,
+#         ),
+#         Start(
+#             Const("◀️ Назад"),
+#             id="back",
+#             state=FiltersApartmentsSG.start,
+#             mode=StartMode.RESET_STACK,
+#         ),
+#         state=FilterRoomsSG.start,
+#         getter=getter_get_rooms,
+#     )
+# )
 
 
 catalog_users_apartments_dialog = Dialog(
@@ -185,11 +273,11 @@ catalog_users_apartments_dialog = Dialog(
                 when="is_apartments",
             ),
             Start(
-                Const("🔍 Фильтры"),
+                Const("🔍 Фильтр"),
                 id="main_filters",
-                state=FiltersApartmentsSG.start,
+                state=FiltersSG.city,
                 mode=StartMode.RESET_STACK,
-                when="check_filters",
+                # when="check_filters",
             ),
             when="data",
         ),
@@ -230,11 +318,7 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
         last_name=message.from_user.last_name,
         full_name=message.from_user.full_name,
     )
-    await dialog_manager.start(
-        state=FiltersApartmentsSG.start,
-        data={"city": None, "price_range": None, "rooms": None},
-        mode=StartMode.RESET_STACK,
-    )
+    await dialog_manager.start(state=FiltersSG.city,mode=StartMode.RESET_STACK,)
 
 
 # @router.message(CommandStart())

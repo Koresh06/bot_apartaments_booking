@@ -2,6 +2,7 @@ from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager, StartMode
 from aiogram_dialog.widgets.kbd import Button
 
+from src.core.repo.requests import RequestsRepo
 from src.tgbot.dialog.apartments_users.states import FilteredCatalogApartmentsSG
 from src.tgbot.dialog.booking_apartment.states import BookingApartmentSG
 
@@ -9,41 +10,82 @@ from src.tgbot.dialog.booking_apartment.states import BookingApartmentSG
 async def handle_city_filter(
     callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: str
 ):
-    list_citys = dialog_manager.dialog_data.get("citys")
-    city_id = list_citys[len(list_citys) - 1][1]
-    dialog_manager.dialog_data["city_id"] = city_id
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
 
-    await dialog_manager.start(
-        state=FilteredCatalogApartmentsSG.start,
-        data={"city_id": city_id, "price_range": None, "rooms": None},
-        mode=StartMode.RESET_STACK,
-    )
+    dialog_manager.dialog_data["city_id"] = item_id
 
+    count = await repo.filter_apartments.no_data_on_apartments(city_id=int(item_id))
+    dialog_manager.dialog_data["count"] = count 
 
-async def handle_room_filter(
-    callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: str
-):
-    list_rooms = dialog_manager.dialog_data.get("rooms")
-    room = list_rooms[int(item_id) - 1][0]
-    dialog_manager.dialog_data["room"] = room
-
-    await dialog_manager.start(
-        state=FilteredCatalogApartmentsSG.start,
-        data={"room": room},
-        mode=StartMode.RESET_STACK,
-    )
+    # await dialog_manager.start(
+    #     state=FilteredCatalogApartmentsSG.start,
+    #     data={"city_id": city_id, "price_range": None, "rooms": None},
+    #     mode=StartMode.RESET_STACK,
+    # )
+    await dialog_manager.next()
 
 
 async def handle_confirm_min_max_price(
     callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, **_kwargs
 ):
     price_range = dialog_manager.dialog_data.get("price_range")
+    dialog_manager.dialog_data["price_range"] = price_range
+
+    # await dialog_manager.start(
+    #     state=FilteredCatalogApartmentsSG.start,
+    #     data={"price_range": price_range},
+    #     mode=StartMode.RESET_STACK,
+    # )
+
+    await dialog_manager.next()
+
+
+async def handle_room_filter(
+    callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: str
+):
+    city_id = dialog_manager.dialog_data.get("city_id")
+    price_range = dialog_manager.dialog_data.get("price_range")
+    rooms = dialog_manager.dialog_data.get("rooms")
+
+    room = rooms[int(item_id) - 1][0]
 
     await dialog_manager.start(
         state=FilteredCatalogApartmentsSG.start,
-        data={"price_range": price_range},
+        data={
+            "city_id": city_id,
+            "price_range": price_range,
+            "room": room,
+        },
         mode=StartMode.RESET_STACK,
     )
+
+
+    # await dialog_manager.start(
+    #     state=FilteredCatalogApartmentsSG.start,
+    #     data={
+    #         "city_id": city_id,
+    #         "price_range": price_range,
+    #         "rooms": room,
+    #     },
+    #     mode=StartMode.RESET_STACK,
+    # )
+
+
+# async def confirm_filters(dialog_manager: DialogManager, **_kwargs):
+#     city_id = dialog_manager.dialog_data.get("city_id")
+#     price_range = dialog_manager.dialog_data.get("price_range")
+#     room = dialog_manager.dialog_data.get("room")
+
+#     await dialog_manager.start(
+#         state=FilteredCatalogApartmentsSG.start,
+#         data={
+#             "city_id": city_id,
+#             "price_range": price_range,
+#             "room": room,
+#         },
+#         mode=StartMode.RESET_STACK,
+#     )
+    
 
 
 async def on_booking(
