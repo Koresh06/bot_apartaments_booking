@@ -13,8 +13,10 @@ from src.tgbot import dp, bot
 from src.tgbot.dialog.apartments_users.states import (
     FilteredCatalogApartmentsSG,
     FiltersApartmentsSG,
+    FiltersSG,
 )
 from .states import ConfirmBooking
+from .keyboard import phone_keyboard
 
 
 async def on_start_date_selected(
@@ -96,11 +98,19 @@ async def on_end_date_selected(
 async def back_to_catalog_apartments(
     callback: CallbackQuery, widget: Button, dialog_manager: DialogManager
 ):
-    apartment = dialog_manager.start_data.get("apartment")
+    city_id = dialog_manager.start_data.get("city_id")
+    price_range = dialog_manager.start_data.get("price_range")
+    room = dialog_manager.start_data.get("room")
+
+
     await dialog_manager.start(
         state=FilteredCatalogApartmentsSG.start,
         mode=StartMode.RESET_STACK,
-        data=apartment,
+        data={
+            "city_id": city_id,
+            "price_range": price_range,
+            "room": room,
+        },
     )
 
 
@@ -152,8 +162,7 @@ async def handle_confirm_booking(
         )
 
         await dialog_manager.start(
-            state=FiltersApartmentsSG.start,
-            data={"city": None, "price_range": None, "rooms": None},
+            state=FiltersSG.city,
             mode=StartMode.RESET_STACK,
         )
     else:
@@ -174,8 +183,9 @@ async def yes_confirm_booking(
     )
 
     if confirm:
+        landlord = await repo.booking_api.get_landlord_by_apartment(apartment_id=apartment_id)
         await bot.send_message(
-            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!"
+            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!", reply_markup= await phone_keyboard(landlord=landlord)   
         )
 
         # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)

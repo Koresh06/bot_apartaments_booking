@@ -1,3 +1,5 @@
+from aiogram import Router
+from aiogram.types import CallbackQuery
 from aiogram_dialog import Dialog, Window
 from aiogram_dialog.widgets.text import Format, Const
 from aiogram_dialog.widgets.input import TextInput
@@ -6,6 +8,8 @@ from aiogram_dialog.widgets.kbd import (
     Next,
     Back,
 )
+
+from src.core.repo.requests import RequestsRepo
 
 from .custom_calendar import CustomCalendar
 from .states import BookingApartmentSG, ConfirmBooking
@@ -18,6 +22,10 @@ from .handlers import (
     yes_confirm_booking,
 )
 from .getters import getter_date_and_booked_dates
+from .keyboard import PhoneCbData
+
+
+router = Router()
 
 
 booking_apartment = Dialog(
@@ -87,3 +95,13 @@ confirm_booking_landlord_dialog = Dialog(
     ),
     getter=getter_date_and_booked_dates,
 )
+
+
+@router.callback_query(PhoneCbData.filter())
+async def phone_callback(callback: CallbackQuery, callback_data: PhoneCbData, repo: RequestsRepo):
+    await repo.filter_apartments.add_phone_click(landlord_id=callback_data.id)
+    
+    await callback.answer(
+        text=f"🏠 Арендодатель: {callback_data.name}\n📞 Номер телефона: {callback_data.phone}",
+        show_alert=True
+    )

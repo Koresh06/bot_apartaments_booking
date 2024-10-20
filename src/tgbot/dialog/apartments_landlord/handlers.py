@@ -12,6 +12,7 @@ from src.core.models.bookings import Booking
 from src.core.repo.requests import RequestsRepo
 from src.tgbot import bot
 from src.tgbot.dialog.apartments_landlord.states import MenuLandlordSG, EditApartmentSG
+from src.tgbot.dialog.booking_apartment.keyboard import phone_keyboard
 
 
 async def error_handler(
@@ -307,8 +308,9 @@ async def yes_confirm_booking(
     )
 
     if confirm:
+        landlord = await repo.booking_api.get_landlord_by_apartment(apartment_id=apartment_id)
         await bot.send_message(
-            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!"
+            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!",  reply_markup= await phone_keyboard(landlord=landlord)
         )
 
         # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)

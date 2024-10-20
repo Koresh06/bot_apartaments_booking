@@ -1,6 +1,7 @@
+from typing import Optional
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
-from src.core.models import Apartment, Booking
+from src.core.models import Apartment, Booking, Landlords
 
 from src.core.repo.base import BaseRepo
 
@@ -35,3 +36,16 @@ class BookingApiRepo(BaseRepo):
         total = result.scalar()
 
         return total
+    
+
+    async def get_landlord_by_apartment(self, apartment_id: int) -> Optional[Landlords]:
+        # Запрос на получение апартамента и связанного с ним арендодателя
+        stmt = select(Apartment).where(Apartment.id == apartment_id).options(selectinload(Apartment.landlord_rel))
+        result = await self.session.execute(stmt)
+        apartment = result.scalar()
+
+        # Если апартамент найден, возвращаем связанного арендодателя
+        if apartment:
+            return apartment.landlord_rel
+
+        return None  # Если апартамент не найден, возвращаем None

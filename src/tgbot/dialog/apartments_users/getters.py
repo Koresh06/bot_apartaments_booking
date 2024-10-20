@@ -94,15 +94,8 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         type=ContentType.PHOTO
     )
 
-    # check_filters = any([
-    #     filters["city_id"] is not None,
-    #     filters["price_range"] is not None,
-    #     filters["rooms"] is not None
-    # ])
-
     return {
         "data": True,
-        # "check_filters": check_filters,
         "is_apartments": True if len(apartments) > 1 else False,
         "media": media,
         "apartment": apartment,

@@ -38,14 +38,14 @@ class FilterApartmentRepo(BaseRepo):
             .where(Apartment.is_available) \
             .where(Apartment.city_id == city_id) \
             .group_by(Apartment.rooms)
-    
+
         # Если указан диапазон цен, добавляем условие на фильтрацию по цене
         if price_range:
             query = query.where(between(Apartment.price_per_day, price_range[0], price_range[1]))
-    
+
         result = await self.session.execute(query)
         rooms = result.scalars().all()  # Извлекаем только номера комнат
-    
+
         # Возвращаем список кортежей (номер комнаты, индекс)
         return [(room, idx) for idx, room in enumerate(rooms, start=1)]
     
@@ -98,5 +98,14 @@ class FilterApartmentRepo(BaseRepo):
             })
 
         return formatted_result
+    
 
+    async def add_phone_click(self, landlord_id: int) -> bool:
+        stmt = select(Landlords).where(Landlords.id == landlord_id)
+        result = await self.session.execute(stmt)
+        landlord = result.scalar()
+        if not landlord:
+            return False
+        landlord.count_clicks_phone += 1
+        await self.session.commit()
 

@@ -16,6 +16,7 @@ class Landlords(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     company_name: Mapped[str] = mapped_column(String(100))
     phone: Mapped[str] = mapped_column(String(100))
+    count_clicks_phone: Mapped[int] = mapped_column(Integer, server_default="0")
     create_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     update_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
 

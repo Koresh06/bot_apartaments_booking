@@ -43,10 +43,12 @@ def get_all_dialogs() -> list[Dialog]:
 from .apartments_users.apartments_filters_catalog import router as catalog_router
 from .admin.admin_dialog import router as admin_router
 from .apartments_landlord.register_landlord import router as landLord_router
+from .booking_apartment.apartment_booking import router as booking_apartment_router
 
 
 def get_routers() -> list[Router]:
     return [
+        booking_apartment_router,
         catalog_router,
         admin_router,
         landLord_router,
