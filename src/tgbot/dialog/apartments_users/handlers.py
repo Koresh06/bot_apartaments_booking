@@ -6,6 +6,8 @@ from src.core.repo.requests import RequestsRepo
 from src.tgbot.dialog.apartments_users.states import FilteredCatalogApartmentsSG
 from src.tgbot.dialog.booking_apartment.states import BookingApartmentSG
 
+from src.core.models import Landlords
+
 
 async def handle_city_filter(
     callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: str
@@ -17,11 +19,6 @@ async def handle_city_filter(
     count = await repo.filter_apartments.no_data_on_apartments(city_id=int(item_id))
     dialog_manager.dialog_data["count"] = count 
 
-    # await dialog_manager.start(
-    #     state=FilteredCatalogApartmentsSG.start,
-    #     data={"city_id": city_id, "price_range": None, "rooms": None},
-    #     mode=StartMode.RESET_STACK,
-    # )
     await dialog_manager.next()
 
 
@@ -30,12 +27,6 @@ async def handle_confirm_min_max_price(
 ):
     price_range = dialog_manager.dialog_data.get("price_range")
     dialog_manager.dialog_data["price_range"] = price_range
-
-    # await dialog_manager.start(
-    #     state=FilteredCatalogApartmentsSG.start,
-    #     data={"price_range": price_range},
-    #     mode=StartMode.RESET_STACK,
-    # )
 
     await dialog_manager.next()
 
@@ -47,6 +38,7 @@ async def handle_room_filter(
     price_range = dialog_manager.dialog_data.get("price_range")
     rooms = dialog_manager.dialog_data.get("rooms")
 
+    print(rooms)
     room = rooms[int(item_id) - 1][0]
 
     await dialog_manager.start(
@@ -60,32 +52,12 @@ async def handle_room_filter(
     )
 
 
-    # await dialog_manager.start(
-    #     state=FilteredCatalogApartmentsSG.start,
-    #     data={
-    #         "city_id": city_id,
-    #         "price_range": price_range,
-    #         "rooms": room,
-    #     },
-    #     mode=StartMode.RESET_STACK,
-    # )
-
-
-# async def confirm_filters(dialog_manager: DialogManager, **_kwargs):
-#     city_id = dialog_manager.dialog_data.get("city_id")
-#     price_range = dialog_manager.dialog_data.get("price_range")
-#     room = dialog_manager.dialog_data.get("room")
-
-#     await dialog_manager.start(
-#         state=FilteredCatalogApartmentsSG.start,
-#         data={
-#             "city_id": city_id,
-#             "price_range": price_range,
-#             "room": room,
-#         },
-#         mode=StartMode.RESET_STACK,
-#     )
-    
+async def on_phone(callback: CallbackQuery, dialog_manager: DialogManager, **_kwargs):
+    landlord: Landlords = dialog_manager.dialog_data.get("apartment")["landlord"]
+    await callback.answer(
+        text=f"🏠 Арендодатель: {landlord.company_name}\n📞 Номер телефона: {landlord.phone}",
+        show_alert=True
+    )
 
 
 async def on_booking(

@@ -34,20 +34,21 @@ class FilterApartmentRepo(BaseRepo):
 
     async def get_rooms(self, city_id: int, price_range: Optional[Tuple[int, int]]) -> List[Tuple[int, int]]:
         # Выбираем количество комнат для апартаментов в указанном городе
-        query = select(Apartment.rooms, func.count(Apartment.rooms)) \
+        query = select(Apartment.rooms) \
             .where(Apartment.is_available) \
             .where(Apartment.city_id == city_id) \
             .group_by(Apartment.rooms)
-
+    
         # Если указан диапазон цен, добавляем условие на фильтрацию по цене
         if price_range:
             query = query.where(between(Apartment.price_per_day, price_range[0], price_range[1]))
-
+    
         result = await self.session.execute(query)
-        rooms = result.all()
-
-        # Возвращаем количество комнат и количество апартаментов
-        return [(room, count) for room, count in rooms]
+        rooms = result.scalars().all()  # Извлекаем только номера комнат
+    
+        # Возвращаем список кортежей (номер комнаты, индекс)
+        return [(room, idx) for idx, room in enumerate(rooms, start=1)]
+    
 
     async def filter_apartments(
             self,
@@ -56,7 +57,7 @@ class FilterApartmentRepo(BaseRepo):
             room: Optional[int] = None
         ) -> List[dict]:
         query = (
-            select(Apartment, ApartmentPhoto, Users.tg_id, Users.chat_id, City.name)
+            select(Apartment, ApartmentPhoto, Users.tg_id, Users.chat_id, City.name, Landlords)
             .outerjoin(ApartmentPhoto, ApartmentPhoto.apartment_id == Apartment.id)
             .join(Landlords, Landlords.id == Apartment.landlord_id) 
             .join(Users, Users.id == Landlords.user_id)
@@ -79,11 +80,12 @@ class FilterApartmentRepo(BaseRepo):
             return False
 
         formatted_result = []
-        for apartment, photo, landlord_tg_id, chat_id,city_name in apartments:
+        for apartment, photo, landlord_tg_id, chat_id,city_name, landlord in apartments:
             formatted_result.append({
                 "apartment_id": apartment.id,
                 "landlord_tg_id": landlord_tg_id,
                 "landlord_chat_id": chat_id,
+                "landlord": landlord,
                 "city": city_name,
                 "street": apartment.street,
                 "house_number": apartment.house_number,
