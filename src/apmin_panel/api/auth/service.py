@@ -61,7 +61,7 @@ class AuthApiRepo(BaseRepo):
             return None
         
         user.email = email
-        password = get_password_hash(password)
+        password = get_password_hash(password=password)
         user.hashed_password = password
         user.is_superuser = True
         await self.session.commit()

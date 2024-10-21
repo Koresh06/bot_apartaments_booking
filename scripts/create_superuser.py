@@ -11,7 +11,7 @@ from src.apmin_panel.api.auth.service import AuthApiRepo
 async def create_superuser() -> None:
     async with async_session_maker() as session:  
         print("Создание суперпользователя")
-        tg_id = input("Укажите TG_ID пользователя: ")
+        tg_id = int(input("Укажите TG_ID пользователя: "))
         email = input("Укажите email пользователя: ")
         password = input("Укажите пароль пользователя: ")
 
