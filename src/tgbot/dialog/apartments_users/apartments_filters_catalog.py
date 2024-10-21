@@ -49,10 +49,10 @@ filter_catalog_apartments_dialog = Dialog(
         Const("🌆 Выберите город"),
         Group(
             Select(
-                Format("{item[0]}"),
+                Format("{item[1]}"),
                 id="city",
                 items="citys",
-                item_id_getter=itemgetter(1),
+                item_id_getter=itemgetter(0),
                 on_click=handle_city_filter,
             ),
             width=4,

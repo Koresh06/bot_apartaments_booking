@@ -38,7 +38,7 @@ from .getters import (
     getter_orders_booking,
 )
 from .handlers import (
-    confirm_photos,
+    confirm_deteils_apartment,
     edit_data,
     handle_city,
     handle_edit_city,
@@ -86,10 +86,10 @@ register_apartament_dialog = Dialog(
         Const("🏙️ Выберите город:"),
         Group(
             Select(
-                Format("🌆 {item[0]}"),
+                Format("🌆 {item[1]}"),
                 id="city",
                 items="citys",
-                item_id_getter=itemgetter(1),
+                item_id_getter=itemgetter(0),
                 on_click=handle_city,
             ),
             width=4,
@@ -101,7 +101,6 @@ register_apartament_dialog = Dialog(
                 state=MenuLandlordSG.start,
                 show_mode=StartMode.RESET_STACK,
             ),
-            Next(when="name"),
         ),
         state=RegisterApartmentSG.city,
         getter=getter_get_city,
@@ -251,7 +250,7 @@ register_apartament_dialog = Dialog(
             NumberedPager(scroll="pages", when=F["pages"] > 1),
             width=8,
         ),
-        Button(Const("✅ Подтвердить"), id="confirm", on_click=confirm_photos),
+        Button(Const("✅ Подтвердить"), id="confirm", on_click=confirm_deteils_apartment),
         Start(
             Const("❌ Отмена"),
             id="cancel_form_register",

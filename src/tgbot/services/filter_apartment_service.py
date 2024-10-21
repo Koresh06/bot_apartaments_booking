@@ -11,9 +11,9 @@ class FilterApartmentRepo(BaseRepo):
 
         query = select(City.id, City.name).order_by(City.id) 
         result: Result = await self.session.execute(query)
-
         citys = result.all()  
-        return [(city_name, city_id) for city_id, city_name in citys]
+
+        return [(city_id, city_name) for city_id, city_name in citys]
     
 
     async def no_data_on_apartments(self, city_id: int) -> bool | None:

@@ -21,7 +21,7 @@ class BotApartmentRepo(BaseRepo):
 
         params = Apartment(
             landlord_id=stmt.id,
-            city_id=data["city_id"],
+            city_id=int(data["city_id"]),
             street=data["street"],
             house_number=data["house_number"],
             apartment_number=data["apartment_number"],
@@ -185,6 +185,10 @@ class BotApartmentRepo(BaseRepo):
 
         await self.session.execute(
             delete(ApartmentPhoto).where(ApartmentPhoto.apartment_id == apartment_id)
+        )
+
+        await self.session.execute(
+            delete(Booking).where(Booking.apartment_id == apartment_id)
         )
 
         await self.session.execute(

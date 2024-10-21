@@ -51,9 +51,13 @@ async def handle_city(
     dialog_manager: DialogManager, 
     item_id: str
 ):
-    list_citys = dialog_manager.dialog_data.get("citys")
-    city_id = list_citys[len(list_citys) - 1][1]  
-    dialog_manager.dialog_data["city"] = city_id
+    list_citys = dialog_manager.dialog_data.get("citys") 
+    data = dict(list_citys)
+    dialog_manager.dialog_data["city"] = data.get(int(item_id))
+    dialog_manager.dialog_data["city_id"] = item_id
+
+    print(item_id)
+    print(data.get(int(item_id)))
     await dialog_manager.next()
     
 
@@ -110,14 +114,14 @@ async def on_delete(
         await scroll.set_page(media_number - 1)
 
 
-async def confirm_photos(
+async def confirm_deteils_apartment(
     callback: CallbackQuery,
     widget: Button,
     dialog_manager: DialogManager,
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     data = {
-        "city_id": dialog_manager.dialog_data["city"],
+        "city_id": dialog_manager.dialog_data["city_id"],
         "street": dialog_manager.find("street").get_value(),
         "house_number": dialog_manager.find("house_number").get_value(),
         "apartment_number": dialog_manager.find("apartment_number").get_value(),
@@ -130,10 +134,10 @@ async def confirm_photos(
     if await repo.bot_apartments.register_apartment_landlord(
         tg_id=callback.from_user.id, data=data
     ):
-        await callback.answer(text="Поздравляем! ✅ Апартамент зарегистрирован!")
+        await callback.answer(text="Поздравляем! ✅ Апартамент зарегистрирован!", show_alert=True)
         await dialog_manager.done()
     else:
-        await callback.answer(text="Что-то пошло не так, попробуйте еще раз")
+        await callback.answer(text="Что-то пошло не так, попробуйте еще раз", show_alert=True)
 
 
 async def on_delete_apartment(

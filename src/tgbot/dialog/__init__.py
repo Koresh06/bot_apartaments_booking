@@ -17,11 +17,12 @@ from .apartments_users.apartments_filters_catalog import (
     # rooms_filter_dialog,
 )
 from .booking_apartment.apartment_booking import booking_apartment, confirm_booking_landlord_dialog
-from .admin.admin_dialog import register_name_city_dialog, main_admin_dialog
+from .admin.admin_dialog import register_name_city_dialog, main_admin_dialog, register_apartament_by_landlord_dialog
 
 
 def get_all_dialogs() -> list[Dialog]:
     return [
+        register_apartament_by_landlord_dialog,
         view_booking_orders_landlord,
         menu_loandlord_dialog,
         register_apartament_dialog,
