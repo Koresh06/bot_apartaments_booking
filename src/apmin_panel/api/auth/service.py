@@ -41,8 +41,8 @@ class AuthApiRepo(BaseRepo):
         return user
     
 
-    async def get_by_email(self, email: EmailStr):
-        stmt = select(Users).where(Users.email == email)
+    async def get_by_tg_id(self, tg_id: int):
+        stmt = select(Users).where(Users.tg_id == tg_id)
         user: Users = await self.session.scalar(stmt)
 
         return user
@@ -50,14 +50,19 @@ class AuthApiRepo(BaseRepo):
 
     async def create_superuser(
             self, 
+            tg_id: int,
             email: EmailStr,
+            password: str
     ):
-        stmt = select(Users).where(Users.email == email)
+        stmt = select(Users).where(Users.tg_id == tg_id)
         user: Users = await self.session.scalar(stmt)
 
         if not user:
             return None
         
+        user.email = email
+        password = get_password_hash(password)
+        user.hashed_password = password
         user.is_superuser = True
         await self.session.commit()
         await self.session.refresh(user)

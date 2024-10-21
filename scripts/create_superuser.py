@@ -11,18 +11,22 @@ from src.apmin_panel.api.auth.service import AuthApiRepo
 async def create_superuser() -> None:
     async with async_session_maker() as session:  
         print("Создание суперпользователя")
-        email = input("Email: ")
+        tg_id = input("Укажите TG_ID пользователя: ")
+        email = input("Укажите email пользователя: ")
+        password = input("Укажите пароль пользователя: ")
 
         # Проверяем, существует ли пользователь
-        super_user = await AuthApiRepo(session).get_by_email(email)
+        super_user = await AuthApiRepo(session).get_by_tg_id(tg_id)
         if not super_user:
-            print("Пользователь с таким email не существует")
+            print("Пользователь с таким TG_ID не существует")
         elif super_user.is_superuser:
             print("Пользователь уже является суперпользователем")
         else:
             # Создаем суперпользователя
             await AuthApiRepo(session).create_superuser(
+                tg_id=tg_id,
                 email=email,
+                password=password
             )
             print("Суперпользователь создан")
 
