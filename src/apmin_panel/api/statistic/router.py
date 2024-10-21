@@ -150,6 +150,7 @@ async def get_completed_bookings(
     completed_bookings = await StatisticsApiRepo(session).get_paginated_completed_bookings(page, size)
 
     total_completed_bookings = await StatisticsApiRepo(session).count_all_completed_bookings()
+
     total_pages = (total_completed_bookings + size - 1) // size
 
     if isinstance(completed_bookings, str):

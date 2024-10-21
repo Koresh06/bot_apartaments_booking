@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Доход по завершенным бронированиям</h1>
+
+    {% if bookings %}
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr class="text-center" style="vertical-align: top;">
+                    <th scope="col">Номер бронирования</th>
+                    <th scope="col">Апартамент</th>
+                    <th scope="col">Пользователь</th>
+                    <th scope="col">Дата начала</th>
+                    <th scope="col">Дата окончания</th>
+                    <th scope="col">Доход (руб.)</th>
+                    <th scope="col">Дата создания<br>бронирования</th> <!-- Новый столбец -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr class="text-center">
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <table class="table table-sm table-borderless mb-0">
+                                <tr><td>Город:</td><td>{{ booking.city_name }}</td></tr>
+                                <tr><td>Улица:</td><td>{{ booking.street }}</td></tr>
+                                <tr><td>Дом:</td><td>{{ booking.house_number }}</td></tr>
+                                <tr><td>Квартира:</td><td>{{ booking.apartment_number or '—' }}</td></tr>
+                            </table>
+                        </td>
+                        <td>{{ booking.username }}</td>
+                        <td>{{ booking.booking.start_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.booking.end_date.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ booking.income }} руб.</td> <!-- Вывод дохода -->
+                        <td>{{ booking.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</td> <!-- Дата создания апартамента -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if total_pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="/landlord/{{ landlord_id }}/total-income-bookings?page={{ page - 1 }}">Предыдущая</a>
+                        </li>
+                    {% endif %}
+                    {% for p in range(1, total_pages + 1) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="/landlord/{{ landlord_id }}/total-income-bookings?page={{ p }}">{{ p }}</a>
+                        </li>
+                    {% endfor %}
+                    {% if page < total_pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="/landlord/{{ landlord_id }}/total-income-bookings?page={{ page + 1 }}">Следующая</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            Нет завершенных бронирований.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -113,7 +113,7 @@ class StatisticsApiRepo(BaseRepo):
     
 
     async def count_all_pending_bookings(self):
-        query = select(func.count(Booking.id))
+        query = select(func.count(Booking.id)).where(Booking.is_completed == False)
         result = await self.session.execute(query)
         total = result.scalar()
 
@@ -145,7 +145,7 @@ class StatisticsApiRepo(BaseRepo):
     
 
     async def count_all_completed_bookings(self):
-        query = select(func.count(Booking.id))
+        query = select(func.count(Booking.id)).where(Booking.is_completed == True)
         result = await self.session.execute(query)
         total = result.scalar()
 
@@ -202,7 +202,7 @@ class StatisticsApiRepo(BaseRepo):
     
 
     async def count_total_income_bookings(self):
-        query = select(func.count(Booking.id))
+        query = select(func.count(Booking.id)).where(Booking.is_completed == True)
         result = await self.session.execute(query)
         total = result.scalar()
 

@@ -150,12 +150,11 @@ async def get_pending_bookings(
     total_pending_bookings = await LandlordApiRepo(session).count_all_pending_bookings_by_landlord_id(landlord_id)
     total_pages = (total_pending_bookings + size - 1) // size
 
-
     
     if not pending_bookings:
         return templates.TemplateResponse(
             request=request,
-            name="statistics/pending-bookings.html",
+            name="landlord/pending-bookings.html",
             context={
                 "message": "Нет ожидающих бронирований.",
                 "user": user,
@@ -163,10 +162,11 @@ async def get_pending_bookings(
         )
     return templates.TemplateResponse(
         request=request,
-        name="statistics/pending-bookings.html",
+        name="landlord/pending-bookings.html",
         context={
             "bookings": pending_bookings,
             "user": user,
+            "landlord_id": landlord_id,
             "page": page,
             "total_pages": total_pages,
         },
@@ -193,7 +193,7 @@ async def get_completed_bookings(
     if not completed_bookings:
         return templates.TemplateResponse(
             request=request,
-            name="statistics/completed-bookings.html",
+            name="landlord/completed-bookings.html",
             context={
                 "message": "Нет завершенных бронирований.",
                 "user": user,
@@ -202,10 +202,11 @@ async def get_completed_bookings(
 
     return templates.TemplateResponse(
         request=request,
-        name="statistics/completed-bookings.html",
+        name="landlord/completed-bookings.html",
         context={
             "bookings": completed_bookings,
             "user": user,
+            "landlord_id": landlord_id,
             "page": page,
             "total_pages": total_pages,
         },
@@ -232,7 +233,7 @@ async def get_total_income_bookings(
     if isinstance(total_income_bookings, str):
         return templates.TemplateResponse(
             request=request,
-            name="statistics/total-income-bookings.html",
+            name="landlord/total-income-bookings.html",
             context={
                 "message": total_income_bookings,
                 "user": user,
@@ -240,10 +241,11 @@ async def get_total_income_bookings(
         )
     return templates.TemplateResponse(
         request=request,
-        name="statistics/total-income-bookings.html",
+        name="landlord/total-income-bookings.html",
         context={
             "bookings": total_income_bookings,
             "user": user,
+            "landlord_id": landlord_id,
             "page": page,
             "total_pages": total_pages,
         }

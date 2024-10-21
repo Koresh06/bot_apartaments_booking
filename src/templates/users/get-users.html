@@ -23,7 +23,7 @@
         </thead>
         <tbody>
             {% for user in users %}
-                {% if not (user.is_admin and user.is_superuser) %}  {# Проверка: если это администратор, и он не суперпользователь #}
+                {% if not (user.is_superuser) %}  {# Проверка: если это администратор, и он не суперпользователь #}
                     <tr class="{% if user.is_blocked %}table-danger{% endif %}">
                         <td>{{ loop.index }}</td>
                         <td>

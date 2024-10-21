@@ -12,7 +12,7 @@
                     <th>Адрес</th>
                     <th>Цена за день</th>
                     <th>Количество комнат</th>
-                    <th>Доступен</th>
+                    <th>Доступ</th>
                     <th>Дата создания</th>
                     <th>Описание</th>
                 </tr>
@@ -25,7 +25,13 @@
                         <td>{{ apartment.city_rel.name }}, {{ apartment.street }} {{ apartment.house_number }}{% if apartment.apartment_number %}, кв. {{ apartment.apartment_number }}{% endif %}</td>
                         <td>{{ apartment.price_per_day }} ₽</td>
                         <td>{{ apartment.rooms }}</td>
-                        <td>{{ 'Да' if apartment.is_available else 'Нет' }}</td>
+                        <td class="text-center">
+                            {% if apartment.is_available %}
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Подтверждено</span>
+                            {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Не подтверждено</span>
+                            {% endif %}
+                        </td>                         
                         <td>{{ apartment.create_at.strftime('%d.%m.%Y') }}</td>
                         <td>
                             <!-- Кнопка для открытия модального окна с описанием -->

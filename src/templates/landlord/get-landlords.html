@@ -15,6 +15,7 @@
                 <th>Имя Арендодателя</th>
                 <th>Имя Telegram</th>
                 <th>Телефон</th>
+                <th class="text-center">Просмотры телефона</th>
                 <th>Дата создания</th>
                 <th>Действия</th>
             </tr>
@@ -27,6 +28,7 @@
                 <td>{{ landlord.company_name }}</td>
                 <td>{{ landlord.user_rel.username if landlord.user_rel.username else landlord.user_rel.full_name }}</td>
                 <td>{{ landlord.phone }}</td>
+                <td class="text-center">{{ landlord.count_clicks_phone }}</td>
                 <td>{{ landlord.create_at.strftime('%d.%m.%Y %H:%M:%S') }}</td>
                 <td>
                     <a href="/apartment/get-apartments-landlord/{{ landlord.id }}"

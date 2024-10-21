@@ -51,21 +51,6 @@ class UsersApiRepo(BaseRepo):
 
         return users
     
-    # async def create_admin(self, schema: UserCreateInRegistration):
-    #     existing_admin = await self.session.scalar(
-    #         select(Users).filter(Users.id == user_id)
-    #     )
-    #     if existing_admin.is_admin:
-    #         raise ValueError(f"Админ с user_id {user_id} уже существует.")
-        
-    #     existing_admin.is_admin = True
-    #     await self.session.commit()
-    #     await self.session.refresh(existing_admin)
-    #     return existing_admin
-        
-        
-
-
 
     async def banned_user_by_id(self, user_id: int):
         query = (
