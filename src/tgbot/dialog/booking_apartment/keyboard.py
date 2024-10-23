@@ -5,20 +5,17 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from src.core.models import Landlords
 
 
-
-
-class PhoneCbData(CallbackData, prefix="calendar"):
-    id: int
-    name: str
-    phone: str
-
+# class PhoneCbData(CallbackData, prefix="calendar"):
+#     id: int
+#     name: str
+#     phone: str
 
 
 async def phone_keyboard(landlord: Landlords) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
-    cb = PhoneCbData(id=landlord.id, name=landlord.company_name, phone=landlord.phone)
-    builder.add(InlineKeyboardButton(text="📞 Телефон", callback_data=cb.pack()))
+    # cb = PhoneCbData(id=landlord.id, name=landlord.company_name, phone=landlord.phone)
+    builder.add(InlineKeyboardButton(text="📞 Телефон", url=f"https://t.me/{landlord.phone}"))
 
     return builder.as_markup()
     

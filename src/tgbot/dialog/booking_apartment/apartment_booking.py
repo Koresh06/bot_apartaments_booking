@@ -97,11 +97,11 @@ confirm_booking_landlord_dialog = Dialog(
 )
 
 
-@router.callback_query(PhoneCbData.filter())
-async def phone_callback(callback: CallbackQuery, callback_data: PhoneCbData, repo: RequestsRepo):
-    await repo.filter_apartments.add_phone_click(landlord_id=callback_data.id)
+# @router.callback_query(PhoneCbData.filter())
+# async def phone_callback(callback: CallbackQuery, callback_data: PhoneCbData, repo: RequestsRepo):
+#     await repo.filter_apartments.add_phone_click(landlord_id=callback_data.id)
     
-    await callback.answer(
-        text=f"🏠 Арендодатель: {callback_data.name}\n📞 Номер телефона: {callback_data.phone}",
-        show_alert=True
-    )
+#     await callback.answer(
+#         text=f"🏠 Арендодатель: {callback_data.name}\n📞 Номер телефона: {callback_data.phone}",
+#         show_alert=True
+#     )
