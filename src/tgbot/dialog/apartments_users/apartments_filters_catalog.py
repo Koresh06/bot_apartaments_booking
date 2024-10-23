@@ -15,7 +15,8 @@ from aiogram_dialog.widgets.kbd import (
     Start,
     NumberedPager,
     StubScroll,
-    Select
+    Select,
+    Url
 )
 
 from src.core.repo.requests import RequestsRepo
@@ -135,7 +136,8 @@ catalog_users_apartments_dialog = Dialog(
         DynamicMedia(selector="media", when="data"),
         Group(
             Next(Const("🔍 Детали"), id="details"),
-            Button(Const("📞 Телефон"), id="phone", on_click=on_phone),
+            # Button(Const("📞 Телефон"), id="phone", on_click=on_phone),
+            Url(Const("📞 Телефон"), url=Format('https://t.me/{apartment[landlord].phone}')),
             Button(Const("📅 Бронировать"), id="booking", on_click=on_booking),
             Row(
                 Button(Const("◀️ Назад"), id="next", on_click=on_prev),
@@ -191,7 +193,7 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
         last_name=message.from_user.last_name,
         full_name=message.from_user.full_name,
     )
-    await dialog_manager.start(state=FiltersSG.city,mode=StartMode.RESET_STACK,)
+    await dialog_manager.start(state=FiltersSG.city, mode=StartMode.RESET_STACK,)
 
 
 # @router.message(CommandStart())

@@ -9,7 +9,6 @@ from src.core.models.landlords import Landlords
 from src.core.repo.requests import RequestsRepo
 
 
-
 async def getter_get_city(dialog_manager: DialogManager, **kwargs) -> dict:
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
 
@@ -33,7 +32,7 @@ async def start_getters(
 
 async def getter_information_registration(dialog_manager: DialogManager, **kwargs):
     name: TextInput = dialog_manager.find("name").get_value()
-    phone: TextInput = dialog_manager.find("phone").get_value()
+    phone: TextInput = dialog_manager.dialog_data.get("phone")
 
     return {
         "name": name,

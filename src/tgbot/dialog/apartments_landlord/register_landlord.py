@@ -1,18 +1,19 @@
 from aiogram import Router
 from aiogram.filters import Command
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, ContentType
 from aiogram_dialog import Dialog, DialogManager, StartMode, Window
-from aiogram_dialog.widgets.kbd import Button, Next, Back
+from aiogram_dialog.widgets.kbd import Button, Next, Back, RequestContact
+from aiogram_dialog.widgets.markup.reply_keyboard import ReplyKeyboardFactory
 from aiogram_dialog.widgets.text import Const, Format
-from aiogram_dialog.widgets.input import TextInput
+from aiogram_dialog.widgets.input import TextInput, MessageInput
 
 from src.core.repo.requests import RequestsRepo
 from ..apartments_landlord.states import LandlordStateSG, MenuLandlordSG
 from .getters import getter_information_registration
 from .handlers import (
-    error_phone_handler,
     confirm_landlord_handler,
     error_handler,
+    handler_phone
     
 )
 
@@ -22,12 +23,12 @@ router = Router()
 
 register_landlord_dialog = Dialog(
     Window(
-        Const(text="Для дальнейшей работы необходимо проqти регистрацию!"),
-        Next(Const("Регистрация"), id="register"),
+        Const(text="Для дальнейшей работы необходимо пройти регистрацию! ✍️"),
+        Next(Const("📝 Регистрация"), id="register"),
         state=LandlordStateSG.register,
     ),
     Window(
-        Const("Укажите ваше Имя:"),
+        Const("Укажите ваше Имя: ✨"),
         TextInput(
             id="name",
             type_factory=str,
@@ -38,23 +39,26 @@ register_landlord_dialog = Dialog(
         state=LandlordStateSG.name,
     ),
     Window(
-        Const("Укажите ваш контактный телефон:"),
-        TextInput(
-            id="phone",
-            type_factory=lambda x: x if x.isdigit() else None,
-            on_success=Next(),
-            on_error=error_phone_handler,
-        ),
+        Const("📱 Отправьте ваш телефон:"),
+        RequestContact(Const("👤 Отправить телефон")),
         Back(Const("◀️ Назад"), id="back"),
+        MessageInput(
+            func=handler_phone, content_types=[ContentType.CONTACT]
+        ),
+        markup_factory=ReplyKeyboardFactory(
+            resize_keyboard=True,
+            one_time_keyboard=True,
+        ),
         state=LandlordStateSG.phone,
     ),
     Window(
-        Format("Подтвердите ваши данныеn\n\n Имя: <b>{name}</b>\n Телефон: <b>{phone}</b>"),
+        Format("Подтвердите ваши данные\n\n✨ Имя: <b>{name}</b>\n📞 Телефон: <b>{phone}</b>"),
         Button(Const("✅ Подтвердить"), id="confirm", on_click=confirm_landlord_handler),
         state=LandlordStateSG.confirm,
         getter=getter_information_registration,
     ),
 )
+
 
 
 @router.message(Command("landlord"))

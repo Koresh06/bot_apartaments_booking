@@ -35,6 +35,16 @@ async def error_phone_handler(
     await message.answer(text="Вы ввели некорректный телефон. Попробуйте еще раз")
 
 
+async def handler_phone(
+    message: Message,
+    message_input: MessageInput,
+    dialog_manager: DialogManager,
+    **kwargs,
+):
+    dialog_manager.dialog_data["phone"] = message.contact.phone_number
+    await dialog_manager.next()
+
+
 async def correct_name_handler(
     message: Message,
     widget: ManagedTextInput,
@@ -56,8 +66,6 @@ async def handle_city(
     dialog_manager.dialog_data["city"] = data.get(int(item_id))
     dialog_manager.dialog_data["city_id"] = item_id
 
-    print(item_id)
-    print(data.get(int(item_id)))
     await dialog_manager.next()
     
 
@@ -70,7 +78,7 @@ async def confirm_landlord_handler(
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     
     name: TextInput = dialog_manager.find("name").get_value()
-    phone: TextInput = dialog_manager.find("phone").get_value()
+    phone = dialog_manager.dialog_data.get("phone")
 
     await repo.bot_users.add_handler(
         tg_id=callback.from_user.id,
