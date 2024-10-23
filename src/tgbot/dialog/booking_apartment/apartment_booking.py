@@ -22,7 +22,6 @@ from .handlers import (
     yes_confirm_booking,
 )
 from .getters import getter_date_and_booked_dates
-from .keyboard import PhoneCbData
 
 
 router = Router()
