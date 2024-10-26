@@ -137,7 +137,7 @@ catalog_users_apartments_dialog = Dialog(
         Group(
             Next(Const("🔍 Детали"), id="details"),
             # Button(Const("📞 Телефон"), id="phone", on_click=on_phone),
-            Url(Const("📞 Телефон"), url=Format('https://t.me/{apartment[landlord].phone}')),
+            Url(Const("📞 Контакт"), url=Format('https://t.me/{apartment[landlord].phone}')),
             Button(Const("📅 Бронировать"), id="booking", on_click=on_booking),
             Row(
                 Button(Const("◀️ Назад"), id="next", on_click=on_prev),

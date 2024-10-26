@@ -15,7 +15,7 @@ async def phone_keyboard(landlord: Landlords) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     # cb = PhoneCbData(id=landlord.id, name=landlord.company_name, phone=landlord.phone)
-    builder.add(InlineKeyboardButton(text="📞 Телефон", url=f"https://t.me/{landlord.phone}"))
+    builder.add(InlineKeyboardButton(text="📞 Контакт", url=f"https://t.me/{landlord.phone}"))
 
     return builder.as_markup()
     
