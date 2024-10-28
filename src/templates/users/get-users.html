@@ -22,41 +22,73 @@
             </tr>
         </thead>
         <tbody>
-            {% for user in users %}
-                {% if not (user.is_superuser) %}  {# Проверка: если это администратор, и он не суперпользователь #}
-                    <tr class="{% if user.is_blocked %}table-danger{% endif %}">
-                        <td>{{ loop.index }}</td>
-                        <td>
-                            <a class="text-decoration-none">{{ user.username if user.username else user.full_name }}</a>
-                        </td>
-                        <td>
-                            {% if user.is_superuser %}
-                                <span class="badge bg-danger">Суперпользователь</span>
-                            {% elif user.is_admin %}
-                                <span class="badge bg-info">Администратор</span>
-                            {% elif user.landlord_rel %}
-                                <span class="badge bg-primary">Арендодатель</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Пользователь</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ user.landlord_rel.phone if user.landlord_rel else '—' }}
-                        </td>
-                        <td>
-                            {% if user.is_banned %}
-                                <span class="badge bg-danger">Заблокирован</span>
-                            {% else %}
-                                <span class="badge bg-success">Активен</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
-                        <td>
-                            <a href="/users/get-user-detail/{{ user.id }}" class="btn btn-info btn-sm">Подробнее</a>
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
+            {% if user.is_superuser %}
+                {% for user in users %}
+                        <tr class="{% if user.is_blocked %}table-danger{% endif %}">
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                <a class="text-decoration-none">{{ user.username if user.username else user.full_name }}</a>
+                            </td>
+                            <td>
+                                {% if user.is_superuser %}
+                                    <span class="badge bg-danger">Суперпользователь</span>
+                                {% elif user.is_admin %}
+                                    <span class="badge bg-info">Администратор</span>
+                                {% elif user.landlord_rel %}
+                                    <span class="badge bg-primary">Арендодатель</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Пользователь</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ user.landlord_rel.phone if user.landlord_rel else '—' }}
+                            </td>
+                            <td>
+                                {% if user.is_banned %}
+                                    <span class="badge bg-danger">Заблокирован</span>
+                                {% else %}
+                                    <span class="badge bg-success">Активен</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td>
+                                <a href="/users/get-user-detail/{{ user.id }}" class="btn btn-info btn-sm">Подробнее</a>
+                            </td>
+                        </tr>
+                {% endfor %}
+            {% else %}
+                {% for user in users %}
+                        <tr class="{% if user.is_blocked %}table-danger{% endif %}">
+                            <td>{{ loop.index }}</td>
+                            <td>
+                                <a class="text-decoration-none">{{ user.username if user.username else user.full_name }}</a>
+                            </td>
+                            <td>
+                                {% if user.is_admin %}
+                                    <span class="badge bg-info">Администратор</span>
+                                {% elif user.landlord_rel %}
+                                    <span class="badge bg-primary">Арендодатель</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Пользователь</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ user.landlord_rel.phone if user.landlord_rel else '—' }}
+                            </td>
+                            <td>
+                                {% if user.is_banned %}
+                                    <span class="badge bg-danger">Заблокирован</span>
+                                {% else %}
+                                    <span class="badge bg-success">Активен</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.create_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                            <td>
+                                <a href="/users/get-user-detail/{{ user.id }}" class="btn btn-info btn-sm">Подробнее</a>
+                            </td>
+                        </tr>
+                {% endfor %}
+            {% endif %}
         </tbody>
     </table>
 
