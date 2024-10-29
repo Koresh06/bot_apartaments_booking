@@ -29,4 +29,4 @@ class Users(Base):
     update_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     booking_rel: Mapped[List["Booking"]] = relationship("Booking", back_populates="user_rel", cascade="all, delete")
-    landlord_rel: Mapped["Landlords"] = relationship("Landlords", uselist=False, back_populates="user_rel")
+    landlord_rel: Mapped["Landlords"] = relationship("Landlords", uselist=False, back_populates="user_rel", cascade="all, delete")

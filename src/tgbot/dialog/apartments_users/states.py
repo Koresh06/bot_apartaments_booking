@@ -23,6 +23,7 @@ class FiltersApartmentsSG(StatesGroup):
 class FilteredCatalogApartmentsSG(StatesGroup):
     start = State()
     details = State()
+    landlord_info = State()
 
 
 class FiltersSG(StatesGroup):

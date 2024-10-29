@@ -88,6 +88,21 @@ class BotApartmentRepo(BaseRepo):
             )
 
         return formatted_result
+    
+
+    async def landlord_info(self, id: int):
+        stmt = (
+            select(Landlords, Users)
+            .join(Users, Landlords.user_id == Users.id)
+            .where(Landlords.id == id)
+        )
+        result = await self.session.execute(stmt)
+        landlord, user = result.first()
+        return {
+            "landlord": landlord,
+            "user": user
+        }
+    
 
 
     async def check_apartment_landlord(

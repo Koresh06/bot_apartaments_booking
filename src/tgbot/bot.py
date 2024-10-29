@@ -9,7 +9,7 @@ from src.tgbot.scheduler_init import scheduler
 
 
 async def start_bot():
-    
+
     setup_middlewares(dp=dp, sessionmaker=async_session_maker)
 
     scheduler.start()

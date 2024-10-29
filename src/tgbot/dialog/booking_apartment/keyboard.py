@@ -2,8 +2,6 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.core.models import Landlords
-
 
 # class PhoneCbData(CallbackData, prefix="calendar"):
 #     id: int
@@ -11,11 +9,11 @@ from src.core.models import Landlords
 #     phone: str
 
 
-async def phone_keyboard(landlord: Landlords) -> InlineKeyboardMarkup:
+async def phone_keyboard(tg_id: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     # cb = PhoneCbData(id=landlord.id, name=landlord.company_name, phone=landlord.phone)
-    builder.add(InlineKeyboardButton(text="📞 Контакт", url=f"https://t.me/{landlord.phone}"))
+    builder.add(InlineKeyboardButton(text="📞 Контакт", url=f"tg://user?id={tg_id}"))
 
     return builder.as_markup()
     

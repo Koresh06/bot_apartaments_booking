@@ -82,4 +82,3 @@ class RequestsRepo:
     def apartments_api(self) -> ApartmentApiRepo:
 
         return ApartmentApiRepo(self.session)
-

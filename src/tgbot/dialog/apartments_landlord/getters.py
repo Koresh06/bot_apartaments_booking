@@ -130,6 +130,9 @@ async def getter_apartment_details(dialog_manager: DialogManager, **kwargs) -> d
     }
 
 
+
+
+
 async def getter_edit_apartment(dialog_manager: DialogManager, **kwargs) -> dict:
     apartment = dialog_manager.start_data
     return {"apartment": apartment}

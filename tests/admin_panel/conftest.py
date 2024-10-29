@@ -2,18 +2,10 @@ from typing import AsyncGenerator
 import pytest
 import pytest_asyncio
 
-
 from httpx import ASGITransport, AsyncClient
-from aiogram import Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
-
-
-from src.apmin_panel.api.auth_helpers import create_hashed_cookie
-from src.tgbot.dialog import get_routers
-from tests.mocked_aiogram import MockedBot, MockedSession
 
 from src.core.db_helper import get_db
 from src.core.models.base import Base
@@ -55,26 +47,9 @@ async def async_client():
         yield client
 
 
-
 @pytest_asyncio.fixture
 async def authenticated_client(async_client: AsyncClient):
-    # Устанавливаем валидный токен в куках
-    valid_login = config.api.admin_login
-    secret_key = config.api.secret_key
-    token = create_hashed_cookie(valid_login, secret_key)  # Создаем хешированный токен
-    async_client.cookies["admin_token"] = token  # Устанавливаем куки
+    
     return async_client
 
 
-@pytest.fixture(scope="session")
-def dp() -> Dispatcher:
-    dispatcher = Dispatcher(storage=MemoryStorage())
-    dispatcher.include_routers(*get_routers())
-    return dispatcher
-
-
-@pytest.fixture(scope="session")
-def bot() -> MockedBot:
-    bot = MockedBot()
-    bot.session = MockedSession()
-    return bot

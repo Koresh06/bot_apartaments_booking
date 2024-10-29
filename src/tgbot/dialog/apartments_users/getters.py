@@ -3,7 +3,10 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram_dialog.widgets.input import TextInput
 
+from src.core.config import config
+from src.core.models.landlords import Landlords
 from src.core.repo.requests import RequestsRepo
+
 
 
 async def getter_get_city(dialog_manager: DialogManager, **kwargs) -> dict:
@@ -101,4 +104,21 @@ async def getter_apartments_data(dialog_manager: DialogManager, **kwargs) -> dic
         "apartment": apartment,
         "count_page": len(apartments),
         "current_page": current_page,
+        "server_address": f"{config.api.host}:{config.api.port}",
     }
+
+
+async def getter_landlord_info(dialog_manager: DialogManager, **kwargs) -> dict:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+
+    apartment = dialog_manager.dialog_data.get("apartment", [])
+    landlord: Landlords = apartment["landlord"]
+    tg_id = apartment["landlord_tg_id"]
+    # info: Landlords = await repo.bot_apartments.landlord_info(id=landlord_id)
+
+    return {
+        "name":landlord.company_name,
+        "phone": landlord.phone,
+        "tg_id": tg_id
+    }
+

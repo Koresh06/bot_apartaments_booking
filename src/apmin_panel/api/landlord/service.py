@@ -301,3 +301,20 @@ class LandlordApiRepo(BaseRepo):
         return new_landlord
 
 
+    async def click_contact_landlord(self, tg_id: int):
+        stmt = (
+            select(Landlords)
+            .join(Users, Landlords.user_id == Users.id)
+            .where(Users.tg_id == tg_id)
+        )
+        result = await self.session.execute(stmt)
+        landlord = result.scalars().first()
+
+        if not landlord:
+            return False
+        
+        landlord.count_clicks_phone += 1
+        await self.session.commit()
+        await self.session.refresh(landlord)
+
+        return landlord

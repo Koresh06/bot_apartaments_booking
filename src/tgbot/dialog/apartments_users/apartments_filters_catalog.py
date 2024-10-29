@@ -16,14 +16,17 @@ from aiogram_dialog.widgets.kbd import (
     NumberedPager,
     StubScroll,
     Select,
-    Url
+    Url,
+    SwitchTo,
 )
 
+from src.core.config import config
 from src.core.repo.requests import RequestsRepo
 from src.tgbot.dialog.apartments_landlord.getters import getter_apartment_details
 from .handlers import (
     handle_city_filter,
     handle_confirm_min_max_price,
+    handle_landlord_info,
     handle_room_filter,
     on_booking,
     on_phone,
@@ -38,6 +41,7 @@ from .getters import (
     getter_get_city,
     getter_get_rooms,
     getter_min_max_price,
+    getter_landlord_info,
 )
 from src.tgbot.dialog.apartments_landlord.handlers import error_handler, on_next, on_prev
 
@@ -137,7 +141,9 @@ catalog_users_apartments_dialog = Dialog(
         Group(
             Next(Const("🔍 Детали"), id="details"),
             # Button(Const("📞 Телефон"), id="phone", on_click=on_phone),
-            Url(Const("📞 Контакт"), url=Format('https://t.me/{apartment[landlord].phone}')),
+            # Url(Const("📞 Контакт"), url=Format("tg://user?id={apartment[landlord_tg_id]}")),
+            Button(Const("🏠 Арендодатель"), id="landlord", on_click=handle_landlord_info),
+            # Url(Const("📞 Контакт"), url=Format("http://{server_address}/landlord/redirect/{apartment[landlord_tg_id]}")),
             Button(Const("📅 Бронировать"), id="booking", on_click=on_booking),
             Row(
                 Button(Const("◀️ Назад"), id="next", on_click=on_prev),
@@ -178,6 +184,17 @@ catalog_users_apartments_dialog = Dialog(
         Back(Const("◀️ Назад"), id="back", show_mode=StartMode.RESET_STACK),
         state=FilteredCatalogApartmentsSG.details,
         getter=getter_apartment_details,
+    ),
+    Window(
+        Format(
+            "Информация об арендаторе:\n"
+            "🏠 Имя: {name}\n"
+            "📞 Телефон: {phone}\n"
+        ),
+        Url(Const("📞 Контакт"), url=Format("tg://user?id={tg_id}")),
+        SwitchTo(Const("◀️ Назад"), id="back", state=FilteredCatalogApartmentsSG.start),
+        state=FilteredCatalogApartmentsSG.landlord_info,
+        getter=getter_landlord_info,
     ),
 )
 

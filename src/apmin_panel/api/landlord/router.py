@@ -2,7 +2,7 @@ import logging
 from typing import Annotated
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from src.apmin_panel.api.auth.permissions import get_current_user
 from src.core.models.users import Users
@@ -300,3 +300,59 @@ async def submit_create_landlord(
 
     return RedirectResponse("/landlord/create-landlord?message=Арендодатель успешно добавлен!", status_code=303)
 
+
+@router.post("/redirect/{tg_id}")
+async def redirect(
+    tg_id: int,
+    session: Annotated[
+        AsyncSession,
+        Depends(get_db),
+    ],
+):
+    landlord = await LandlordApiRepo(session).click_contact_landlord(tg_id=tg_id)
+    if not landlord:
+        raise HTTPException(status_code=404, detail="Landlord not found")
+    
+    tg_url = f"tg://user?id={tg_id}"
+    return RedirectResponse(url=tg_url)
+
+
+# @router.post("/track/{tg_id}")
+# async def track(
+#     tg_id: int,
+#     session: Annotated[
+#         AsyncSession,
+#         Depends(get_db),
+#     ],
+# ):
+#     landlord = await LandlordApiRepo(session).click_contact_landlord(tg_id=tg_id)
+#     if not landlord:
+#         raise HTTPException(status_code=404, detail="Landlord not found")
+#     return {"message": "Click tracked"}
+
+# @router.get("/redirect/{tg_id}")
+# async def redirect(
+#     tg_id: int,
+#     session: Annotated[
+#         AsyncSession,
+#         Depends(get_db),
+#     ],
+# ):
+#     tg_url = f"tg://user?id={tg_id}"
+#     html_content = f'''
+#     <html>
+#         <body>
+#             <script>
+#                 fetch("/landlord/track/{tg_id}", {{
+#                     method: 'POST'
+#                 }})
+#                 .then(response => response.json())
+#                 .then(data => {{
+#                     console.log(data.message);
+#                     window.location.href = "{tg_url}";
+#                 }});
+#             </script>
+#         </body>
+#     </html>
+#     '''
+#     return HTMLResponse(content=html_content)

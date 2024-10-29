@@ -4,27 +4,18 @@ from pydantic import BaseModel, EmailStr
 
 
 class Token(BaseModel):
-    """ Схема для токена
-    """
     access_token: str
     token_type: str
 
 
 class TokenPayload(BaseModel):
-    """ Схема для
-    """
     user_id: int = None
 
 
 class UserCreateInRegistration(BaseModel):
-    """ Свойства для получения через API при регистрации
-    """
     user_id: int
     email: EmailStr
     password: str
-
-    class Config:
-        orm_mode = True
 
 
 class LoginForm:

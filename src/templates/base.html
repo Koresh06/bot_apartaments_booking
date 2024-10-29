@@ -10,9 +10,11 @@
 
 </head>
 <body>
-    {% if user %}
-        {% include 'navbar.html' %}
-    {% endif %}
+    <header class="header sticky-top">
+        {% if user %}
+            {% include 'navbar.html' %}
+        {% endif %}
+    </header>
 
     {% block content %}
     {% endblock %}

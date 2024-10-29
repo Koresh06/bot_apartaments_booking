@@ -1,5 +1,5 @@
 from aiogram.types import CallbackQuery
-from aiogram_dialog import DialogManager, StartMode
+from aiogram_dialog import DialogManager, StartMode, ShowMode
 from aiogram_dialog.widgets.kbd import Button
 
 from src.core.repo.requests import RequestsRepo
@@ -81,3 +81,17 @@ async def on_booking(
         },
         mode=StartMode.NORMAL,
     )
+
+
+
+async def handle_landlord_info(
+    callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, **_kwargs
+    ):
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+
+    landlord: Landlords = dialog_manager.dialog_data.get("apartment")["landlord"]
+
+    await repo.filter_apartments.add_phone_click(landlord_id=landlord.id)
+    await dialog_manager.switch_to(state=FilteredCatalogApartmentsSG.landlord_info, show_mode=ShowMode.EDIT)
+
+    
