@@ -67,7 +67,7 @@ filter_catalog_apartments_dialog = Dialog(
     ),
     Window(
         Const("⚠️ Внимание! На данный момент информация по данному городу отсутствует. Попробуйте позже. Нажмите - /start", when=~F["count"]),
-        Const("💰 Укажите минимальную цену:", when="count"),
+        Format("💰 Укажите начальную цену:\nМинимальная цена = {min}", when="count"),
         TextInput(
             id="min_price",
             type_factory=float,
@@ -78,7 +78,7 @@ filter_catalog_apartments_dialog = Dialog(
         state=FiltersSG.min_price,
     ),
     Window(
-        Const("💸 Укажите максимальную цену:"),
+        Format("💸 Укажите конечную цену:\nМаксимальная цена = {max}"),
         TextInput(
             id="max_price",
             type_factory=float,

@@ -59,12 +59,15 @@ async def getter_filters(dialog_manager: DialogManager, **kwargs) -> dict:
     price_range = dialog_manager.dialog_data.get("price_range")
     room = dialog_manager.dialog_data.get("room")
 
+    min_max_price = await repo.filter_apartments.get_min_max_price(city_id=int(city_id))
 
     return  {
         "count": True,
         "city": city_id,
         "price_range": price_range,
-        "room": room
+        "room": room,
+        "min": min_max_price[0],
+        "max": min_max_price[1],
     }
 
 

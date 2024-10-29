@@ -15,6 +15,25 @@ class FilterApartmentRepo(BaseRepo):
 
         return [(city_id, city_name) for city_id, city_name in citys]
     
+    async def get_min_max_price(self, city_id: int) -> tuple:
+        query = select(Apartment.price_per_day) \
+            .where(Apartment.is_available) \
+            .where(Apartment.city_id == city_id) \
+            .order_by(Apartment.price_per_day) \
+            .limit(1)
+        result = await self.session.execute(query)
+        min_price = result.scalar()
+
+        query = select(Apartment.price_per_day) \
+            .where(Apartment.is_available) \
+            .where(Apartment.city_id == city_id) \
+            .order_by(Apartment.price_per_day.desc()) \
+            .limit(1)
+        result = await self.session.execute(query)
+        max_price = result.scalar()
+
+        return min_price, max_price
+    
 
     async def no_data_on_apartments(self, city_id: int) -> bool | None:
         query = select(func.count(Apartment.id)).where(Apartment.city_id == city_id)
