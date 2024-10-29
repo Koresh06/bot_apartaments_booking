@@ -22,6 +22,7 @@ from .handlers import (
     yes_confirm_booking,
 )
 from .getters import getter_date_and_booked_dates
+from .keyboard import PhoneCbData, landlord_keyboard, phone_keyboard
 
 
 router = Router()
@@ -96,11 +97,11 @@ confirm_booking_landlord_dialog = Dialog(
 )
 
 
-# @router.callback_query(PhoneCbData.filter())
-# async def phone_callback(callback: CallbackQuery, callback_data: PhoneCbData, repo: RequestsRepo):
-#     await repo.filter_apartments.add_phone_click(landlord_id=callback_data.id)
+@router.callback_query(PhoneCbData.filter())
+async def phone_callback(callback: CallbackQuery, callback_data: PhoneCbData, repo: RequestsRepo):
+    await repo.filter_apartments.add_phone_click(landlord_id=callback_data.landlord_id)
     
-#     await callback.answer(
-#         text=f"🏠 Арендодатель: {callback_data.name}\n📞 Номер телефона: {callback_data.phone}",
-#         show_alert=True
-#     )
+    await callback.message.edit_text(
+        text=f"Информация об арендаторе:\n🏠 Имя: {callback_data.name}\n📞 Телефон: {callback_data.phone}\n",
+        reply_markup= await phone_keyboard(tg_id=callback_data.tg_id)
+    )

@@ -140,10 +140,7 @@ catalog_users_apartments_dialog = Dialog(
         DynamicMedia(selector="media", when="data"),
         Group(
             Next(Const("🔍 Детали"), id="details"),
-            # Button(Const("📞 Телефон"), id="phone", on_click=on_phone),
-            # Url(Const("📞 Контакт"), url=Format("tg://user?id={apartment[landlord_tg_id]}")),
             Button(Const("🏠 Арендодатель"), id="landlord", on_click=handle_landlord_info),
-            # Url(Const("📞 Контакт"), url=Format("http://{server_address}/landlord/redirect/{apartment[landlord_tg_id]}")),
             Button(Const("📅 Бронировать"), id="booking", on_click=on_booking),
             Row(
                 Button(Const("◀️ Назад"), id="next", on_click=on_prev),

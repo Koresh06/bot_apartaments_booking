@@ -16,7 +16,7 @@ from src.tgbot.dialog.apartments_users.states import (
     FiltersSG,
 )
 from .states import ConfirmBooking
-from .keyboard import phone_keyboard
+from .keyboard import landlord_keyboard
 
 
 async def on_start_date_selected(
@@ -183,9 +183,9 @@ async def yes_confirm_booking(
     )
 
     if confirm:
-        # landlord = await repo.booking_api.get_landlord_by_apartment(apartment_id=apartment_id)
+        landlord = await repo.booking_api.get_landlord_by_apartment(apartment_id=apartment_id)
         await bot.send_message(
-            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!", reply_markup= await phone_keyboard(tg_id=user_id)   
+            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!", reply_markup= await landlord_keyboard(landlord=landlord, tg_id=user_id)   
         )
 
         # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)
