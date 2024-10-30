@@ -23,6 +23,7 @@ async def landlord_keyboard(landlord: Landlords, tg_id: int) -> InlineKeyboardMa
 
     return builder.as_markup()
 
+
 async def phone_keyboard(tg_id: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 

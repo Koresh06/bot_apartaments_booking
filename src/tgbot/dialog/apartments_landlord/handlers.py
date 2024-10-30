@@ -12,7 +12,7 @@ from src.core.models.bookings import Booking
 from src.core.repo.requests import RequestsRepo
 from src.tgbot import bot
 from src.tgbot.dialog.apartments_landlord.states import MenuLandlordSG, EditApartmentSG
-from src.tgbot.dialog.booking_apartment.keyboard import phone_keyboard
+from src.tgbot.dialog.booking_apartment.keyboard import landlord_keyboard
 
 
 async def error_handler(
@@ -56,18 +56,14 @@ async def correct_name_handler(
 
 
 async def handle_city(
-    callback: CallbackQuery, 
-    widget: Button, 
-    dialog_manager: DialogManager, 
-    item_id: str
+    callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: str
 ):
-    list_citys = dialog_manager.dialog_data.get("citys") 
+    list_citys = dialog_manager.dialog_data.get("citys")
     data = dict(list_citys)
     dialog_manager.dialog_data["city"] = data.get(int(item_id))
     dialog_manager.dialog_data["city_id"] = item_id
 
     await dialog_manager.next()
-    
 
 
 async def confirm_landlord_handler(
@@ -76,7 +72,7 @@ async def confirm_landlord_handler(
     dialog_manager: DialogManager,
 ) -> None:
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
-    
+
     name: TextInput = dialog_manager.find("name").get_value()
     phone = dialog_manager.dialog_data.get("phone")
 
@@ -142,10 +138,14 @@ async def confirm_deteils_apartment(
     if await repo.bot_apartments.register_apartment_landlord(
         tg_id=callback.from_user.id, data=data
     ):
-        await callback.answer(text="Поздравляем! ✅ Апартамент зарегистрирован!", show_alert=True)
+        await callback.answer(
+            text="Поздравляем! ✅ Апартамент зарегистрирован!", show_alert=True
+        )
         await dialog_manager.done()
     else:
-        await callback.answer(text="Что-то пошло не так, попробуйте еще раз", show_alert=True)
+        await callback.answer(
+            text="Что-то пошло не так, попробуйте еще раз", show_alert=True
+        )
 
 
 async def on_delete_apartment(
@@ -155,7 +155,9 @@ async def on_delete_apartment(
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     apartment = dialog_manager.dialog_data.get("apartment")
-    if await repo.bot_apartments.delete_apartment_landlord(tg_id=callback.from_user.id, apartment_id=apartment["apartment_id"]):
+    if await repo.bot_apartments.delete_apartment_landlord(
+        tg_id=callback.from_user.id, apartment_id=apartment["apartment_id"]
+    ):
         await callback.answer(text="Поздравляем! ✅ Апартамент удален!")
     else:
         await callback.answer(text="Что-то пошло не так, попробуйте еще раз")
@@ -186,35 +188,35 @@ async def on_prev(
 
 
 async def handle_edit_city(
-    callback: CallbackQuery, 
-    widget: Button, 
-    dialog_manager: DialogManager, 
-    item_id: int
+    callback: CallbackQuery, widget: Button, dialog_manager: DialogManager, item_id: int
 ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     apartment = dialog_manager.start_data
     apartment_id = apartment["apartment_id"]
     list_citys = dialog_manager.dialog_data.get("citys")
-    
+
     city_id = int(item_id)
     city_tuple = next((city for city in list_citys if city[1] == city_id), None)
-    
+
     city_name = city_tuple[0]
     updated = await repo.bot_apartments.update_apartment_info(
         tg_id=callback.from_user.id,
         apartment_id=apartment_id,
         widget_id=widget.widget_id,
-        text=city_id
+        text=city_id,
     )
 
     if not updated:
-        await callback.message.answer("Не удалось обновить информацию. Убедитесь, что вы являетесь владельцем квартиры и все данные верны.", parse_mode=ParseMode.HTML)
+        await callback.message.answer(
+            "Не удалось обновить информацию. Убедитесь, что вы являетесь владельцем квартиры и все данные верны.",
+            parse_mode=ParseMode.HTML,
+        )
     else:
-        await callback.message.answer(f"Успешно изменено на: <b>{city_name}</b>", parse_mode=ParseMode.HTML)
+        await callback.message.answer(
+            f"Успешно изменено на: <b>{city_name}</b>", parse_mode=ParseMode.HTML
+        )
 
     await dialog_manager.switch_to(state=EditApartmentSG.edit)
-
-
 
 
 async def edit_data(
@@ -241,13 +243,18 @@ async def update_apartment_information(
         tg_id=message.from_user.id,
         apartment_id=apartment_id,
         widget_id=widget.widget.widget_id,
-        text=text
+        text=text,
     )
 
     if not updated:
-        await message.answer("Не удалось обновить информацию. Убедитесь, что вы являетесь владельцем квартиры и все данные верны.", parse_mode=ParseMode.HTML)
+        await message.answer(
+            "Не удалось обновить информацию. Убедитесь, что вы являетесь владельцем квартиры и все данные верны.",
+            parse_mode=ParseMode.HTML,
+        )
     else:
-        await message.answer(f"Успешно изменено на: <b>{text}</b>", parse_mode=ParseMode.HTML)
+        await message.answer(
+            f"Успешно изменено на: <b>{text}</b>", parse_mode=ParseMode.HTML
+        )
 
     await dialog_manager.switch_to(state=EditApartmentSG.edit)
 
@@ -260,20 +267,23 @@ async def handle_update_apartment_photos(
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     apartment = dialog_manager.start_data
     apartment_id = apartment["apartment_id"]
-    
+
     photos = dialog_manager.dialog_data.get("photos", [])
 
     # Вызов функции для обновления фотографий
     updated = await repo.bot_apartments.update_apartment_photos(
-        tg_id=callback.from_user.id,
-        apartment_id=apartment_id,
-        photos_ids=photos
+        tg_id=callback.from_user.id, apartment_id=apartment_id, photos_ids=photos
     )
 
     if not updated:
-        await callback.message.answer("Не удалось обновить фотографии. Проверьте права доступа.", parse_mode=ParseMode.HTML)
+        await callback.message.answer(
+            "Не удалось обновить фотографии. Проверьте права доступа.",
+            parse_mode=ParseMode.HTML,
+        )
     else:
-        await callback.answer("Фотографии успешно обновлены.", parse_mode=ParseMode.HTML)
+        await callback.answer(
+            "Фотографии успешно обновлены.", parse_mode=ParseMode.HTML
+        )
 
     await dialog_manager.switch_to(state=EditApartmentSG.edit)
 
@@ -294,12 +304,16 @@ async def handle_update_is_available(
     )
 
     if is_available is None:
-        await callback.message.answer("Не удалось обновить статус. Проверьте права доступа.")
+        await callback.message.answer(
+            "Не удалось обновить статус. Проверьте права доступа."
+        )
     else:
         status_text = "✅ Свободно" if is_available else "❌ Занято"
         dialog_manager.dialog_data["is_available"] = status_text
         await callback.answer(f"Статус успешно обновлен на: {status_text}")
-        await dialog_manager.switch_to(state=EditApartmentSG.edit, show_mode=ShowMode.EDIT)
+        await dialog_manager.switch_to(
+            state=EditApartmentSG.edit, show_mode=ShowMode.EDIT
+        )
 
 
 async def close_dialog(_, __, dialog_manager: DialogManager, **kwargs):
@@ -311,6 +325,8 @@ async def yes_confirm_booking(
 ):
     booking: Booking = dialog_manager.dialog_data.get("booking")
     user_id = dialog_manager.dialog_data.get("user_id")
+    landlord_tg_id = dialog_manager.dialog_data.get("apartment")["landlord_tg_id"]
+    print(landlord_tg_id)
     apartment_id = dialog_manager.dialog_data.get("apartment")["apartment_id"]
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     scheduler: AsyncIOScheduler = dialog_manager.middleware_data.get("scheduler")
@@ -322,7 +338,9 @@ async def yes_confirm_booking(
     if confirm:
         landlord = await repo.booking_api.get_landlord_by_apartment(apartment_id=apartment_id)
         await bot.send_message(
-            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!",  reply_markup= await phone_keyboard(tg_id=user_id)
+            chat_id=user_id,
+            text="Поздравляем! ✅ Бронирование успешно подтверждено!",
+            reply_markup=await landlord_keyboard(landlord=landlord, tg_id=landlord_tg_id),
         )
 
         # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)

@@ -175,6 +175,7 @@ async def yes_confirm_booking(
     booking: Booking = dialog_manager.start_data.get("booking")
     user_id = dialog_manager.start_data.get("user_id")
     apartment_id = dialog_manager.start_data.get("apartment")["apartment_id"]
+    landlord_tg_id = dialog_manager.start_data.get("apartment")["landlord_tg_id"]
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
     scheduler: AsyncIOScheduler = dialog_manager.middleware_data.get("scheduler")
 
@@ -185,7 +186,7 @@ async def yes_confirm_booking(
     if confirm:
         landlord = await repo.booking_api.get_landlord_by_apartment(apartment_id=apartment_id)
         await bot.send_message(
-            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!", reply_markup= await landlord_keyboard(landlord=landlord, tg_id=user_id)   
+            chat_id=user_id, text="Поздравляем! ✅ Бронирование успешно подтверждено!", reply_markup= await landlord_keyboard(landlord=landlord, tg_id=landlord_tg_id)   
         )
 
         # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)
