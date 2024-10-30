@@ -1,4 +1,5 @@
 from aiogram_dialog import setup_dialogs
+from aiogram.types import BotCommand
 
 from src.tgbot import dp, bot
 from src.core.db_helper import async_session_maker
@@ -9,6 +10,13 @@ from src.tgbot.scheduler_init import scheduler
 
 
 async def start_bot():
+    commands = [
+        BotCommand(command="/start", description="Старт бота"),
+        BotCommand(command="/landlord", description="Я арендодатель"),
+        # Добавьте другие команды по необходимости
+    ]
+    await bot.set_my_commands(commands)
+
 
     setup_middlewares(dp=dp, sessionmaker=async_session_maker)
 
