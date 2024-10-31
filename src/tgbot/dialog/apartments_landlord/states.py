@@ -47,6 +47,7 @@ class EditApartmentSG(StatesGroup):
 class LandlordApartmentsSG(StatesGroup):
     catalog = State()
     details = State()
+    view = State()
 
 
 class OrdersBookingSG(StatesGroup):
@@ -54,4 +55,7 @@ class OrdersBookingSG(StatesGroup):
     cancel_message = State()
     cancle_сonfirm = State()
 
+
+class StatisticsViewSG(StatesGroup):
+    start = State()
 

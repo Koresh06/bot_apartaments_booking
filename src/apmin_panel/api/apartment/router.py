@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Request
 
 from src.apmin_panel.api.auth.permissions import get_current_user
+from src.apmin_panel.api.landlord.service import LandlordApiRepo
 from src.core.models.users import Users
 
 from src.apmin_panel.conf_static import templates
@@ -66,6 +67,7 @@ async def get_apartment(
     user: Users = Depends(get_current_user),
 ):
     apartments = await ApartmentApiRepo(session).get_apartment_by_landlord(landlord_id)
+    landlord = await ApartmentApiRepo(session).get_landlord_by_id(landlord_id)
 
     
     if isinstance(apartments, str):
@@ -83,6 +85,7 @@ async def get_apartment(
         name="apartments/get-apatments-landlord.html",
         context={
             "apartments": apartments,
+            "landlord": landlord,
             "user": user,
         },
     )

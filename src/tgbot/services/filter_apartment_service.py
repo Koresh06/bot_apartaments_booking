@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional, Tuple
 from sqlalchemy import between, func, select, Result
 
@@ -119,12 +120,21 @@ class FilterApartmentRepo(BaseRepo):
         return formatted_result
     
 
-    async def add_click_contact_apartment(self, apartment_id: int) -> bool:
+    async def update_click_contact_apartment(self, apartment_id: int) -> bool:
         stmt = select(Apartment).where(Apartment.id == apartment_id)
-        result = await self.session.execute(stmt)
-        landlord = result.scalar()
-        if not landlord:
-            return False
-        landlord.count_contact_views += 1
+        landlord: Apartment = await self.session.scalar(stmt)
+
+        current_month = datetime.now().strftime("%m-%Y")
+
+        new_count_clicks_phone = landlord.count_contact_views.copy() if landlord.count_contact_views else {}
+
+        if current_month in new_count_clicks_phone:
+            new_count_clicks_phone[current_month] += 1
+        else:
+            new_count_clicks_phone[current_month] = 1
+
+        landlord.count_contact_views = new_count_clicks_phone
+
+        await self.session.flush()
         await self.session.commit()
 

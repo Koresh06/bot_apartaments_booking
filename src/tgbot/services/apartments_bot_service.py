@@ -271,3 +271,70 @@ class BotApartmentRepo(BaseRepo):
             })
 
         return apartments_info if apartments_info else False
+
+
+    async def get_statistics_view(self, tg_id: int) -> Optional[str]:
+        stmt = (
+            select(Landlords)
+            .join(Users)
+            .where(Users.tg_id == tg_id)
+        )
+        landlord: Landlords = await self.session.scalar(stmt)
+
+        if not landlord:
+            return None
+
+        # Обработка данных и замена месяцев на русские названия
+        month_names = {
+            "01": "Январь", "02": "Февраль", "03": "Март", "04": "Апрель",
+            "05": "Май", "06": "Июнь", "07": "Июль", "08": "Август",
+            "09": "Сентябрь", "10": "Октябрь", "11": "Ноябрь", "12": "Декабрь"
+        }
+
+        filtered_stats = {}
+        for date_str, count in landlord.count_clicks_phone.items():
+            year, month = date_str.split('-')[1], date_str.split('-')[0]
+            if year not in filtered_stats:
+                filtered_stats[year] = {}
+            filtered_stats[year][month_names[month]] = count
+
+        # message_text = "📊 Статистика просмотров по месяцам:\n"
+        # for year, months in filtered_stats.items():
+        #     message_text += f"\n📅 {year} год:\n"
+        #     for month, count in months.items():
+        #         message_text += f"  **{month}**: {count}\n"
+
+        if filtered_stats == {}:
+            return None
+
+        return filtered_stats
+    
+
+    async def get_statistics_view_apartment(self, apartment_id: int) -> Optional[str]:
+        stmt = (
+            select(Apartment)
+            .where(Apartment.id == apartment_id)
+        )
+        apartment: Apartment = await self.session.scalar(stmt)
+
+        if not apartment:
+            return None
+
+        # Обработка данных и замена месяцев на русские названия
+        month_names = {
+            "01": "Январь", "02": "Февраль", "03": "Март", "04": "Апрель",
+            "05": "Май", "06": "Июнь", "07": "Июль", "08": "Август",
+            "09": "Сентябрь", "10": "Октябрь", "11": "Ноябрь", "12": "Декабрь"
+        }
+
+        filtered_stats = {}
+        for date_str, count in apartment.count_contact_views.items():
+            year, month = date_str.split('-')[1], date_str.split('-')[0]
+            if year not in filtered_stats:
+                filtered_stats[year] = {}
+            filtered_stats[year][month_names[month]] = count
+
+        if filtered_stats == {}:
+            return None
+
+        return filtered_stats

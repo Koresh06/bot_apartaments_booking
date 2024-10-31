@@ -2,7 +2,7 @@ from operator import itemgetter
 from aiogram import F
 from aiogram.types import ContentType
 from aiogram_dialog import Dialog, StartMode, Window
-from aiogram_dialog.widgets.text import Format, Const, Multi
+from aiogram_dialog.widgets.text import Format, Const, Multi, Jinja
 from aiogram_dialog.widgets.media import DynamicMedia
 from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram_dialog.widgets.kbd import (
@@ -25,6 +25,7 @@ from .states import (
     RegisterApartmentSG,
     LandlordApartmentsSG,
     OrdersBookingSG,
+    StatisticsViewSG,
 )
 from .getters import (
     getter_catalog_landlord_apartments,
@@ -36,6 +37,8 @@ from .getters import (
     getter_is_available,
     getter_get_city,
     getter_orders_booking,
+    getter_statistics_view,
+    getter_statistics_view_apartment,
 )
 from .handlers import (
     confirm_deteils_apartment,
@@ -76,6 +79,11 @@ menu_loandlord_dialog = Dialog(
             id="orders_booking",
             state=OrdersBookingSG.orders,
         ),
+        Start(
+            Const("📊 Статистика просмотров"),
+            id="statistics_view",
+            state=StatisticsViewSG.start,
+        ),        
         state=MenuLandlordSG.start,
     ),
 )
@@ -300,8 +308,11 @@ my_apartmernt_landlord_dialog = Dialog(
                 Button(Const("Вперед ▶️"), id="prev", on_click=on_next),
                 when="is_apartments",
             ),
-            Button(Const("✏️ Редактировать"), id="edit", on_click=edit_data),
-            Button(Const("🗑️ Удалить"), id="delete", on_click=on_delete_apartment),
+            SwitchTo(Const("📊 Статистика просмотров"), id="statistics_view", state=LandlordApartmentsSG.view),
+            Row(
+                Button(Const("✏️ Редактировать"), id="edit", on_click=edit_data),
+                Button(Const("🗑️ Удалить"), id="delete", on_click=on_delete_apartment),
+            ),
             Start(
                 Const("◀️ Назад"),
                 id="back",
@@ -333,6 +344,25 @@ my_apartmernt_landlord_dialog = Dialog(
         Back(Const("◀️ Назад"), id="back", show_mode=StartMode.RESET_STACK),
         state=LandlordApartmentsSG.details,
         getter=getter_apartment_details,
+    ),
+    Window(
+        Const("⚠️ На данный момент статистика отсутствует!", when=~F["statistics"]),
+        Jinja(
+            """
+            <b>📊 Статистика по апартаменту</b>
+            {% for year, months in statistics.items() %}
+            \n📅 {{ year }} год:
+            {% for month, count in months.items() %}
+            **{{ month }}**: <b>{{ count }}</b>
+            {% endfor %}
+            {% endfor %}
+            """,
+            when="statistics",
+
+        ),
+        SwitchTo(Const("◀️ Назад"), id="back", state=LandlordApartmentsSG.catalog),
+        state=LandlordApartmentsSG.view,
+        getter=getter_statistics_view_apartment,
     ),
 )
 
@@ -539,7 +569,7 @@ edit_apartment_dialog = Dialog(
 
 view_booking_orders_landlord = Dialog(
     Window(
-        Const("Заказов нет", when=~F["data"],),
+        Const("⚠️ На данный момент у вас нет забронированных апартаментов.", when=~F["data"],),
         Format(
             "<b>ID:{booking.id}</b>\n"
             "<b>🏙️ Город: {apartment[city]}</b>\n"
@@ -566,6 +596,7 @@ view_booking_orders_landlord = Dialog(
             ),
             when="data",
         ),
+        Start(Const("☰ Панель арендодателя"), id="back", state=MenuLandlordSG.start),
         state=OrdersBookingSG.orders,
         getter=getter_orders_booking,
     ),
@@ -584,5 +615,28 @@ view_booking_orders_landlord = Dialog(
         Button(Const("✅ Подтвердить"), id="confirm", on_click=no_confirm_booking),
         Back(Const("◀️ Назад"), id="back"),
         state=OrdersBookingSG.cancle_сonfirm,
+    ),
+)
+
+
+statistics_view_landlord = Dialog(
+    Window(
+        Const("⚠️ На данный момент статистика отсутствует!", when=~F["statistics"]),
+        Jinja(
+            """
+            <b>📊 Статистика арендодателя</b>
+            {% for year, months in statistics.items() %}
+            \n📅 {{ year }} год:
+            {% for month, count in months.items() %}
+            **{{ month }}**: <b>{{ count }}</b>
+            {% endfor %}
+            {% endfor %}
+            """,
+            when="statistics",
+
+        ),
+        Start(Const("◀️ Назад"), id="back", state=MenuLandlordSG.start),
+        state=StatisticsViewSG.start,
+        getter=getter_statistics_view,
     ),
 )

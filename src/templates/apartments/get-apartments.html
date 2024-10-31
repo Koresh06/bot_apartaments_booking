@@ -7,18 +7,19 @@
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead>
-                <tr>
+                <tr class="text-center">
                     <th>№</th>
                     <th>Арендодатель</th>
                     <th>Адрес</th>
                     <th>Цена за день</th>
                     <th>Количество комнат</th>
                     <th>Статус</th>
+                    <th>Просмотры контакта</th>
                     <th>Дата создания</th>
                     <th>Описание</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="text-center">
                 {% if apartments and apartments | length > 0 %}
                     {% for apartment in apartments %}
                     <tr>
@@ -26,14 +27,15 @@
                         <td>{{ apartment.landlord_rel.company_name }}</td>
                         <td>{{ apartment.city_rel.name }}, {{ apartment.street }} {{ apartment.house_number }}{% if apartment.apartment_number %}, кв. {{ apartment.apartment_number }}{% endif %}</td>
                         <td>{{ apartment.price_per_day }} ₽</td>
-                        <td class="text-center">{{ apartment.rooms }}</td>
-                        <td class="text-center">
+                        <td>{{ apartment.rooms }}</td>
+                        <td>
                             {% if apartment.is_available %}
                                 <span class="badge bg-success"><i class="fas fa-check-circle"></i> Свободно</span>
                             {% else %}
                                 <span class="badge bg-danger"><i class="fas fa-times-circle"></i> Занято</span>
                             {% endif %}
-                        </td>           
+                        </td>  
+                        <td >{{ apartment.count_contact_views.values()|sum }}</td>             
                         <td>{{ apartment.create_at.strftime('%d.%m.%Y') }}</td>
                         <td>
                             <!-- Кнопка для открытия модального окна с описанием -->

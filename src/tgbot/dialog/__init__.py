@@ -7,6 +7,7 @@ from .apartments_landlord.landlord_apratments_dilalog import (
     my_apartmernt_landlord_dialog,
     edit_apartment_dialog,
     view_booking_orders_landlord,
+    statistics_view_landlord,
 )
 from .apartments_landlord.register_landlord import register_landlord_dialog
 from .apartments_users.apartments_filters_catalog import (
@@ -22,6 +23,7 @@ from .admin.admin_dialog import register_name_city_dialog, main_admin_dialog, re
 
 def get_all_dialogs() -> list[Dialog]:
     return [
+        statistics_view_landlord,
         register_apartament_by_landlord_dialog,
         view_booking_orders_landlord,
         menu_loandlord_dialog,

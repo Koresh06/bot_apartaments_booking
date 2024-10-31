@@ -209,16 +209,3 @@ async def command_start_process(message: Message, dialog_manager: DialogManager)
     )
     await dialog_manager.start(state=FiltersSG.city, mode=StartMode.RESET_STACK,)
 
-
-# @router.message(CommandStart())
-# async def cmd_start(message: Message):
-#     await message.answer("Привет!")
-
-
-# @dp.message(Command("filter"))
-# async def command_filter_process(
-#     callback: CallbackQuery, dialog_manager: DialogManager
-# ):
-#     await dialog_manager.start(
-#         state=FiltersApartmentsSG.start, mode=StartMode.RESET_STACK
-#     )

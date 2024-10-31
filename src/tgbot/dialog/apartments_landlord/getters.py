@@ -217,3 +217,33 @@ async def getter_orders_booking(dialog_manager: DialogManager, event_from_user: 
         "current_page": current_page,
         "booking": booking,
     }
+
+
+async def getter_statistics_view_apartment(dialog_manager: DialogManager, event_from_user: User, **kwargs) -> dict:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+
+    apartment_id = dialog_manager.dialog_data.get("apartment")["apartment_id"]
+
+    statistics = await repo.bot_apartments.get_statistics_view_apartment(apartment_id=int(apartment_id))
+
+    if statistics is None:
+        return {"statistics": False}
+
+    return {
+        "statistics": statistics
+    }
+
+
+
+async def getter_statistics_view(dialog_manager: DialogManager, event_from_user: User, **kwargs) -> dict:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+
+    statistics = await repo.bot_apartments.get_statistics_view(tg_id=event_from_user.id)
+
+    if statistics is None:
+        return {"statistics": False}
+
+    return {
+        "statistics": statistics
+    }
+    
