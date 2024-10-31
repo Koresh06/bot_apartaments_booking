@@ -1,9 +1,9 @@
-from datetime import date
+from datetime import date, datetime
 import logging
 from sqlalchemy import select
 
 from src.core.repo.base import BaseRepo
-from src.core.models import Users, Apartment, Booking
+from src.core.models import Users, Apartment, Booking, Landlords
 
 
 class ApartmentBookingRepo(BaseRepo):
@@ -138,3 +138,23 @@ class ApartmentBookingRepo(BaseRepo):
 
 
         return current_bookings
+
+
+    async def update_clicks_phone(self, landlord_id: int):
+        stmt = select(Landlords).where(Landlords.id == landlord_id)
+        landlord: Landlords = await self.session.scalar(stmt)
+
+        current_month = datetime.now().strftime("%m-%Y")
+
+        new_count_clicks_phone = landlord.count_clicks_phone.copy() if landlord.count_clicks_phone else {}
+
+        if current_month in new_count_clicks_phone:
+            new_count_clicks_phone[current_month] += 1
+        else:
+            new_count_clicks_phone[current_month] = 1
+
+        landlord.count_clicks_phone = new_count_clicks_phone
+
+        await self.session.flush()
+        await self.session.commit()
+

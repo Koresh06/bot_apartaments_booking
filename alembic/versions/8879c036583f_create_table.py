@@ -1,18 +1,18 @@
 """create table
 
-Revision ID: de0d3e5066fd
+Revision ID: 8879c036583f
 Revises: 
-Create Date: 2024-10-16 11:57:23.758902
+Create Date: 2024-10-31 20:01:11.850042
 
 """
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'de0d3e5066fd'
+revision: str = '8879c036583f'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,8 +31,14 @@ def upgrade() -> None:
     sa.Column('tg_id', sa.Integer(), nullable=False),
     sa.Column('chat_id', sa.Integer(), nullable=True),
     sa.Column('username', sa.String(length=100), nullable=True),
+    sa.Column('email', sa.String(length=100), nullable=True),
+    sa.Column('first_name', sa.String(), nullable=False),
+    sa.Column('last_name', sa.String(), nullable=True),
     sa.Column('full_name', sa.String(length=100), nullable=False),
+    sa.Column('hashed_password', sa.String(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('is_admin', sa.Boolean(), nullable=False),
+    sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.Column('is_banned', sa.Boolean(), server_default='false', nullable=False),
     sa.Column('create_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
@@ -45,6 +51,7 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('company_name', sa.String(length=100), nullable=False),
     sa.Column('phone', sa.String(length=100), nullable=False),
+    sa.Column('count_clicks_phone', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     sa.Column('create_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('landlords_user_id_fkey')),
@@ -62,6 +69,7 @@ def upgrade() -> None:
     sa.Column('rooms', sa.Integer(), nullable=False),
     sa.Column('is_available', sa.Boolean(), nullable=False),
     sa.Column('description', sa.String(length=500), nullable=True),
+    sa.Column('count_contact_views', sa.Integer(), server_default='0', nullable=False),
     sa.Column('rating', sa.Integer(), server_default='0', nullable=False),
     sa.Column('create_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),

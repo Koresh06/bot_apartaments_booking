@@ -89,9 +89,8 @@ async def handle_landlord_info(
     ):
     repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
 
-    landlord: Landlords = dialog_manager.dialog_data.get("apartment")["landlord"]
-
-    await repo.filter_apartments.add_phone_click(landlord_id=landlord.id)
+    apartment_id = dialog_manager.dialog_data.get("apartment")["apartment_id"]
+    await repo.filter_apartments.add_click_contact_apartment(apartment_id=apartment_id)
     await dialog_manager.switch_to(state=FilteredCatalogApartmentsSG.landlord_info, show_mode=ShowMode.EDIT)
 
     

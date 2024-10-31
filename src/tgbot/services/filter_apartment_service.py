@@ -119,12 +119,12 @@ class FilterApartmentRepo(BaseRepo):
         return formatted_result
     
 
-    async def add_phone_click(self, landlord_id: int) -> bool:
-        stmt = select(Landlords).where(Landlords.id == landlord_id)
+    async def add_click_contact_apartment(self, apartment_id: int) -> bool:
+        stmt = select(Apartment).where(Apartment.id == apartment_id)
         result = await self.session.execute(stmt)
         landlord = result.scalar()
         if not landlord:
             return False
-        landlord.count_clicks_phone += 1
+        landlord.count_contact_views += 1
         await self.session.commit()
 
