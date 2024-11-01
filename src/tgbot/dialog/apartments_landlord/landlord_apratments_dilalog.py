@@ -668,7 +668,8 @@ booking_information_landlord = Dialog(
             {% endfor %}
             {% endfor %}
             {% endfor %}
-            """
+            """,
+            when="information",
         ),
         Start(Const("◀️ Назад"), id="back", state=MenuLandlordSG.start),
         state=BookingInformationSG.start,
