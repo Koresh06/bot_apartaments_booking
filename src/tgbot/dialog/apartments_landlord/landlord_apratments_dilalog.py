@@ -651,7 +651,7 @@ statistics_view_landlord = Dialog(
 
 booking_information_landlord = Dialog(
     Window(
-        # Const("⚠️ На данный момент статистика отсутствует!", when=~F["information"]),
+        Const("⚠️ На данный момент статистика отсутствует!", when=~F["information"]),
         Jinja(
             """
             <b>📝 Информация по бронированиям</b>
@@ -670,7 +670,6 @@ booking_information_landlord = Dialog(
             {% endfor %}
             """
         ),
-        # Format("{information}"),
         Start(Const("◀️ Назад"), id="back", state=MenuLandlordSG.start),
         state=BookingInformationSG.start,
         getter=getter_booking_information,
