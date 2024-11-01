@@ -1,5 +1,6 @@
 from typing import List, Optional
 from sqlalchemy import delete, select
+from sqlalchemy.orm import joinedload
 
 from src.core.repo.base import BaseRepo
 from src.core.models import Users, Landlords, ApartmentPhoto, Apartment, City, Booking
@@ -271,8 +272,7 @@ class BotApartmentRepo(BaseRepo):
             })
 
         return apartments_info if apartments_info else False
-
-
+    
     async def get_statistics_view(self, tg_id: int) -> Optional[str]:
         stmt = (
             select(Landlords)
@@ -338,3 +338,57 @@ class BotApartmentRepo(BaseRepo):
             return None
 
         return filtered_stats
+
+
+    async def get_information_booking(self, tg_id: int) -> Optional[dict]:
+        stmt = (
+            select(Landlords)
+            .join(Users)
+            .where(Users.tg_id == tg_id)
+        )
+        landlord: Landlords = await self.session.scalar(stmt)
+        
+        if not landlord:
+            return None
+        
+        # Получение всех бронирований для арендодателя
+        bookings_stmt = (
+            select(Booking)
+            .join(Apartment, Apartment.id == Booking.apartment_id)  # Условие соединения с Apartment
+            .where(Apartment.landlord_id == landlord.id)
+            .options(joinedload(Booking.apartment_rel).joinedload(Apartment.city_rel))  # Подгружаем связанные объекты
+        )
+        bookings = await self.session.execute(bookings_stmt)
+        booking_list = bookings.scalars().all()
+        
+        # Обработка данных и замена месяцев на русские названия
+        month_names = {
+            "01": "Январь", "02": "Февраль", "03": "Март", "04": "Апрель",
+            "05": "Май", "06": "Июнь", "07": "Июль", "08": "Август",
+            "09": "Сентябрь", "10": "Октябрь", "11": "Ноябрь", "12": "Декабрь"
+        }
+        
+        # Формируем информацию о бронированиях
+        statistics = {}
+        for booking in booking_list:
+            year = booking.start_date.strftime("%Y")
+            month = booking.start_date.strftime("%m")
+            
+            city_name = booking.apartment_rel.city_rel.name
+            full_address = f"{city_name}, {booking.apartment_rel.street}, {booking.apartment_rel.house_number}"  # Полный адрес
+            
+            if year not in statistics:
+                statistics[year] = {}
+            if month_names[month] not in statistics[year]:
+                statistics[year][month_names[month]] = []
+            
+            # Добавляем информацию о бронировании
+            statistics[year][month_names[month]].append({
+                "apartment": full_address,
+                "start_date": booking.start_date.strftime("%d.%m.%Y"),
+                "end_date": booking.end_date.strftime("%d.%m.%Y"),
+                "is_confirmed": "✅ Подтверждено" if booking.is_confirmed else "❌ Не подтверждено",
+                "is_completed": "🔴 Не завершено" if not booking.is_completed else "✅ Завершено",
+            })
+
+        return statistics

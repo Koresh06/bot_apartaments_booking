@@ -247,3 +247,17 @@ async def getter_statistics_view(dialog_manager: DialogManager, event_from_user:
         "statistics": statistics
     }
     
+
+async def getter_booking_information(dialog_manager: DialogManager, event_from_user: User, **kwargs) -> dict:
+    repo: RequestsRepo = dialog_manager.middleware_data.get("repo")
+
+    information = await repo.bot_apartments.get_information_booking(tg_id=event_from_user.id)
+    # print(information)
+
+    if information is None:
+        return {"information": False}
+
+    return {
+        "information": information
+    }
+

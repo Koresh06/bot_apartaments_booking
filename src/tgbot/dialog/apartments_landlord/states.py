@@ -59,3 +59,7 @@ class OrdersBookingSG(StatesGroup):
 class StatisticsViewSG(StatesGroup):
     start = State()
 
+
+class BookingInformationSG(StatesGroup):
+    start = State()
+

@@ -26,8 +26,10 @@ from .states import (
     LandlordApartmentsSG,
     OrdersBookingSG,
     StatisticsViewSG,
+    BookingInformationSG,
 )
 from .getters import (
+    getter_booking_information,
     getter_catalog_landlord_apartments,
     getter_confirm_edit_photos,
     getter_edit_apartment,
@@ -83,7 +85,12 @@ menu_loandlord_dialog = Dialog(
             Const("📊 Статистика просмотров"),
             id="statistics_view",
             state=StatisticsViewSG.start,
-        ),        
+        ),   
+        Start(
+            Const("🏨 Информация по бронированиям"),
+            id="booking_information",
+            state=BookingInformationSG.start,
+        ),
         state=MenuLandlordSG.start,
     ),
 )
@@ -640,3 +647,32 @@ statistics_view_landlord = Dialog(
         getter=getter_statistics_view,
     ),
 )
+
+
+booking_information_landlord = Dialog(
+    Window(
+        # Const("⚠️ На данный момент статистика отсутствует!", when=~F["information"]),
+        Jinja(
+            """
+            <b>📝 Информация по бронированиям</b>
+            {% for year, months in information.items() %}
+            \n📅 {{ year }} год:
+            {% for month, bookings in months.items() %}
+            <b>{{ month }}:</b>
+            {% for booking in bookings %}
+                    {{ "-" * 50 }}                
+                📍 <b>Адрес:</b> {{ booking.apartment }}
+                🗓️ <b>Даты:</b> {{ booking.start_date }} - {{ booking.end_date }}
+                {{ booking.is_confirmed }}
+                {{ booking.is_completed }}
+            {% endfor %}
+            {% endfor %}
+            {% endfor %}
+            """
+        ),
+        # Format("{information}"),
+        Start(Const("◀️ Назад"), id="back", state=MenuLandlordSG.start),
+        state=BookingInformationSG.start,
+        getter=getter_booking_information,
+    ),
+) 
