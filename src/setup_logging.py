@@ -1,19 +1,9 @@
-import sys
-sys.dont_write_bytecode = True
-
-import asyncio
 import logging
+
 
 import betterlogging as bl
 
-from src.tgbot.bot import start_bot
-from src.run_fastapi import start_app
-
-
-logger = logging.getLogger(__name__)
-
-
-def setup_logging():
+def setup_main_logging():
     """
     Set up logging configuration for the application.
 
@@ -37,20 +27,3 @@ def setup_logging():
     )
     logger = logging.getLogger(__name__)
     logger.info("Starting bot")
-
-
-async def main():
-    setup_logging()
-
-    # Запуск бота в фоне
-    asyncio.create_task(start_bot())
-
-    # Запуск FastAPI приложения
-    await start_app()
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logging.error("Bot has been stopped")

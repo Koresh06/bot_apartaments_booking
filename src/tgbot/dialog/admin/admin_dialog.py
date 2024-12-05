@@ -55,13 +55,13 @@ register_name_city_dialog = Dialog(
             on_success=Next(),
             on_error=error_handler,
         ),
-        Start(Const("◀️ Назад"), id="back", state=RegisterNameCitysSG.start, mode=StartMode.RESET_STACK),
+        Start(Const("◀️ Назад"), id="back", state=MainAdminSG.start, mode=StartMode.RESET_STACK),
         state=RegisterNameCitysSG.start,
     ),
     Window(
         Format("🌆 Название города: <b>{name}</b>"),
         Button(Const("✅ Подтвердить"), id="confirm", on_click=handle_register_name_city),
-        Back(Const("◀️ Назад")),
+        Back(Const("◀️ Назад")), 
         state=RegisterNameCitysSG.confirm,
     ),
     getter=getter_name_city,
@@ -80,6 +80,7 @@ register_apartament_by_landlord_dialog = Dialog(
                 on_click=handle_register_apartament_by_landlord,
             )
         ),
+        Start(Const("◀️ Назад"), id="back", state=MainAdminSG.start, mode=StartMode.RESET_STACK),
         getter=getter_landlords,
         state=RegisterApartmentLandlordSG.landlord,
     ),

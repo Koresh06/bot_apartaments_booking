@@ -660,7 +660,7 @@ booking_information_landlord = Dialog(
             {% for month, bookings in months.items() %}
             <b>{{ month }}:</b>
             {% for booking in bookings %}
-                    {{ "-" * 50 }}                
+                    {{ "-" * 50 }}            
                 📍 <b>Адрес:</b> {{ booking.apartment }}
                 🗓️ <b>Даты:</b> {{ booking.start_date }} - {{ booking.end_date }}
                 {{ booking.is_confirmed }}

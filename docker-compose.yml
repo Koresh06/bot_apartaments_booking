@@ -6,10 +6,8 @@ services:
     restart: "no"
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: rental_bot
+    env_file:
+      - .env
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
@@ -19,6 +17,23 @@ services:
       - "01-simple-alchemy-postgres:/var/lib/postgresql/data"
     command: [ "sh", "-c", "apk add --no-cache musl-locales musl-locales-lang && docker-entrypoint.sh postgres" ]
 
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
+      REDIS_URL: redis://${REDIS_HOST}:${REDIS_PORT}
+      PYTHONPATH: /src 
+    volumes:
+      - .:/src
+    command: ["python", "-m", "src.main_bot"] 
+
   web:
     build:
       context: .
@@ -26,11 +41,15 @@ services:
     restart: always
     depends_on:
       - postgres
-    environment:
-      DATABASE_URL: postgres://postgres:12345@postgres:5432/rental_bot
     env_file:
       - .env
-
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
+      REDIS_URL: redis://${REDIS_HOST}:${REDIS_PORT}
+      PYTHONPATH: /src  
+    volumes:
+      - .:/src
+    command: ["python", "-m", "src.main_fastapi"]  
 
   nginx:
     image: nginx:latest
@@ -41,22 +60,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - web
-
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: [ "poetry", "run", "alembic", "upgrade", "head" ]
-    env_file:
-      - .env
-    depends_on:
-      - postgres
-    environment:
-      DATABASE_URL: postgres://postgres:12345@postgres:5432/rental_bot
-    volumes:
-      - .:/src
+      - bot
 
 volumes:
   01-simple-alchemy-postgres:
-
-

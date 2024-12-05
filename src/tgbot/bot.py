@@ -13,7 +13,6 @@ async def start_bot():
     commands = [
         BotCommand(command="/start", description="Старт бота"),
         BotCommand(command="/landlord", description="Я арендодатель"),
-        # Добавьте другие команды по необходимости
     ]
     await bot.set_my_commands(commands)
 

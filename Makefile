@@ -1,16 +1,21 @@
 # Переменные
 PYTHON_CMD = python
-FASTAPI_APP = src.run_fastapi:app
-MAIN_MODULE = src.__main__
+MAIN_BOT_MODULE = src.main_bot
+MAIN_FASTAPI_MODULE = src.main_fastapi
+CREATE_SUPERUSER_SCRIPT = scripts.create_superuser
 
 # Запуск FastAPI
 start_fastapi:
-	$(PYTHON_CMD) -m uvicorn $(FASTAPI_APP) --reload
+	$(PYTHON_CMD) -m $(MAIN_FASTAPI_MODULE)
 
-# Запуск бота и FastAPI из __main__.py
+# Запуск бота
 start_bot:
-	$(PYTHON_CMD) -m $(MAIN_MODULE)
+	$(PYTHON_CMD) -m $(MAIN_BOT_MODULE)
 
-# Запуск обоих приложений (через __main__.py)
+# Запуск обоих приложений (бот и FastAPI)
 start_all:
-	$(MAKE) start_bot
+	$(MAKE) start_bot & $(MAKE) start_fastapi
+
+# Создание суперпользователя
+create-superuser:
+	$(PYTHON_CMD) -m $(CREATE_SUPERUSER_SCRIPT)

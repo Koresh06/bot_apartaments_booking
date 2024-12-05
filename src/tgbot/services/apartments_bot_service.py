@@ -354,9 +354,9 @@ class BotApartmentRepo(BaseRepo):
         # Получение всех бронирований для арендодателя
         bookings_stmt = (
             select(Booking)
-            .join(Apartment, Apartment.id == Booking.apartment_id)  # Условие соединения с Apartment
+            .join(Apartment, Apartment.id == Booking.apartment_id)
             .where(Apartment.landlord_id == landlord.id)
-            .options(joinedload(Booking.apartment_rel).joinedload(Apartment.city_rel))  # Подгружаем связанные объекты
+            .options(joinedload(Booking.apartment_rel).joinedload(Apartment.city_rel))  
         )
         bookings = await self.session.execute(bookings_stmt)
         booking_list = bookings.scalars().all()

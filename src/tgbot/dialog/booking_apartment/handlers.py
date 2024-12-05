@@ -1,4 +1,4 @@
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from functools import partial
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from aiogram.types import CallbackQuery, User, Chat
@@ -190,7 +190,7 @@ async def yes_confirm_booking(
         )
 
         # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)
-        start_time = datetime.date(booking.start_date)
+        start_time = datetime.date(booking.start_date, time(0, 0))
         # start_time = datetime.now() + timedelta(seconds=15) # Тестовое время начала бронирования
         func_apartment = partial(
             repo.apartment_bookings.installation_false_is_available_apartment,
@@ -198,8 +198,8 @@ async def yes_confirm_booking(
         )
         scheduler.add_job(func=func_apartment, trigger="date", run_date=start_time)
 
-        # Устанавливаем время завершения бронирования end_date (дата окончания бронирования) - 12:00 (по Бишкекскому времени) + зменение статуса на завершонную бронь
-        end_time = datetime.combine(booking.end_date, time(9, 0))
+        # Устанавливаем время завершения бронирования end_date (дата окончания бронирования) + зменение статуса на завершенную бронь
+        end_time = datetime.combine(booking.end_date, time(14, 0))
         # end_time = datetime.now() + timedelta(seconds=30) # Тестовое время окончания бронирования
         func_booking = partial(
             repo.apartment_bookings.update_is_completed_booking, booking.id

@@ -51,4 +51,6 @@ build-backend = "poetry.core.masonry.api"
 pythonpath = [".", "src",]
 asyncio_mode = "auto"
 
+[tool.poetry.scripts]
+start-bot = "src.__main__:main"
 

@@ -112,7 +112,7 @@ class ApartmentBookingRepo(BaseRepo):
                 self.session.add(booking)
                 await self.session.commit()
                 
-                logging.info("Статус бронирования обновлены успешно.")
+                logging.info("Статус бронирования обновлены успешно и завершен.")
             else:
                 logging.warning(f"Бронирование с ID {booking_id} не найдено.")
 
