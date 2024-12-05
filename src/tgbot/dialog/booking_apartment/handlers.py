@@ -190,7 +190,7 @@ async def yes_confirm_booking(
         )
 
         # Устанавливаем время начало бронирования + сокрытие апартамента из каталога. start_date (дата начала бронирования)
-        start_time = datetime.date(booking.start_date, time(0, 0))
+        start_time = datetime.combine(booking.start_date, time(0, 0))
         # start_time = datetime.now() + timedelta(seconds=15) # Тестовое время начала бронирования
         func_apartment = partial(
             repo.apartment_bookings.installation_false_is_available_apartment,
