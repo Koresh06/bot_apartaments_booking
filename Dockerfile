@@ -1,21 +1,20 @@
-# Используем образ Python 3.11
-FROM python:3.11-slim
+FROM python:3.11-buster
 
-# Устанавливаем рабочую директорию
-WORKDIR /src
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Копируем файлы проекта, необходимые для установки зависимостей
-COPY pyproject.toml poetry.lock /src/
+WORKDIR /code
 
-# Устанавливаем Poetry
-RUN pip install --upgrade pip
-RUN pip install poetry
+RUN apt-get update && apt-get install -y python3-dev
 
-# Устанавливаем зависимости без создания виртуальной среды
-RUN poetry config virtualenvs.create false && poetry install --no-dev
+RUN pip install --upgrade pip && \
+    pip install poetry
 
-# Копируем остальной код проекта в контейнер
-COPY . /src
+COPY pyproject.toml poetry.lock /code/
 
-# Открываем порт 8000 для входа в контейнер
-EXPOSE 8000
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-root --no-interaction --no-ansi
+
+EXPOSE 8050
+
+COPY . /code/

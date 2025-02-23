@@ -2,20 +2,23 @@ version: '3.11'
 
 services:
   postgres:
-    image: postgres:15-alpine
-    restart: "no"
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     env_file:
       - .env
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
     volumes:
-      - "01-simple-alchemy-postgres:/var/lib/postgresql/data"
-    command: [ "sh", "-c", "apk add --no-cache musl-locales musl-locales-lang && docker-entrypoint.sh postgres" ]
+      - postgres_data:/var/lib/postgresql/data
 
   bot:
     build:
@@ -28,10 +31,8 @@ services:
       - .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
-      REDIS_URL: redis://${REDIS_HOST}:${REDIS_PORT}
-      PYTHONPATH: /src 
     volumes:
-      - .:/src
+      - .:/code
     command: ["python", "-m", "src.main_bot"] 
 
   web:
@@ -45,11 +46,9 @@ services:
       - .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB}
-      REDIS_URL: redis://${REDIS_HOST}:${REDIS_PORT}
-      PYTHONPATH: /src  
     volumes:
-      - .:/src
-    command: ["python", "-m", "src.main_fastapi"]  
+      - .:/code
+    command: sh -c "alembic upgrade head && uvicorn --factory src.run_fastapi:create_app --host ${API_HOST} --port ${API_PORT} --proxy-headers"
 
   nginx:
     image: nginx:latest
@@ -63,4 +62,4 @@ services:
       - bot
 
 volumes:
-  01-simple-alchemy-postgres:
+  postgres_data:
