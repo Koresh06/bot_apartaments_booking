@@ -74,6 +74,7 @@ class TgBot:
     """
 
     token: str
+    admin_id: int
 
     @staticmethod
     def from_env(env: Env):
@@ -81,8 +82,10 @@ class TgBot:
         Creates the TgBot object from environment variables.
         """
         token = env.str("BOT_TOKEN")
+        admin_id = env.int("ADMIN_ID")
         return TgBot(
             token=token,
+            admin_id=admin_id
         )
 
 

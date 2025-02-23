@@ -21,7 +21,7 @@ router = APIRouter(
 )
 
 
-@router.get("/get-apartments", response_class=JSONResponse)
+@router.get("/get-apartments/", response_class=HTMLResponse)
 async def get_apartments(
     request: Request,
     session: Annotated[AsyncSession, Depends(get_db)],

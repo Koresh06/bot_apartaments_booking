@@ -40,7 +40,7 @@ main_admin_dialog = Dialog(
         Const("🛠️ Администратор"),
         Start(Const("🌆 Добавить город"), id="add_city", state=RegisterNameCitysSG.start, show_mode=StartMode.RESET_STACK),
         Start(Const("🏙️ Добавить апартамент"), id="add_apartment_landlord", state=RegisterApartmentLandlordSG.landlord, show_mode=StartMode.RESET_STACK),
-        Url(Const("🔗 Панель администратора"), url=Const(config.api.web_url)),
+        # Url(Const("🔗 Панель администратора"), url=Const(config.api.web_url)),
         state=MainAdminSG.start,
     )
 )

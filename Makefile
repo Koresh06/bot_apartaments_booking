@@ -5,7 +5,7 @@ MAIN_FASTAPI_MODULE = src.main_fastapi
 CREATE_SUPERUSER_SCRIPT = scripts.create_superuser
 
 # Запуск FastAPI
-start_fastapi:
+start_web:
 	$(PYTHON_CMD) -m $(MAIN_FASTAPI_MODULE)
 
 # Запуск бота

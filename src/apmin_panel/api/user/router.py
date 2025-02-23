@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 
 from src.apmin_panel.api.auth.permissions import get_current_user
 from src.apmin_panel.api.auth.service import AuthApiRepo
@@ -12,6 +12,7 @@ from src.apmin_panel.conf_static import templates
 from src.core.db_helper import get_db
 from .service import UsersApiRepo
 from .schemas import CreateAdminSchema
+from .newsletters import send_newsletter_notification
 
 
 router = APIRouter(
@@ -31,7 +32,7 @@ async def get_users(
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
-    
+
     users = await UsersApiRepo(session).get_paginated_users(page, size)
 
     total_users = await UsersApiRepo(session).count_all_users()
@@ -61,14 +62,14 @@ async def get_users(
 
 @router.get("/get-user-detail/{user_id}", response_class=HTMLResponse)
 async def get_user_detail(
-    user_id: int,    
+    user_id: int,
     request: Request,
     session: Annotated[AsyncSession, Depends(get_db)],
     user: Users = Depends(get_current_user),
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
-    
+
     user_by_id = await UsersApiRepo(session).get_user_by_id(user_id)
 
     if isinstance(user_by_id, str):
@@ -100,17 +101,17 @@ async def show_create_admin_form(
 ):
     if not user.is_superuser:
         return RedirectResponse("/auth/", status_code=303)
-    
+
     not_landlords = await UsersApiRepo(session).get_users_not_admin()
 
     if isinstance(not_landlords, str):
         return templates.TemplateResponse(
-            request=request,    
+            request=request,
             name="users/create-admin.html",
             context={
                 "message": not_landlords,
                 "user": user,
-            }
+            },
         )
 
     return templates.TemplateResponse(
@@ -119,10 +120,9 @@ async def show_create_admin_form(
         context={
             "users": not_landlords,
             "user": user,
-            "message": message, 
-        }
+            "message": message,
+        },
     )
-
 
 
 @router.post("/submit-create-admin")
@@ -133,13 +133,17 @@ async def submit_create_admin(
 ):
     if not user.is_superuser:
         return RedirectResponse("/auth/", status_code=303)
-    
+
     admin = await AuthApiRepo(session).create_admin(schema=schemas)
 
     if not admin:
-        return RedirectResponse("/users/create-admin?message=Не удалось создать админа.", status_code=303)
+        return RedirectResponse(
+            "/users/create-admin?message=Не удалось создать админа.", status_code=303
+        )
 
-    return RedirectResponse("/users/create-admin?message=Админ успешно добавлен!", status_code=303)
+    return RedirectResponse(
+        "/users/create-admin?message=Админ успешно добавлен!", status_code=303
+    )
 
 
 @router.post("/{user_id}/banned")
@@ -151,9 +155,9 @@ async def banned_user(
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
-    
+
     banned = await UsersApiRepo(session).banned_user_by_id(user_id)
-    user_by_id = await UsersApiRepo(session).get_user_by_id(user_id)    
+    user_by_id = await UsersApiRepo(session).get_user_by_id(user_id)
 
     if isinstance(user_by_id, str):
         return templates.TemplateResponse(
@@ -166,7 +170,7 @@ async def banned_user(
         )
 
     return templates.TemplateResponse(
-        request=request, 
+        request=request,
         name="users/get-user-detail.html",
         context={
             "by_user": user_by_id,
@@ -184,9 +188,9 @@ async def unbanned_user(
 ):
     if not user:
         return RedirectResponse("/auth/", status_code=303)
-    
+
     await UsersApiRepo(session).unbanned_user_by_id(user_id)
-    user_by_id = await UsersApiRepo(session).get_user_by_id(user_id)    
+    user_by_id = await UsersApiRepo(session).get_user_by_id(user_id)
 
     if isinstance(user_by_id, str):
         return templates.TemplateResponse(
@@ -205,4 +209,52 @@ async def unbanned_user(
             "by_user": user_by_id,
             "user": user,
         },
+    )
+
+
+@router.get(
+    "/newsletter",
+    response_class=HTMLResponse,
+    name="newsletter",
+    dependencies=[Depends(get_current_user)],
+)
+async def newsletters(
+    request: Request,
+    user: Users = Depends(get_current_user),
+):
+    if not user:
+        return RedirectResponse("/auth/", status_code=303)
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="users/newsletter.html",
+        context={"user": user},
+    )
+
+@router.post(
+    "/send-newsletter",
+    response_class=HTMLResponse,
+    name="newsletters",
+    dependencies=[Depends(get_current_user)],
+)
+async def newsletters(
+    request: Request,
+    session: Annotated[AsyncSession, Depends(get_db)],
+    user: Users = Depends(get_current_user),
+    message: str = Form(...),
+):
+    if not user:
+        return RedirectResponse("/auth/", status_code=303)
+    
+    try:
+        tg_ids = await UsersApiRepo(session).get_users_tg_id()
+    except Exception as exx:
+        print(exx)
+
+    await send_newsletter_notification(tg_ids, message)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="users/newsletter.html",
+        context={"user": user},
     )

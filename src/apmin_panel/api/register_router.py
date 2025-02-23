@@ -5,7 +5,7 @@ from .user.router import router as user_router
 from .booking.router import router as bookings_router
 from .landlord.router import router as landlords_router
 from .statistic.router import router as statistics_router
-from .booking.router import router as apartment_router
+from .apartment.router import router as apartment_router
 
 
 def register_routers(app: FastAPI) -> None:

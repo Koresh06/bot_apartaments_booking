@@ -1,4 +1,5 @@
-from sqlalchemy import and_, func, select
+from typing import List
+from sqlalchemy import and_, desc, func, select
 from sqlalchemy.orm import selectinload
 from src.core.models import Landlords, Users, Apartment
 
@@ -78,3 +79,8 @@ class UsersApiRepo(BaseRepo):
         await self.session.commit()
         await self.session.refresh(user)
         return user
+    
+    async def get_users_tg_id(self) -> List[Users]:
+        stmt = select(Users.tg_id).order_by(desc(Users.id))
+        result = await self.session.scalars(stmt)
+        return result
